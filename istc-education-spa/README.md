@@ -1,4 +1,22 @@
+# ISTC Education SPA
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Technologies Used
+- [daisyUI](https://daisyui.com/)
+
+## Helpful Documents
+
+### Tutorials
+- [Passwordless Authentication with Next.js, Prisma, and next-auth](https://dev.to/prisma/passwordless-authentication-with-next-js-prisma-and-next-auth-5g8g)
+
+### Documentation
+
+
+### GitHubs
+[Next.js Azure B2c NextAuth.js](https://github.com/BenjaminWFox/nextjs-azureb2c-nextauth/)
+
+
+
 
 ## Getting Started
 
