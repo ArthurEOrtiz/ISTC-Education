@@ -1,6 +1,6 @@
 const Home:React.FC = () => {
   return (
-    <div>
+    <div className="w-full flex justify-center items-center">
       <p>Welcome to the ISTC Education website</p>
     </div>
   );
