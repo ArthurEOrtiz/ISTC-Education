@@ -1,4 +1,29 @@
+# ISTC Education SPA
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## Technologies Used
+- [daisyUI](https://daisyui.com/)
+- [NextAuth.Js](https://next-auth.js.org/)
+
+## Helpful Documents
+
+### Tutorials
+- [Passwordless Authentication with Next.js, Prisma, and next-auth](https://dev.to/prisma/passwordless-authentication-with-next-js-prisma-and-next-auth-5g8g)
+
+- [Register a web application in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tutorial-register-applications)
+
+- [Create user flows and custom policies in Azure Active Directory B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/tutorial-create-user-flows?pivots=b2c-custom-policy)
+
+- [Configure authentication in a sample single-page application by using Azure AD B2C](https://learn.microsoft.com/en-us/azure/active-directory-b2c/configure-authentication-sample-spa-app?tabs=app-reg-ga)
+
+### Documentation
+
+
+### GitHubs
+[Next.js Azure B2c NextAuth.js](https://github.com/BenjaminWFox/nextjs-azureb2c-nextauth/)
+
+
+
 
 ## Getting Started
 
