@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { agent } from './agent';
+import { agent } from './httpConfig';
 
 export const getWeather = async () => {
     const response = await fetch('https://localhost:7180/WeatherForecast', {agent});

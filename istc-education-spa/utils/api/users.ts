@@ -1,8 +1,9 @@
-import { agent } from "./agent";
+import { User } from "@/types/user";
+import { agent, headers, rootUrl } from "./httpConfig";
 import fetch from 'node-fetch'
 
 export const getUserIndex = async () => {
-    const response = await fetch('https://localhost:7180/api/user', {
+    const response = await fetch(`${rootUrl}/user`, {
         method: 'GET',
         agent
     });
@@ -16,9 +17,10 @@ export const getUserIndex = async () => {
     return data;
 }
 
-export const getUser = async (id: string) => {
-    const response = await fetch(`https://localhost:7180/api/user/${id}`, {
+export const getUser = async (id: number) => {
+    const response = await fetch(`${rootUrl}/user/${id}`, {
         method: 'GET',
+        headers,
         agent
     });
 
@@ -31,18 +33,49 @@ export const getUser = async (id: string) => {
     return data;
 }
 
-export const createUser = async (user: any) => {
-    const response = await fetch('https://localhost:7180/api/user', {
+export const createUser = async (user: User) => {
+    const response = await fetch(`${rootUrl}/user/${user.userId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify(user),
         agent
     });
 
     if (!response.ok) {
         throw new Error('Failed to create user');
+    }
+
+    const data = await response.json();
+
+    return data;
+}
+
+export const updateUser = async (user: User) => {
+    const response = await fetch(`${rootUrl}/user/${user.userId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(user),
+        agent
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update user');
+    }
+
+    const data = await response.json();
+
+    return data;
+}
+
+export const deleteUser = async (id: number) => {
+    const response = await fetch(`${rootUrl}/user/${id}`, {
+        method: 'DELETE',
+        headers,
+        agent
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete user');
     }
 
     const data = await response.json();
