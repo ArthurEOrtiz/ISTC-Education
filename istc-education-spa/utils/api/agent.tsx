@@ -1,6 +1,6 @@
-import fs from 'fs';
+// import fs from 'fs';
+// import path from "path";
 import https from 'https';
-import path from "path";
 
 export const agent = new https.Agent({
     //ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'istceducation.pfx')),
