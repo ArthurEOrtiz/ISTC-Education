@@ -1,12 +1,12 @@
 interface Location {
     locationId: number;
     courseId: number;
-    description?: string;
-    room?: string;
-    remoteLink?: string;
-    addressLine1?: string;
-    addressLine2?: string;
-    city?: string;
-    state?: string;
-    postalCode?: string;
+    description: string | null;
+    room: string | null;
+    remoteLink: string | null;
+    addressLine1: string | null;
+    addressLine2: string | null;
+    city: string | null;
+    state: string | null;
+    postalCode: string | null;
 }

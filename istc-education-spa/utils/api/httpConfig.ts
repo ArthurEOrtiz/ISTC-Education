@@ -1,13 +1,19 @@
+import axios from 'axios';
 import https from 'https';
 
-export const agent = new https.Agent({
+const httpsAgent = new https.Agent({
     //ca: fs.readFileSync(path.join(process.cwd(), 'certs', 'istceducation.pfx')),
     rejectUnauthorized: false // This is not recommended for production, but this will accept self-signed certificates.
 }); 
 
-export const headers = {
+const headers = {
     'Content-Type': 'application/json'
 };
 
-export const rootUrl = 'https://localhost:7180/';
+const baseURL = 'https://localhost:7180/';
 
+export const axiosInstance = axios.create({
+    baseURL,
+    headers,
+    httpsAgent
+});

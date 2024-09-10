@@ -3,9 +3,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Technologies Used
 - [daisyUI](https://daisyui.com/)
-- [NextAuth.Js](https://next-auth.js.org/)
+- [Clerk](https://clerk.com/)
+- [axios](https://www.npmjs.com/package/axios)
+- [react-phone-number-input](https://www.npmjs.com/package/react-phone-number-input)
 
 ## Helpful Documents
+- [Clerk - Organizations, Roles, and Permissions](https://clerk.com/docs/organizations/overview)
 
 ### Tutorials
 - [Passwordless Authentication with Next.js, Prisma, and next-auth](https://dev.to/prisma/passwordless-authentication-with-next-js-prisma-and-next-auth-5g8g)

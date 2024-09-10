@@ -8,15 +8,10 @@ namespace istc_education_api.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class UserController : ControllerBase
+	public class UserController : BaseController<UserController>
 	{
-		private readonly DataContext _context;
-		private readonly ILogger<UserController> _logger;
-
-		public UserController(DataContext context, ILogger<UserController> logger)
+		public UserController(DataContext context, ILogger<UserController> logger) : base(context, logger)
 		{
-			_context = context;
-			_logger = logger;
 		}
 
 		[HttpGet]
@@ -25,11 +20,7 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var users = await _context.Users
-					.Include(u => u.Contact)
-					.Include(u => u.Employer)
-					.Include(u => u.Student)
-					.ToListAsync();
+				var users = await GetUserQuery().ToListAsync();
 				return Ok(users);
 			}
 			catch (Exception ex)
@@ -45,11 +36,7 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var user = await _context.Users
-					.Include(u => u.Contact)
-					.Include(u => u.Employer)
-					.Include(u => u.Student)
-					.FirstOrDefaultAsync(u => u.UserId == id);
+				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.UserId == id);
 				if (user == null)
 				{
 					return NotFound();
@@ -61,6 +48,56 @@ namespace istc_education_api.Controllers
 			{
 				_logger.LogError(ex, "Error getting user");
 				return BadRequest();
+			}
+		}
+
+		[HttpGet("IPId/{IPId}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		public async Task<IActionResult> GetUserByIdentityProviderId(string IPId)
+		{
+			try
+			{
+				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.IPId == IPId);
+
+				if (user == null)
+				{
+					return NotFound("User not found");
+				}
+
+				return Ok(user);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting user");
+				return BadRequest("Error getting user");
+			}
+		}
+
+		[HttpGet("Email/{email}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		public async Task<IActionResult> GetUserByEmail(string email)
+		{
+			try
+			{
+				var contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Email == email);
+
+				if (contact == null) {
+					return NotFound("Contact not found");
+				}
+
+				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.UserId == contact.UserId);
+
+				if (user == null)
+				{
+					return NotFound("User not found");
+				}
+
+				return Ok(user);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting user");
+				return BadRequest("Error getting user");
 			}
 		}
 
@@ -84,7 +121,6 @@ namespace istc_education_api.Controllers
 				_logger.LogError(ex, "Error creating user");
 				return BadRequest("Error creating user");
 			}
-
 		}
 
 		[HttpPut("{id}")]
@@ -163,6 +199,14 @@ namespace istc_education_api.Controllers
 				_logger.LogError(ex, "Error deleting user");
 				return BadRequest("Error deleting user");
 			}
+		}
+
+		private IQueryable<User> GetUserQuery()
+		{
+			return _context.Users
+				.Include(u => u.Contact)
+				.Include(u => u.Employer)
+				.Include(u => u.Student);
 		}
 
 		private bool UserExists(int id)

@@ -1,14 +1,14 @@
 export interface User {
     userId: number;
-    ipId?: string;
+    ipId: string | null;
     status: 'Active' | 'Archived';
     firstName: string;
     lastName: string;
-    middleName?: string;
+    middleName: string | null;
     isAdmin: boolean;
     isStudent: boolean;
-    contact?: Contact;
-    employer?: Employer;
-    student?: Student;
+    contact: Contact | null;
+    employer: Employer | null;
+    student: Student | null;
 }
 

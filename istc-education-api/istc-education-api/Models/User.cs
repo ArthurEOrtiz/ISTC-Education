@@ -16,7 +16,7 @@ namespace istc_education_api.Models
 
 		[Required]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "First name must be between 3 and 50 characters")]
-		public string FristName { get; set; } = string.Empty;
+		public string FirstName { get; set; } = string.Empty;
 
 		[Required]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Last name must be between 3 and 50 characters")]	

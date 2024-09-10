@@ -3,7 +3,7 @@ interface Certification {
     studentId: number;
     certificationType: 'Appraiser' | 'Mapping';
     requestedDate: Date;
-    reviewDate?: Date;
+    reviewDate: Date | null;
     isApproved: boolean;
-    approvedBy?: number;
+    approvedBy: number | null;
 }

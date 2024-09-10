@@ -2,7 +2,7 @@ interface Course {
     courseId: number;
     status: 'UpComing' | 'InProgress' | 'Archived';
     title: string;
-    description?: string;
+    description: string | null;
     attendanceCredit: number;
     maxAttendance: number;
     enrollmentDeadline: Date;
@@ -10,10 +10,10 @@ interface Course {
     instructorEmail: string;
     hasExam: boolean;
     hasPDF: boolean;
-    location?: Location;
-    pdf?: PDF;
-    topics?: Topic[];
-    exams?: Exam[];
-    classes?: Class[];
-    waitList?: WaitList[];
+    location: Location | null;
+    pdf: PDF | null;
+    topics: Topic[] | null;
+    exams: Exam[] | null;
+    classes: Class[] | null;
+    waitList: WaitList[] | null;
 }

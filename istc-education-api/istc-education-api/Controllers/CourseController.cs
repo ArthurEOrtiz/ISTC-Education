@@ -8,15 +8,10 @@ namespace istc_education_api.Controllers
 {
 	[ApiController]
 	[Route("[controller]")]
-	public class CourseController : ControllerBase
+	public class CourseController : BaseController<Course>
 	{
-		private readonly DataContext _context;
-		private readonly ILogger<UserController> _logger;
-
-		public CourseController(DataContext context, ILogger<UserController> logger)
+		public CourseController(DataContext context, ILogger<Course> logger) : base(context, logger)
 		{
-			_context = context;
-			_logger = logger;
 		}
 
 		[HttpGet]

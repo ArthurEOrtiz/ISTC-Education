@@ -1,19 +1,21 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 const isPublicRoute = createRouteMatcher([
-    '/api/weather',
     '/',
     '/sign-in(.*)',
     '/sign-up(.*)',
 ])
 
+const isProtectedRoute = createRouteMatcher(['/user(.*)'])
+
 export default clerkMiddleware(
     (auth, request) => {
-        if(!isPublicRoute(request)){
-            auth().protect()
-        }
+        if(isProtectedRoute(request)) auth().protect()
     },
-    { debug: true }
+    {
+      clockSkewInMs: 15000, 
+      debug: false, 
+    }
 )
 
 export const config = {
