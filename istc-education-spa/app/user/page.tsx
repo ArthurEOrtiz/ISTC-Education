@@ -13,7 +13,7 @@ const UserPage:React.FC = async () => {
     }
 
     const IPId: string = clerkUser.id;
-    console.log("IPID:", IPId);
+    
     const serverUser: User | null = await getUserByIPId(IPId);
 
     if (serverUser === null) {
