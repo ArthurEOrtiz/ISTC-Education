@@ -10,14 +10,14 @@ namespace istc_education_api.Models
 		public int CourseId { get; set; }
 
 		[RegularExpression("UpComing|InProgress|Archived", 
-			ErrorMessage = "Status must be 'UpComing''InProgress' or 'Archived'")]
+			ErrorMessage = "Status must be 'UpComing''InProgress' or 'Archived'.")]
 		public string Status { get; set; } = "UpComing";
 
-		[Required]
-		[StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters")]
+		[Required(ErrorMessage = "Title is required.")]
+		[StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters.")]
 		public string Title { get; set; } = string.Empty;
 
-		[StringLength(500, ErrorMessage = "Description must be between 0 and 500 characters")]
+		[StringLength(500, ErrorMessage = "Description must be between 0 and 500 characters.")]
 		public string? Description { get; set; }
 
 		public int AttendanceCredit { get; set; }
@@ -26,8 +26,8 @@ namespace istc_education_api.Models
 
 		public DateTime EnrollmentDeadline { get; set; }
 
-		[Required]
-		[StringLength(50, MinimumLength = 3, ErrorMessage = "Instructor name must be between 3 and 50 characters")]
+		[Required(ErrorMessage = "Instructor Name is required.")]
+		[StringLength(50, MinimumLength = 3, ErrorMessage = "Instructor name must be between 3 and 50 characters.")]
 		public string InstructorName { get; set; } = string.Empty;
 
 		[EmailAddress]

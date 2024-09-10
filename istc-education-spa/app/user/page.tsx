@@ -1,32 +1,24 @@
 import NewUserRegistration from "@/components/users/new-user-registration";
 import { User } from "@/types/user";
-import { getUserByIpId } from "@/utils/api/users";
+import { getUserByIPId } from "@/utils/api/users";
 import { currentUser, User as ClerkUser } from "@clerk/nextjs/server";
-import axios from "axios";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const UserPage:React.FC = async () => {
-    const clerkUser: ClerkUser | null = await currentUser()
-        .catch((error) => { throw error });   
+    const clerkUser: ClerkUser | null = await currentUser();
 
     if (!clerkUser) {
         return notFound(); 
     }
 
-    const ipId: string | undefined = clerkUser.id;
+    const IPId: string = clerkUser.id;
+    console.log("IPID:", IPId);
+    const serverUser: User | null = await getUserByIPId(IPId);
 
-    const serverUser: User | null = ipId ? await getUserByIpId(ipId).catch((error) => {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
-            return null;
-        }
-        throw error;
-    }) : null;
-
-    if (serverUser === null && ipId) {
-        return <NewUserRegistration IPId={ipId} />;
+    if (serverUser === null) {
+        return <NewUserRegistration IPId={IPId} />;
     }
-
 
     const { contact, employer } = serverUser || {};
 

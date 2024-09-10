@@ -6,30 +6,28 @@ import UserInfo from "./user-info";
 import { postUser } from "@/utils/api/users";
 import ModalBase from "../modal/modal-base";
 import { useRouter } from "next/navigation";
+import ErrorBody from "../modal/error-body";
 
 interface NewUserRegistrationProps {
     IPId: string;
 }
 
 const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [step, setStep] = useState<number>(1);
-    const [error, setError] = useState<string | null>(null);
+    const [ user, setUser ] = useState<User | null>(null);
+    const [ step, setStep ] = useState<number>(1);
+    const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
     const router = useRouter();
 
     const registerUser = async () => {
         if (user) {
             try {
                 const response = await postUser(user);
-                console.log(response);
                 if (response.success) {
-                    console.log("User registered successfully");
                     router.refresh();
                 } else {
                     setError(response.error ?? "An unknown error occurred");
                 }
             } catch (error) {
-                console.error(error);
                 setError("An error occurred while registering the user");
             }
         }
@@ -93,13 +91,13 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
                     )}
                 </div>
             </div>
-            {error && (
+            {errors && (
                 <ModalBase
                     title="Error"
-                    isOpen={error !== null}
+                    isOpen={errors !== null}
                     onClose={() => setError(null)}
                 >
-                    <p>{error}</p>
+                    <ErrorBody errors={errors} />
                 </ModalBase>
             )}
         </>

@@ -12,12 +12,12 @@ namespace istc_education_api.Models
 		[ForeignKey("User")]
 		public int UserId { get; set; }
 
-		[Required]
-		[StringLength(50, MinimumLength = 3)]
+		[Required(ErrorMessage = "Employer is required.")]
+		[StringLength(50, MinimumLength = 3, ErrorMessage = "Employer must be between 3 and 50 characters.")]
 		public string EmployerName { get; set; } = string.Empty;
 
-		[Required]
-		[StringLength(50, MinimumLength = 3)]
+		[Required(ErrorMessage = "Job Title is required.")]
+		[StringLength(50, MinimumLength = 3, ErrorMessage = "Job Title must be between 3 and 50 characters long.")]
 		public string JobTitle { get; set; } = string.Empty;
 	}
 }

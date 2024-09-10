@@ -2,7 +2,6 @@
 import { User } from "@/types/user";
 import { getUserByEmail } from "@/utils/api/users";
 import { idahoCounties, states } from "@/utils/constants";
-import axios from "axios";
 import { ChangeEvent, useEffect, useState } from "react";
 import PhoneInput from "react-phone-number-input/input";
 
@@ -91,6 +90,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         if (otherEmployer !== null && submittingUser.employer) {
             submittingUser.employer.employerName = otherEmployer;
         }
+
         onSubmit(submittingUser);
         e.preventDefault();
     }
@@ -109,7 +109,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         ...prev,
                         contact: {
                             ...prev.contact,
-                            [contactField]: value,
+                            [contactField]: value === '' ? null : value,
                         },
                     };
                 });
@@ -120,7 +120,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                     setOtherEmployer(value);
                     break;
                 }
-
                 setUser(prev => {
                     if (!prev.employer) {
                         throw new Error('Employer object is missing from user object');
@@ -129,7 +128,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         ...prev,
                         employer: {
                             ...prev.employer,
-                            [employerField]: value,
+                            [employerField]: value
                         },
                     };
                 });
@@ -152,10 +151,59 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             default:
                 setUser(prev => ({
                     ...prev,
-                    [id]: value,
+                    [id]: value === '' ? null : value,  
                 }));
         }
 
+    }
+
+    const handleValidation = async (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const formErrors: { [key: string]: string} = {};
+        const { id, value } = e.target;
+
+        switch(id) {
+            case 'firstName':
+                formErrors[id] = validateLength(value, 3, 50) ? '' : 'First name must be between 3 and 50 characters';
+                break;
+            case 'lastName':
+                formErrors[id] = validateLength(value, 3, 50) ? '' : 'Last name must be between 3 and 50 characters';
+                break;
+            case 'middleName':
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Middle name must be between 3 and 50 characters';
+                break;
+            case 'contact.email':
+                formErrors[id] =  await validateEmail(value);
+                break;
+            case 'contact.phone':
+                formErrors[id] = validatePhone(value);
+                break;
+            case 'contact.addressLine1':
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Address must be between 3 and 50 characters';
+                break;
+            case 'contact.addressLine2':
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Address must be between 3 and 50 characters';
+                break;
+            case 'contact.city':
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'City must be between 3 and 50 characters';
+                break;
+            case 'contact.postalCode':
+                formErrors[id] = validateZip(value);
+                break;
+            case 'employer.employerName':
+                formErrors[id] = value !== 'initial' ? '' : 'Employer name is required';
+                break;
+            case 'employer.jobTitle':
+                formErrors[id] = validateLength(value, 3, 50) ? '' : 'Job title must be between 3 and 50 characters';
+                break;
+            case 'employer.otherEmployerName':
+                if (otherEmployer !== null) formErrors[id] = validateLength(value, 3, 50) ? '' : 'Employer name must be between 3 and 50 characters';
+                break;
+        }
+
+        setErrors(prev => ({
+            ...prev,
+            [id]: formErrors[id],
+        }));
     }
 
     const validateEmail =  async (email: string) => {
@@ -235,55 +283,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         return false;
     }
 
-    const validateForm = async (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const formErrors: { [key: string]: string} = {};
-        const { id, value } = e.target;
-
-        switch(id) {
-            case 'firstName':
-                formErrors[id] = validateLength(value, 3, 50) ? '' : 'First name must be between 3 and 50 characters';
-                break;
-            case 'lastName':
-                formErrors[id] = validateLength(value, 3, 50) ? '' : 'Last name must be between 3 and 50 characters';
-                break;
-            case 'middleName':
-                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Middle name must be between 3 and 50 characters';
-                break;
-            case 'contact.email':
-                formErrors[id] =  await validateEmail(value);
-                break;
-            case 'contact.phone':
-                formErrors[id] = validatePhone(value);
-                break;
-            case 'contact.addressLine1':
-                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Address must be between 3 and 50 characters';
-                break;
-            case 'contact.addressLine2':
-                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'Address must be between 3 and 50 characters';
-                break;
-            case 'contact.city':
-                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'City must be between 3 and 50 characters';
-                break;
-            case 'contact.postalCode':
-                formErrors[id] = validateZip(value);
-                break;
-            case 'employer.employerName':
-                formErrors[id] = value !== 'initial' ? '' : 'Employer name is required';
-                break;
-            case 'employer.jobTitle':
-                formErrors[id] = validateLength(value, 3, 50) ? '' : 'Job title must be between 3 and 50 characters';
-                break;
-            case 'employer.otherEmployerName':
-                if (otherEmployer !== null) formErrors[id] = validateLength(value, 3, 50) ? '' : 'Employer name must be between 3 and 50 characters';
-                break;
-        }
-
-        setErrors(prev => ({
-            ...prev,
-            [id]: formErrors[id],
-        }));
-    }
-
     return (
         <form onSubmit={handleOnSubmit} className="space-y-2">
             <div className="border border-error rounded-md p-1">
@@ -295,7 +294,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="John"
                         id="firstName"
                         defaultValue={user.firstName}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>
@@ -311,7 +310,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="Ray"
                         id="middleName"
                         defaultValue={user.middleName || ''}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>
@@ -326,7 +325,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="Doe"
                         id="lastName"
                         defaultValue={user.lastName}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>
@@ -343,7 +342,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                             placeholder="some@example.com" 
                             id="contact.email"
                             defaultValue={user?.contact?.email}
-                            onBlur={validateForm}
+                            onBlur={handleValidation}
                             onChange={handleChange}
                             />
                     </label>
@@ -366,7 +365,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                             id="contact.phone"
                             defaultCountry="US"
                             value={user.contact?.phone as string}
-                            onBlur={validateForm}   
+                            onBlur={handleValidation}   
                             onChange={(value) => {
                                 if (user.contact) {
                                     setUser({
@@ -392,7 +391,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="123 Main St" 
                         id="contact.addressLine1"
                         defaultValue={user.contact?.addressLine1 || ''}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>
@@ -407,7 +406,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="Apt 101" 
                         id="contact.addressLine2"
                         defaultValue={user.contact?.addressLine2 || ''}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>
@@ -447,7 +446,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                             placeholder="83702" 
                             id="contact.postalCode"
                             defaultValue={user.contact?.postalCode || ''}
-                            onBlur={validateForm}
+                            onBlur={handleValidation}
                             onChange={handleChange}
                             onInput={handleZipInput}
                             />
@@ -459,9 +458,13 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                 <select 
                     id="employer.employerName"
                     defaultValue={handleEmpoyerNameDefaultValue()}
-                    onBlur={validateForm}
+                    onBlur={(e) => {
+                        console.log("Employer Name onBlur", e.target.value);
+                        handleValidation(e)
+                    }}
                     onChange={(e) => {
                         const { value } = e.target;
+                        console.log("Employer Name onChange", value);
                         if (value === 'Other') {
                             setOtherEmployer('');
                         } else {
@@ -490,7 +493,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                             placeholder="Simplot" 
                             id="employer.otherEmployerName"
                             defaultValue={otherEmployer}
-                            onBlur={validateForm}
+                            onBlur={handleValidation}
                             onChange={handleChange}
                             />
                     </label>
@@ -507,7 +510,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         placeholder="Software Developer" 
                         id="employer.jobTitle"
                         defaultValue={user.employer?.jobTitle || ''}
-                        onBlur={validateForm}
+                        onBlur={handleValidation}
                         onChange={handleChange}
                         />
                 </label>

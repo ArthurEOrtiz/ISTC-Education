@@ -14,7 +14,7 @@ const ModalBase: React.FC<ModalBaseProps> = ({ title, children, isOpen, width = 
             <div className="fixed inset-0 flex justify-center items-center">
                 <div className={`bg-gray-500 border rounded-lg shadow-lg ${width} ${height}`}>
                     <div className="flex justify-between items-center p-4 border-b">
-                        <h2 className="text-white text-xl font-bold">{title}</h2>
+                        <h2 className="text-white text-3xl font-bold">{title}</h2>
                         <button 
                             onClick={onClose}
                             className="btn btn-error btn-circle text-white text-3xl font-extrabold pb-1"

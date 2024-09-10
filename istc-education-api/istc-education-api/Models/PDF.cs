@@ -12,12 +12,12 @@ namespace istc_education_api.Models
 		[ForeignKey("Course")]
 		public int CourseId { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "File Name is required.")]
 		[StringLength(100, MinimumLength = 5, ErrorMessage = "The file name must be between 5 and 100 characters long.")]
 		[FileExtensions(Extensions = "pdf", ErrorMessage = "The file must be a PDF.")]
 		public string FileName { get; set; } = string.Empty;
 
-		[Required]
+		[Required(ErrorMessage = "Data is required.")]
 		[MinLength(1, ErrorMessage = "The file must be at least 1 byte.")]
 		public byte[] Data { get; set; } = [];
 	}

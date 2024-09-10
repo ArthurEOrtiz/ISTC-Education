@@ -5,25 +5,31 @@ import { useState } from "react";
 import ModalBase from "../modal/modal-base";
 import { putUser } from "@/utils/api/users";
 import { useRouter } from "next/navigation";
-
+import ErrorBody from "../modal/error-body";
 
 interface EditUserProps {
     user: User;
 }
 
 export const EditUser: React.FC<EditUserProps> = ({ user }) => {
-    const [ error, setError ] = useState<string | null>(null);
+    const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const router = useRouter();
 
     const handleSubmit = async (user: User) => {
         setIsSubmitting(true);
-        await putUser(user).then(() => {
-            router.push('/user');
-        }).catch((error) => {
+        try {
+            const response = await putUser(user);
+            if (response.success) {
+                router.push('/user');
+            } else {
+                setErrors(response.error ?? "An unknown error occurred");
+            }
+        } catch (error) {
+            setErrors("An error occurred while updating the user");
+        } finally {
             setIsSubmitting(false);
-            setError(error.message);
-        });
+        }
     }
 
     if (isSubmitting) {
@@ -43,16 +49,17 @@ export const EditUser: React.FC<EditUserProps> = ({ user }) => {
                     submitText="Update User"
                     goBack={true}   
                     onSubmit={handleSubmit}
-                    onError={setError}
+                    onError={setErrors}
                 />
             </div>
-            {error && (
+            {errors && (
                 <ModalBase
                     title="Error"
-                    isOpen={error !== null}
-                    onClose={() => setError(null)}
+                    width="w-1/2"
+                    isOpen={errors !== null}
+                    onClose={() => setErrors(null)}
                 >
-                    <p>{error}</p>
+                    <ErrorBody errors={errors} />
                 </ModalBase>
             )}
         </>

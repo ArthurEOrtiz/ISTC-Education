@@ -1,0 +1,36 @@
+/****** Script for SelectTopNRows command from SSMS  ******/
+SELECT *
+FROM Users;
+
+SELECT *
+FROM Contacts;
+
+SELECT *
+FROM Employers;
+
+SELECT *
+FROM Students;
+
+SELECT *
+FROM Attendances;
+
+--SELECT *
+--FROM Courses;
+
+--SELECT *
+--FROM Classes;
+
+--SELECT *
+--FROM Locations;
+
+--SELECT *
+--FROM Exams;
+
+--SELECT *
+--FROM Topics;
+
+--SELECT *
+--FROM WaitList;
+
+--SELECT *
+--FROM Topics;

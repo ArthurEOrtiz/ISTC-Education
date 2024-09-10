@@ -4,67 +4,70 @@ import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 
 export const getAllUsers = async () => {
-    const users: User[] = await axiosInstance.get('/User')
-        .then((response) => { return response.data})
-        .catch((error) => { throw error });
-    return users;
+    try {
+        const response = await axiosInstance.get('/User');
+        return response.data as User[];
+    } catch (error) {
+        throw new Error('Error fetching all users');    
+    }
 }
 
 export const getUser = async (id: number) => {
-    const user: User | null = await axiosInstance.get(`/User/${id}`)
-        .then((response) => {return response.data as User})
-        .catch((error) => { 
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-                return null;
-            } else {
-                throw error;
-            }
-        });
-    return user;
+    try {
+        const response = await axiosInstance.get(`/User/${id}`);
+        return response.data as User;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return null;
+        } else {
+            throw new Error('Error fetching user by id');
+        }
+    }
 }
 
 export const getUserByEmail = async (email: string) => {
-    const user: User | null = await axiosInstance.get(`/User/Email/${email}`)
-        .then((response) => response.data as User)
-        .catch((error) => { 
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-                return null;
-            } else {
-                throw error;
-            }
-        });
-    return user;
+    try {
+        const response = await axiosInstance.get(`/User/Email/${email}`);
+        return response.data as User;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return null;
+        } else {
+            throw new Error('Error fetching user by email');
+        }
+    }
 }
 
-export const getUserByIpId = async (IPId: string) => {
-    const user: User | null = await axiosInstance.get(`/User/IPId/${IPId}`)
-        .then((response) => {return response.data as User})
-        .catch((error) => { 
-            if (axios.isAxiosError(error) && error.response?.status === 404) {
-                return null;
-            } else {
-                throw error;
-            }
-        });
-    return user;
-}
+export const getUserByIPId = async (IPId: string): Promise<User | null> => {
+    try {
+        const response = await axiosInstance.get(`/User/IPId/${IPId}`);
+        return response.data as User;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return null;
+        } else {
+            throw new Error('Error fetching user by IPId');
+        }
+    }
+};
 
-export const postUser = async (user: User): Promise<{ success: boolean; error?: string }> => {
+export const postUser = async (user: User): Promise<ApiResponse> => {
     try {
         const response = await axiosInstance.post('/User', user);
         if (response.status === 201) {
-            return { success: true };
+            return { success: true, data: response.data };
         } else {
             return { success: false, error: `Unexpected status code: ${response.status}` };
         }
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 400) {
-                const data = error.response.data as ErrorResponse;
-                if (data.errors) {
-                    const errorString = Object.values(data.errors).join('\n');
-                    return { success: false, error: errorString };
-                }
+                const errors = error.response.data.errors as ErrorResponse;
+                if (errors) {
+                    return { success: false, error: errors };
+                } else {
+                    return { success: false, error: `Unexpected error code: ${error.status}` };
+                } 
             }
             return { success: false, error: error.message };
         }
@@ -72,14 +75,41 @@ export const postUser = async (user: User): Promise<{ success: boolean; error?: 
     }
 };
 
-export const putUser = async (user: User) => {
-    const response = await axiosInstance.put(`/User/${user.userId}`, user);
-    return response.data;
+export const putUser = async (user: User): Promise<ApiResponse> => {
+    try {
+        const response = await axiosInstance.put(`/User/${user.userId}`, user);
+        if (response.status === 204) {
+            return { success: true };
+        } else {
+            return { success: false, error: `Unexpected status code: ${response.status}` };
+        }
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 400) {
+                const errors: ErrorResponse = error.response.data.errors;
+                if (errors) {
+                    return { success: false, error: errors}
+                } else {
+                    return { success: false, error: `Unexpected error code: ${error.status}` };
+                }
+            }
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: 'An unexpected error occurred' };
+    }
 }
 
 export const deleteUser = async (id: number) => {
-    const response = await axiosInstance.delete(`/User/${id}`);
-    return response.data;
+    try {
+        const response = await axiosInstance.delete(`/User/${id}`);
+        if (response.status === 204) {
+            return true;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        return false;
+    }
 }
 
 
