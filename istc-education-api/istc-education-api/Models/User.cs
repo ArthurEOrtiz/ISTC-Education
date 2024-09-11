@@ -25,10 +25,6 @@ namespace istc_education_api.Models
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Middle name must be between 3 and 50 characters.")]
 		public string? MiddleName { get; set; }
 
-		public bool IsAdmin { get; set; }
-
-		public bool IsStudent { get; set; }
-
 		public virtual Contact? Contact { get; set; } = new Contact(); 
 
 		public virtual Employer? Employer { get; set; } = new Employer();

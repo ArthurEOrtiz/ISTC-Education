@@ -2,6 +2,7 @@
 import { User } from "@/types/user";
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
+import { clerkClient } from "@clerk/nextjs/server";
 
 export const getAllUsers = async () => {
     try {
@@ -108,7 +109,19 @@ export const deleteUser = async (id: number) => {
             return false;
         }
     } catch (error) {
-        return false;
+        throw new Error('Error deleting user');
+    }
+}
+
+export const isUserAdmin = async (IPId: string ): Promise<boolean> => {
+    try {
+        const user = await clerkClient().users.getUser(IPId);
+
+        const { privateMetadata }: { privateMetadata: UserPrivateMetadata } = user;
+
+        return privateMetadata.isAdmin === true;
+    } catch (error) {
+        throw new Error('Error checking if user is admin');
     }
 }
 
