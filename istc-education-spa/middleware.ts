@@ -6,7 +6,7 @@ const isPublicRoute = createRouteMatcher([
     '/sign-up(.*)',
 ])
 
-const isProtectedRoute = createRouteMatcher(['/user(.*)'])
+const isProtectedRoute = createRouteMatcher(['/user(.*)', '/dashboard(.*)', '/admin(.*)'])
 
 export default clerkMiddleware(
     (auth, request) => {

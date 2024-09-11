@@ -7,7 +7,7 @@ const MainNav: React.FC = () => {
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
             <SignedIn>
-                <Link href="/user">Dashboard</Link>
+                <Link href="/dashboard">Dashboard</Link>
             </SignedIn>
         </nav>
     );
