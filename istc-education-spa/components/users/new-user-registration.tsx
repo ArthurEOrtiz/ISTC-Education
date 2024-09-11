@@ -1,7 +1,6 @@
 'use client';
 import { useState } from "react";
 import UserForm from "./user-form";
-import { User } from "@/types/user";
 import UserInfo from "./user-info";
 import { postUser } from "@/utils/api/users";
 import ModalBase from "../modal/modal-base";

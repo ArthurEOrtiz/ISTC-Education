@@ -1,5 +1,4 @@
 'use client';
-import { User } from "@/types/user";
 import { postUser } from "@/utils/api/users";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

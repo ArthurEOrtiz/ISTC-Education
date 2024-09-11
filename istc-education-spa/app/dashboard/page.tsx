@@ -1,5 +1,4 @@
 import NewUserRegistration from "@/components/users/new-user-registration";
-import { User } from "@/types/user";
 import { getUserByEmail, isUserAdmin, putUser } from "@/utils/api/users";
 import { currentUser, User as ClerkUser } from "@clerk/nextjs/server";
 import Link from "next/link";

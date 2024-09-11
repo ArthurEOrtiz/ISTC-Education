@@ -1,5 +1,3 @@
-import { User } from "@/types/user";
-
 interface UserInfoProps {
     user: User;
 }

@@ -1,5 +1,4 @@
 'use client';
-import { User } from "@/types/user";
 import UserForm from "./user-form";
 import { useState } from "react";
 import ModalBase from "../modal/modal-base";

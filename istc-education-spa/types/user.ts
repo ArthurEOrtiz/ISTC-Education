@@ -1,4 +1,4 @@
-export interface User {
+interface User {
     userId: number;
     ipId: string | null;
     status: 'Active' | 'Archived';

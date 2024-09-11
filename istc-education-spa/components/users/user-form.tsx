@@ -1,8 +1,7 @@
 'use client';
-import { User } from "@/types/user";
 import { getUserByEmail } from "@/utils/api/users";
 import { idahoCounties, states } from "@/utils/constants";
-import { ChangeEvent, use, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import PhoneInput from "react-phone-number-input/input";
 
 interface UserFormProps {
@@ -68,9 +67,9 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                     };
                     setUser(incomingUserCopy);
                     setOtherEmployer(incomingUser.employer.employerName);
-                } else {
-                    setUser(incomingUser);
-                }
+            } else {
+                setUser(incomingUser);
+            }
         }
     }, []);
 
@@ -93,28 +92,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         input.value = input.value.replace(/[^0-9]/g, '');
     };
 
-    const handleEmpoyerNameDefaultValue = (employerName: string) => {
-        if (employerName === idahoCounties.find((county) => county === employerName)) {
-            return employerName;
-        }
-
-        if (employerName === 'Tax Commission') {
-            return employerName;
-        }
-
-        // if (employerName === 'Other') {
-        //     throw new Error('Employer name cannot be "Other"');
-        // }
-
-        if (employerName === "Initial") {         
-            return "Initial";
-        }
-
-        
-        return "Other";
-        
-    }
-
     const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const submittingUser = user;   
@@ -122,9 +99,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             submittingUser.employer.employerName = otherEmployer;
         }
         
-        console.log("Submitting User", submittingUser);
-        console.log("Empoyer Name", submittingUser.employer?.employerName);
-        console.log("Other Empoyer", otherEmployer);
         onSubmit(submittingUser);
     }
 

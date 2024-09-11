@@ -1,18 +1,17 @@
 import { isUserAdmin } from "@/utils/api/users";
 import { auth } from "@clerk/nextjs/server";
-import { notFound } from "next/navigation";
 
 const CourseCreatePage: React.FC = async() => {
     const IPId: string | null = auth().userId;
 
     if (!IPId) {
-        return notFound();
+        throw new Error("Autherization Error");
     }
 
     const isAdmin: boolean = await isUserAdmin(IPId);
 
     if (!isAdmin) {
-        return notFound();
+        throw new Error("You are not authorized to create a course");
     }
 
 

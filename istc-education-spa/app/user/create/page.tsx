@@ -3,7 +3,7 @@ import { isUserAdmin } from "@/utils/api/users";
 import CreateUser from "@/components/users/create-user";
 
 const UserCreatePage: React.FC = async() => {
-    const { userId: IPId } =  auth();
+    const { userId: IPId } = auth();
 
     if (!IPId) {
         throw new Error("Autherization Error");

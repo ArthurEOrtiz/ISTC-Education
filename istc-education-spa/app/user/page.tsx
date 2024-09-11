@@ -1,8 +1,19 @@
 import UserInfo from "@/components/users/user-info";
-import { User } from "@/types/user";
-import { getAllUsers } from "@/utils/api/users";
+import { getAllUsers, isUserAdmin } from "@/utils/api/users";
+import { auth } from "@clerk/nextjs/server";
 
 const UserIndexPage: React.FC = async() => {
+    const { userId: IPId } = auth();
+    if (!IPId) {
+        throw new Error("Autherization Error");
+    }
+
+    const isAdmin = await isUserAdmin(IPId);
+
+    if (!isAdmin) {
+        throw new Error("You are not authorized to view users");
+    }
+
     const users: User[] = await getAllUsers();
 
     return (
