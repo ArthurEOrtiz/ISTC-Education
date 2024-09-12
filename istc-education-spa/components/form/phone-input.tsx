@@ -1,4 +1,4 @@
-import React from 'react';
+import { FocusEvent } from "react";
 import PhoneInput from "react-phone-number-input/input";
 
 interface PhoneInputProps {
@@ -6,7 +6,7 @@ interface PhoneInputProps {
     id: string;
     defaultCountry: string;
     value: string;
-    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+    onBlur: (e: FocusEvent<HTMLInputElement>) => void;
     onChange: (value: string) => void;
     error?: string;
     required?: boolean;   

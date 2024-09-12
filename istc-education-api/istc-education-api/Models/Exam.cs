@@ -15,8 +15,6 @@ namespace istc_education_api.Models
 		[ForeignKey("Course")]
 		public int CourseId { get; set; }
 
-		public int ExamCredit { get; set; }	
-
 		public bool HasPassed { get; set; } = false;
 	}
 }

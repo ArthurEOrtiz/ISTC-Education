@@ -31,9 +31,11 @@ namespace istc_education_api.Models
 		public string InstructorName { get; set; } = string.Empty;
 
 		[EmailAddress]
-		public string InstructorEmail { get; set; } = string.Empty;
+		public string? InstructorEmail { get; set; }
 
 		public bool HasExam { get; set; }
+
+		public int? ExamCredit { get; set; }	
 
 		public bool HasPDF { get; set; }
 

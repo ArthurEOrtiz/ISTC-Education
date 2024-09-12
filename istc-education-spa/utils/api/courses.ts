@@ -1,4 +1,4 @@
-'user server';
+'use server';
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 

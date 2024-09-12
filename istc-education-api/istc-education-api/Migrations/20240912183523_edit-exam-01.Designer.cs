@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using istc_education_api.DataAccess;
 
@@ -11,9 +12,11 @@ using istc_education_api.DataAccess;
 namespace istc_education_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240912183523_edit-exam-01")]
+    partial class editexam01
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -185,9 +188,6 @@ namespace istc_education_api.Migrations
                     b.Property<DateTime>("EnrollmentDeadline")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ExamCredit")
-                        .HasColumnType("int");
-
                     b.Property<bool>("HasExam")
                         .HasColumnType("bit");
 
@@ -195,6 +195,7 @@ namespace istc_education_api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("InstructorEmail")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("InstructorName")

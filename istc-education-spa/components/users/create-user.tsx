@@ -33,9 +33,10 @@ const CreateUser: React.FC = () => {
 
     return (
         <>
-            <div className="lg:w-2/3 border border-info rounded-md p-4">
+            <div className="border border-info rounded-md p-4">
                 <UserForm
                     submitText="Next"
+                    goBack
                     user={user || undefined}
                     onSubmit={(user) => {
                         setPreviewUser(true);

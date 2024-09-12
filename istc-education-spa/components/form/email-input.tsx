@@ -1,12 +1,12 @@
-import React from 'react';
+import { ChangeEvent, FocusEvent } from "react";
 
 interface EmailInputProps {
     label: string;
     id: string;
     placeholder: string;
     defaultValue?: string;
-    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onBlur: (e: FocusEvent<HTMLInputElement>) => void;
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     error?: string;
     isEmailChecking?: boolean;
     required?: boolean;
@@ -17,14 +17,14 @@ const EmailInput: React.FC<EmailInputProps> = ({ label, id, placeholder, default
         <label className="input input-bordered flex items-center gap-2">
             {label}
             <input 
-            type="email" 
-            className="grow" 
-            placeholder={placeholder}
-            id={id}
-            defaultValue={defaultValue}
-            onBlur={onBlur}
-            onChange={onChange}
-        />
+                type="email" 
+                className="grow" 
+                placeholder={placeholder}
+                id={id}
+                defaultValue={defaultValue}
+                onBlur={onBlur}
+                onChange={onChange}
+            />
         </label>
         {isEmailChecking && (
             <div className="flex items-center gap-2">

@@ -1,27 +1,27 @@
-import React from 'react';
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
 interface SelectInputProps {
     id: string;
     options: string[];
     value?: string;
-    onBlur?: (e: React.FocusEvent<HTMLSelectElement>) => void;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+    onBlur?: (e: FocusEvent<HTMLSelectElement>) => void;
+    onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
     error?: string;
     required?: boolean;
 }
 
 const SelectInput: React.FC<SelectInputProps> = ({ id, options, value: incomingValue, onBlur, onChange, error, required }) => {
-    const [ value, setValue ] = React.useState<string>('');
-    const [ selection, setSelection ] = React.useState<string[]>(options);
+    const [ value, setValue ] = useState<string>('');
+    const [ selection, setSelection ] = useState<string[]>(options);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (incomingValue) {
             setValue(incomingValue);
         }
         setSelection(options);
     }, [incomingValue, options]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setValue(e.target.value);
         onChange(e);
     }

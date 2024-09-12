@@ -1,11 +1,14 @@
 'use client';
 import { getUserByEmail } from "@/utils/api/users";
-import { idahoCounties, states } from "@/utils/constants";
+import { idahoCounties, states } from "@/utils/forms/constants";
 import { ChangeEvent, useEffect, useState } from "react";
 import TextInput from "../form/text-input";
 import EmailInput from "../form/email-input";
 import CustomPhoneInput from "../form/phone-input";
 import SelectInput from "../form/select-input";
+import { validateLength, validatePhone, validateZip } from "@/utils/forms/validation";
+import { useRouter } from "next/navigation";
+import { handleIntInput } from "@/utils/forms/handlers";
 
 interface UserFormProps {
     user?: User;
@@ -54,6 +57,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     const [ errors, setErrors ] = useState<FormError>({});
     const [ isEmailChecking, setIsEmailChecking ] = useState<boolean>(false);
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
+    const router = useRouter();
 
     useEffect(() => {
         // If user.employer.employerName is not any of the idahoCounties.
@@ -89,11 +93,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         otherEmployer,
         errors
     ]);    
-
-    const handleZipInput = (event: React.FormEvent<HTMLInputElement>) => {
-        const input = event.currentTarget;
-        input.value = input.value.replace(/[^0-9]/g, '');
-    };
 
     const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -249,20 +248,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         }
     };
     
-    const validatePhone = (phone: string) => {
-        const phoneRegex = /^1?\s?\(?([0-9]{3})\)?\s?([0-9]{3})[-.●]?([0-9]{4})$/;
-        return phone === '' || phoneRegex.test(phone) ? '' : 'Invalid phone number';
-    };
-
-    const validateZip = (zip: string) => {
-        const zipRegex = /^[0-9]{5}$/;
-        return zip === '' || zipRegex.test(zip) ? '' : 'Invalid zip code';
-    }
-    
-    const validateLength = (value: string, minLength: number, maxLength: number) => {
-        return value.length >= minLength && value.length <= maxLength;
-    }
-
     const requiredFieldsFilled = () => {
         const requiredFields = ['firstName', 'lastName', 'contact.email', 'employer.employerName', 'employer.jobTitle'];
         
@@ -404,7 +389,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         defaultValue={user.contact?.postalCode || ''}
                         onBlur={handleValidation}
                         onChange={handleChange}
-                        onInput={handleZipInput}
+                        onInput={handleIntInput}
                         error={errors['contact.postalCode']}
                     />
                 </div>
@@ -452,7 +437,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                 {goBack && (
                     <button
                         className="btn btn-error dark:text-white"
-                        onClick={() => window.history.back()}
+                        onClick={() => router.back()}
                     >
                         Go Back
                     </button>

@@ -1,14 +1,15 @@
 interface Course {
     courseId: number;
     status: 'UpComing' | 'InProgress' | 'Archived';
-    title: string;
+    title: string; // Required
     description: string | null;
-    attendanceCredit: number;
-    maxAttendance: number;
+    attendanceCredit: number; // Required
+    maxAttendance: number; // Required
     enrollmentDeadline: Date;
-    instructorName: string;
-    instructorEmail: string;
+    instructorName: string  // Required
+    instructorEmail: string | null;
     hasExam: boolean;
+    examCredit: number | null;
     hasPDF: boolean;
     location: Location | null;
     pdf: PDF | null;

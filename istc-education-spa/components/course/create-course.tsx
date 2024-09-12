@@ -4,6 +4,7 @@ import { useState } from "react";
 import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
+import CourseForm from "./course-form";
 
 const CreateCourse: React.FC = () => {
     const [ course, setCourse ] = useState<Course | null>(null);
@@ -28,13 +29,13 @@ const CreateCourse: React.FC = () => {
 
     return (
         <>
-            <div className="lg:w-2/3 border border-info rounded-md p-4">
-                {/* <CourseForm
+            <div className="border border-info rounded-md p-4">
+                <CourseForm
                     submitText="Create Course"
+                    goBack
                     course={course || undefined}
                     onSubmit={(course) => setCourse(course)}
-
-                /> */}
+                />
             </div>
             {success && (
                 <ModalBase
