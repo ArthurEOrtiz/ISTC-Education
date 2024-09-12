@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 
 const UserIndexPage: React.FC = async() => {
     const { userId: IPId } = auth();
+    
     if (!IPId) {
         throw new Error("Autherization Error");
     }

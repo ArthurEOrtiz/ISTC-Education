@@ -2,7 +2,7 @@ import { isUserAdmin } from "@/utils/api/users";
 import { auth } from "@clerk/nextjs/server";
 
 const CourseCreatePage: React.FC = async() => {
-    const IPId: string | null = auth().userId;
+    const { userId: IPId } = auth();
 
     if (!IPId) {
         throw new Error("Autherization Error");

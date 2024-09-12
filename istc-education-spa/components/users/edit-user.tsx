@@ -8,11 +8,13 @@ import ErrorBody from "../modal/error-body";
 
 interface EditUserProps {
     user: User;
+    isAdmin?: boolean;   
 }
 
-export const EditUser: React.FC<EditUserProps> = ({ user }) => {
+export const EditUser: React.FC<EditUserProps> = ({ user, isAdmin = false }) => {
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
+    const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
 
     const handleSubmit = async (user: User) => {
@@ -20,7 +22,7 @@ export const EditUser: React.FC<EditUserProps> = ({ user }) => {
         try {
             const response = await putUser(user);
             if (response.success) {
-                router.push('/user');
+                setSuccess(true);
             } else {
                 setErrors(response.error ?? "An unknown error occurred");
             }
@@ -42,7 +44,7 @@ export const EditUser: React.FC<EditUserProps> = ({ user }) => {
 
     return (
         <>
-            <div className="lg:w-2/3 border border-info rounded-md p-4">
+            <div className="border border-info rounded-md p-2">
                 <UserForm
                     user={user}
                     submitText="Update User"
@@ -51,6 +53,34 @@ export const EditUser: React.FC<EditUserProps> = ({ user }) => {
                     onError={setErrors}
                 />
             </div>
+            {success && (
+                <ModalBase
+                    title="Success"
+                    width="w-1/2"
+                    isOpen={success}
+                    onClose={() => {}}
+                >
+                    <div className="space-y-2">
+                        <h2 className="text-xl font-bold">User Updated Successfully</h2>
+                        <div className="flex flex-row justify-end space-x-2">
+                            <button
+                                className="btn btn-success dark:text-white"
+                                onClick={() => router.push('/dashboard')}
+                            >
+                                Go to Dashboard
+                            </button>
+                            {isAdmin && (
+                                <button
+                                    className="btn btn-info dark:text-white"
+                                    onClick={() => router.push('/admin')}
+                                >
+                                    Go to Admin Dashboard
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </ModalBase>
+            )}
             {errors && (
                 <ModalBase
                     title="Error"

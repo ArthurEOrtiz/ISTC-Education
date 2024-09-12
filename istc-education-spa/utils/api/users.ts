@@ -1,5 +1,4 @@
 'use server';
-import { User } from "@/types/user";
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 import { clerkClient } from "@clerk/nextjs/server";
@@ -100,7 +99,7 @@ export const putUser = async (user: User): Promise<ApiResponse> => {
     }
 }
 
-export const deleteUser = async (id: number) => {
+export const deleteUser = async (id: number): Promise<boolean> => {
     try {
         const response = await axiosInstance.delete(`/User/${id}`);
         if (response.status === 204) {

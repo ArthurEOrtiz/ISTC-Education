@@ -2,7 +2,10 @@
 import { getUserByEmail } from "@/utils/api/users";
 import { idahoCounties, states } from "@/utils/constants";
 import { ChangeEvent, useEffect, useState } from "react";
-import PhoneInput from "react-phone-number-input/input";
+import TextInput from "../form/text-input";
+import EmailInput from "../form/email-input";
+import CustomPhoneInput from "../form/phone-input";
+import SelectInput from "../form/select-input";
 
 interface UserFormProps {
     user?: User;
@@ -48,7 +51,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         },
     } as User);
     const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
-    const [ errors, setErrors ] = useState<{ [key: string]: string}>({});
+    const [ errors, setErrors ] = useState<FormError>({});
     const [ isEmailChecking, setIsEmailChecking ] = useState<boolean>(false);
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
 
@@ -116,7 +119,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                         ...prev,
                         contact: {
                             ...prev.contact,
-                            [contactField]: value === '' ? null : value,
+                            [contactField]: value,
                         },
                     };
                 });
@@ -165,7 +168,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     }
 
     const handleValidation = async (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const formErrors: { [key: string]: string} = {};
+        const formErrors: FormError = {};
         const { id, value } = e.target;
 
         switch(id) {
@@ -229,10 +232,8 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             const response = await getUserByEmail(email)
                 .then((response) => {
                     if (!response) {
-                        console.log('Email address is available');
                         return '';
                     }
-                    console.log('Email address already in use', response);
                     return 'Email address already in use';
                 })
                 .catch(() => {
@@ -291,239 +292,162 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     }
 
     return (
-        <form onSubmit={handleOnSubmit} className="space-y-2">
-            <div className="border border-error rounded-md p-1">
-                <label className="input input-bordered flex items-center gap-2">
-                    First Name
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="John"
-                        id="firstName"
-                        defaultValue={user.firstName}
-                        onBlur={handleValidation}
-                        onChange={handleChange}
-                        />
-                </label>
-                {errors['firstName'] && <p className="text-sm text-error mt-1">{errors['firstName']}</p>}
-                <p className="text-sm text-error mt-1">Required</p>
-            </div>
-            <div>
-                <label className="input input-bordered flex items-center gap-2">
-                    Middle Name
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="Ray"
-                        id="middleName"
-                        defaultValue={user.middleName || ''}
-                        onBlur={handleValidation}
-                        onChange={handleChange}
-                        />
-                </label>
-                {errors['middleName'] && <p className="text-sm text-error mt-1">{errors['middleName']}</p>}
-            </div>
-            <div className="border border-error rounded-md p-1">
-                <label className="input input-bordered flex items-center gap-2">
-                    Last Name
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="Doe"
-                        id="lastName"
-                        defaultValue={user.lastName}
-                        onBlur={handleValidation}
-                        onChange={handleChange}
-                        />
-                </label>
-                {errors['lastName'] && <p className="text-sm text-error mt-1">{errors['lastName']}</p>}
-                <p className="text-sm text-error">Required</p>
-            </div>
+        <form onSubmit={handleOnSubmit} className="max-w-2xl space-y-2">
+            <TextInput
+                id="firstName"
+                label="First Name"
+                placeholder="John"
+                defaultValue={user.firstName}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['firstName']}
+                required
+            />
+            <TextInput
+                id="middleName"
+                label="Middle Name"
+                placeholder="Ray"
+                defaultValue={user.middleName || ''}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['middleName']}
+            />
+            <TextInput
+                id="lastName"
+                label="Last Name"
+                placeholder="Doe"
+                defaultValue={user.lastName}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['lastName']}
+                required
+            />
             <div className="w-full sm:flex sm:justify-between sm:items-baseline sm:space-x-2 space-y-2">
-                <div className="border border-error rounded-md p-1 md:w-1/2">
-                    <label className="input input-bordered flex items-center gap-2">
-                        Email
-                        <input 
-                            type="email" 
-                            className="grow" 
-                            placeholder="some@example.com" 
-                            id="contact.email"
-                            defaultValue={user?.contact?.email}
-                            onBlur={handleValidation}
-                            onChange={handleChange}
-                            />
-                    </label>
-                    {isEmailChecking && (
-                        <div className="flex items-center gap-2">
-                            <span className="loading loading-spinner loading-sm"></span>
-                            <p className="text-sm text-success mt-1">Checking email...</p>
-                        </div>
-                    )}
-                    {errors['contact.email'] && <p className="text-sm text-error mt-1">{errors['contact.email']}</p>}
-                    <p className="text-sm text-error">Required</p>
-                </div>
-                <div className="sm:w-1/2">
-                    <label className="input input-bordered flex items-center gap-2 w-full">
-                        Phone
-                        <PhoneInput 
-                            type="text" 
-                            className="w-full" 
-                            placeholder="555-555-5555" 
-                            id="contact.phone"
-                            defaultCountry="US"
-                            value={user.contact?.phone as string}
-                            onBlur={handleValidation}   
-                            onChange={(value) => {
-                                if (user.contact) {
-                                    setUser({
-                                        ...user,
-                                        contact: {
-                                            ...user.contact,
-                                            phone: value as string,
-                                        },
-                                    });
-                                }
-                            }}
-                            />
-                    </label>
-                    {errors['contact.phone'] && <p className="text-sm text-error mt-1">{errors['contact.phone']}</p>}
-                </div>
-            </div>
-            <div>
-                <label className="input input-bordered flex items-center gap-2">
-                    Address Line 1
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="123 Main St" 
-                        id="contact.addressLine1"
-                        defaultValue={user.contact?.addressLine1 || ''}
-                        onBlur={handleValidation}
-                        onChange={handleChange}
-                        />
-                </label>
-                {errors['contact.addressLine1'] && <p className="text-sm text-error mt-1">{errors['contact.addressLine1']}</p>}
-            </div>
-            <div>
-                <label className="input input-bordered flex items-center gap-2">
-                    Address Line 2
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="Apt 101" 
-                        id="contact.addressLine2"
-                        defaultValue={user.contact?.addressLine2 || ''}
-                        onBlur={handleValidation}
-                        onChange={handleChange}
-                        />
-                </label>
-                {errors['contact.addressLine2'] && <p className="text-sm text-error mt-1">{errors['contact.addressLine2']}</p>}
-            </div>
-            <div className="w-full sm:flex sm:justify-between sm:items-baseline sm:space-x-2  space-y-2">
-                <div className="sm:w-1/3">
-                    <label className="input input-bordered flex items-center gap-2">
-                        City
-                        <input 
-                            type="text" 
-                            className="grow" 
-                            placeholder="Boise" 
-                            id="contact.city"
-                            defaultValue={user.contact?.city ||''}
-                            onChange={handleChange}
-                            />
-                    </label>
-                    {errors['contact.city'] && <p className="text-sm text-error mt-1">{errors['contact.city']}</p>}
-                </div>
-                <select 
-                    className="select select-bordered w-full"
-                    id="contact.state"
+                <EmailInput
+                    label="Email"
+                    id="contact.email"
+                    placeholder="some@example.com"
+                    defaultValue={user.contact?.email}
+                    onBlur={handleValidation}
                     onChange={handleChange}
-                    defaultValue={user.contact?.state || 'Idaho'}
-                    >
-                    {states.map((state, index) => (
-                        <option key={index} value={state}>{state}</option>
-                    ))}
-                </select>
-                <div className="sm:w-1/3">
-                    <label className="input input-bordered flex items-center gap-2">
-                        Zip
-                        <input 
-                            type="text"
-                            className="grow" 
-                            placeholder="83702" 
-                            id="contact.postalCode"
-                            defaultValue={user.contact?.postalCode || ''}
-                            onBlur={handleValidation}
-                            onChange={handleChange}
-                            onInput={handleZipInput}
-                            />
-                    </label>
-                    {errors['contact.postalCode'] && <p className="text-sm text-error mt-1">{errors['contact.postalCode']}</p>}
-                </div>
-            </div>
-            <div className="border border-error rounded-md p-1">
-                <select 
-                    id="employer.employerName"
-                    defaultValue={user.employer?.employerName || 'Initial'}
-                    onBlur={(e) => {
-                        console.log("Employer Name onBlur", e.target.value);
-                        handleValidation(e)
-                    }}
-                    onChange={(e) => {
-                        const { value } = e.target;
-                        console.log("Employer Name onChange", value);
-                        if (value === 'Other') {
-                            setOtherEmployer('');
-                        } else {
-                            setOtherEmployer(null);
+                    error={errors['contact.email']}
+                    isEmailChecking={isEmailChecking}
+                    required
+                />
+                <CustomPhoneInput
+                    label="Phone"
+                    id="contact.phone"
+                    defaultCountry="US"
+                    value={user.contact?.phone as string}
+                    onBlur={handleValidation}   
+                    onChange={(value) => {
+                        if (user.contact) {
+                            setUser({
+                                ...user,
+                                contact: {
+                                    ...user.contact,
+                                    phone: value as string,
+                                },
+                            });
                         }
-                        handleChange(e);
                     }}
-                    className="select select-bordered w-full">
-                    <option disabled value="Initial">Select Employer</option>
-                    <option value="Other">Other</option>
-                    <option value="Tax Commission">Tax Commission</option>  
-                    {idahoCounties.map((county, index ) => (
-                        <option key={index} value={county}>{county}</option>
-                    ))}
-                </select>
-                {errors['employer.employerName'] && <p className="text-sm text-error mt-1">{errors['employer.employerName']}</p>}
-                <p className="text-sm text-error">Required</p>
+                    error={errors['contact.phone']}
+                />
             </div>
-            {otherEmployer !== null &&
-                <div className="border border-error rounded-md p-1">
-                    <label className="input input-bordered flex items-center gap-2">
-                        Other Employer
-                        <input 
-                            type="text" 
-                            className="grow" 
-                            placeholder="Simplot" 
-                            id="employer.otherEmployerName"
-                            defaultValue={otherEmployer}
-                            onBlur={handleValidation}
-                            onChange={handleChange}
-                            />
-                    </label>
-                    {errors['employer.otherEmployerName'] && <p className="text-sm text-error mt-1">{errors['employer.otherEmployerName']}</p>}
-                    <p className="text-sm text-error">Required</p>
-                </div>
-            }
-            <div className="border border-error rounded-md p-1">
-                <label className="input input-bordered flex items-center gap-2">
-                    Job Title
-                    <input 
-                        type="text" 
-                        className="grow" 
-                        placeholder="Software Developer" 
-                        id="employer.jobTitle"
-                        defaultValue={user.employer?.jobTitle || ''}
+            <TextInput
+                id="contact.addressLine1"
+                label="Address Line 1"
+                placeholder="123 Main St"
+                defaultValue={user.contact?.addressLine1 || ''}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['contact.addressLine1']}
+            />
+            <TextInput
+                id="contact.addressLine2"
+                label="Address Line 2"
+                placeholder="Apt 101"
+                defaultValue={user.contact?.addressLine2 || ''}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['contact.addressLine2']}
+            />
+            <div className="w-full sm:flex sm:justify-between sm:items-baseline space-y-2">
+                <div className="sm:w-1/3">
+                    <TextInput
+                        id="contact.city"
+                        label="City"
+                        placeholder="Boise"
+                        defaultValue={user.contact?.city || ''}
                         onBlur={handleValidation}
                         onChange={handleChange}
-                        />
-                </label>
-                {errors['employer.jobTitle'] && <p className="text-sm text-error mt-1">{errors['employer.jobTitle']}</p>}
-                <p className="text-sm text-error">Required</p>
+                        error={errors['contact.city']}
+                    />
+                </div>
+           
+                
+                <div className="sm:w-1/3 w-full">
+                    <SelectInput
+                        id="contact.state"
+                        options = {states}
+                        value={user.contact?.state || 'Idaho'}
+                        onChange={handleChange}
+                    />
+                </div>
+  
+
+                <div className="sm:w-1/3">
+                    <TextInput
+                        id="contact.postalCode"
+                        label="Zip"
+                        placeholder="83702"
+                        defaultValue={user.contact?.postalCode || ''}
+                        onBlur={handleValidation}
+                        onChange={handleChange}
+                        onInput={handleZipInput}
+                        error={errors['contact.postalCode']}
+                    />
+                </div>
             </div>
+            <SelectInput
+                id="employer.employerName"
+                options={['Initial', 'Other', 'Tax Commission', ...idahoCounties]}
+                value={user.employer?.employerName || 'Initial'}
+                onBlur={handleValidation}
+                onChange={(e) => {
+                    const { value } = e.target;
+                    if (value === 'Other') {
+                        setOtherEmployer('');
+                    } else {
+                        setOtherEmployer(null);
+                    }
+                    handleChange(e);
+                }}
+                error={errors['employer.employerName']}
+                required
+            />
+            {otherEmployer !== null &&
+                <TextInput
+                    id="employer.otherEmployerName"
+                    label="Other Employer"
+                    placeholder="Simplot"
+                    defaultValue={otherEmployer}
+                    onBlur={handleValidation}
+                    onChange={handleChange}
+                    error={errors['employer.otherEmployerName']}
+                    required
+                />
+            }
+            <TextInput
+                id="employer.jobTitle"
+                label="Job Title"
+                placeholder="Software Developer"
+                defaultValue={user.employer?.jobTitle || ''}
+                onBlur={handleValidation}
+                onChange={handleChange}
+                error={errors['employer.jobTitle']}
+                required
+            />
             <div className="flex justify-end gap-2">
                 {goBack && (
                     <button

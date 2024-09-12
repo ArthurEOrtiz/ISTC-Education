@@ -1,7 +1,6 @@
 'user server';
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
-import { clerkClient } from "@clerk/nextjs/server";
 
 export const getAllCourses = async () => {
     try {

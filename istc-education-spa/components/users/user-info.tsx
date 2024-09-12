@@ -5,18 +5,8 @@ interface UserInfoProps {
 const UserInfo: React.FC<UserInfoProps> = ({ user }) => {
     return (
         <div className="space-y-2">
-            <div className="flex space-x-4 justify-between">
-                <div>
-                    <span className="font-bold">First Name:</span> {user.firstName}
-                </div>
-                {user.middleName && (
-                    <div>
-                        <span className="font-bold">Middle Name:</span> {user.middleName}
-                    </div>
-                )}
-                <div>
-                    <span className="font-bold">Last Name:</span> {user.lastName}
-                </div>
+            <div className="border-b border-info">
+                <h2 className="text-2xl font-bold">{user.firstName} {user.middleName} {user.lastName}</h2>
             </div>
             {user.contact && (
                 <>
