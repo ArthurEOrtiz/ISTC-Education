@@ -433,6 +433,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                 error={errors['employer.jobTitle']}
                 required
             />
+            <div className="border-b p-2"/>
             <div className="flex justify-end gap-2">
                 {goBack && (
                     <button

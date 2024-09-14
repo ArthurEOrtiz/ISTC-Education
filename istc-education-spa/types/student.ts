@@ -3,8 +3,8 @@ interface Student {
     userId: number;
     appraiserCertified: boolean;
     mappingCertified: boolean;
-    certifications: Certification[] | null;
-    attendances: Attendance[] | null;
-    exams: Exam[] | null;
-    waitLists: WaitList[] | null;
+    certifications?: Certification[];
+    attendances?: Attendance[];
+    exams?: Exam[];
+    waitLists?: WaitList[];
 }

@@ -5,9 +5,13 @@ import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
 import CourseForm from "./course-form";
+import CourseInfo from "./course-info";
+import { FaPlugCirclePlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa";
 
 const CreateCourse: React.FC = () => {
     const [ course, setCourse ] = useState<Course | null>(null);
+    const [ step, setStep ] = useState<number>(1);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
@@ -27,16 +31,46 @@ const CreateCourse: React.FC = () => {
         }
     }
 
+    const handleCourseFormSubmit = (course: Course) => {
+        setCourse(course);
+        setStep(2);
+    }
+
     return (
         <>
-            <div className="border border-info rounded-md p-4">
-                <CourseForm
-                    submitText="Create Course"
-                    goBack
-                    course={course || undefined}
-                    onSubmit={(course) => setCourse(course)}
-                />
-            </div>
+            {step === 1 && (   
+                <div className="border border-info rounded-md p-4">
+                    <CourseForm
+                        submitText="Create Course"
+                        goBack
+                        course={course || undefined}
+                        onSubmit={handleCourseFormSubmit}
+                    />
+                </div>
+            )}
+            {step === 2 && course && (
+                <div className="border border-info rounded-md p-4 space-y-2">
+                    <CourseInfo course={course} expanded />
+                    <div className="flex justify-between">
+
+                        <button
+                            className="btn btn-error dark:text-white"
+                            onClick={() => setStep(1)}
+                        >
+                            Go Back
+                        </button>
+
+                        <button
+                            className="btn btn-success dark:text-white"
+                            onClick={() => {}}
+                        >
+                            <FaPlus /> Class
+                        </button>
+
+
+                    </div>
+                </div>
+            )}
             {success && (
                 <ModalBase
                     title="Success"
@@ -62,7 +96,7 @@ const CreateCourse: React.FC = () => {
                     isOpen={!!errors}
                     onClose={() => setError(null)}
                 >
-                    <ErrorBody error={errors} />
+                    <ErrorBody errors={errors} />
                 </ModalBase>
             )}
         </>

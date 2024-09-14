@@ -11,10 +11,10 @@ interface Course {
     hasExam: boolean;
     examCredit: number | null;
     hasPDF: boolean;
-    location: Location | null;
-    pdf: PDF | null;
-    topics: Topic[] | null;
-    exams: Exam[] | null;
-    classes: Class[] | null;
-    waitList: WaitList[] | null;
+    location: Location;
+    pdf?: PDF;
+    topics?: Topic[];
+    exams?: Exam[];
+    classes?: Class[];
+    waitList?: WaitList[];
 }

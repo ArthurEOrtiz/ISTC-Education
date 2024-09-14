@@ -1,3 +1,5 @@
+import { FaTimes } from "react-icons/fa";
+
 interface ModalBaseProps {
     title: string;
     children: React.ReactNode;
@@ -17,8 +19,8 @@ const ModalBase: React.FC<ModalBaseProps> = ({ title, children, isOpen, width = 
                         <h2 className="text-white text-3xl font-bold">{title}</h2>
                         <button 
                             onClick={onClose}
-                            className="btn btn-error btn-circle text-white text-3xl font-extrabold pb-1"
-                        >&times;</button>
+                            className="btn btn-error btn-circle text-white text-3xl font-extrabold"
+                        ><FaTimes /></button>
                     </div>
                     <div className="p-4 text-white">
                         {children}

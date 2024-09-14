@@ -32,7 +32,7 @@ const TextInput: React.FC<TextInputProps> = ({ label, id, placeholder, defaultVa
                 {label}
                 <input 
                     type="text" 
-                    className="w-full" 
+                    className="grow" 
                     placeholder={placeholder}
                     id={id}
                     defaultValue={value}

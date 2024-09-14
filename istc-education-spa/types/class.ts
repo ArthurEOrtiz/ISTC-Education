@@ -3,5 +3,5 @@ interface Class {
     courseId: number;
     scheduleStart: Date;
     scheduleEnd: Date;
-    attendances: Attendance[] | null;
+    attendances?: Attendance[];
 }

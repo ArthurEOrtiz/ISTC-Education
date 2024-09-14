@@ -1,12 +1,15 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import TextInput from "../form/text-input";
-import { validateLength } from "@/utils/forms/validation";
+import { validateEmail, validateLength, validateURL, validateZip } from "@/utils/forms/validation";
 import { useRouter } from "next/navigation";
 import TextAreaInput from "../form/textarea-input";
 import DateInput from "../form/date-input";
 import NumberInput from "../form/number-input";
 import EmailInput from "../form/email-input";
+import SelectInput from "../form/select-input";
+import { states } from "@/utils/forms/constants";
+import { handleIntInput } from "@/utils/forms/handlers";
 
 interface CourseFormProps {
     course?: Course;
@@ -35,15 +38,22 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         hasExam: false,
         examCredit: null,
         hasPDF: false,
-        location: null,
-        pdf: null,
-        topics: null,
-        exams: null,
-        classes: null,
-        waitList: null,
-    });
+        location: {
+            locationId: 0,
+            courseId: 0,
+            description: null,
+            room: null,
+            remoteLink: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: null,
+            state: "Idaho",
+            postalCode: null
+        } as Location,
+    } as Course);
     const [ errors, setErrors ] = useState<FormError>({}); 
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
+    const pdfInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -51,6 +61,11 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
             setCourse(incomingCourse);
         }
     }, [incomingCourse]);
+
+    useEffect(() => {
+        const formErrors = Object.values(errors);
+        setIsFormValid(formErrors.every(err => err === '') && requiredFieldsFilled());
+    }, [course, errors]);
 
     const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -80,6 +95,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     ...prev,
                     [id]: examCredit,
                 }));
+                break;
+            case id.startsWith("location"):
+                const locationField = id.split('.')[1];
+                setCourse(prev => ({
+                    ...prev,
+                    location: {
+                        ...prev.location as Location,
+                        [locationField]: value,
+                    }
+                }));
+                break;
             default:
                 setCourse(prev => ({
                     ...prev,
@@ -88,7 +114,54 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         }
     }
 
-   const handleValidation = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const handlePDFChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+
+        if (file) {
+            const fileName = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (typeof e.target?.result === 'string') {
+                    const splitResult = e.target.result.split(',');
+                    if (splitResult.length > 1) {
+                        const base64 = splitResult[1];
+                        setCourse(prev => ({
+                            ...prev,
+                            hasPDF: true,
+                            pdf: {
+                                pdfId: 0,
+                                courseId: 0,
+                                fileName,
+                                data: base64,
+                            }
+                        }));
+                    } else {
+                        setErrors(prev => ({
+                            ...prev,
+                            pdf: 'Invalid PDF',
+                        }));
+                        
+                    }
+                } else {
+                    setErrors(prev => ({
+                        ...prev,
+                        pdf: 'Invalid PDF',
+                    }));
+                }
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    const handleRemovePDF = () => {
+        if (pdfInputRef.current) {
+            pdfInputRef.current.value = '';
+        }
+        setErrors(prev => ({ ...prev, pdf: '' }));
+        setCourse(prev => ({ ...prev, hasPDF: false, pdf: undefined }))
+    }
+
+    const handleValidation = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const formErrors: FormError = {};
         const { id, value } = e.target;
 
@@ -113,17 +186,59 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                 break;
             case 'instructorName':
                 formErrors[id] = validateLength(value, 3, 50) ? '' : 'Instructor Name must be between 3 and 50 characters';
-            default:
+                break;
+            case 'instructorEmail':
+                formErrors[id] = value === '' ? '' : validateEmail(value)
+                break;
+            case 'location.description':
+                formErrors[id] = value === '' ? '' : validateLength(value, 10, 100) ? '' : 'Location Description must be between 10 and 100 characters';
+                break;
+            case 'location.room':
+                formErrors[id] = value === '' ? '' : validateLength(value, 0, 30) ? '' : 'Room must be less than 30 characters';
+                break;
+            case 'location.remoteLink':
+                formErrors[id] = value === '' ? '' : validateURL(value)
+                break;
+            case 'location.addressLine1':
+                formErrors[id] = value === '' ? '' : validateLength(value, 5, 50) ? '' : 'Address Line 1 must be between 5 and 50 characters';
+                break;
+            case 'location.addressLine2':
+                formErrors[id] = value === '' ? '' : validateLength(value, 0, 50) ? '' : 'Address Line 2 must be between 0 and 50 characters';
+                break;
+            case 'location.city':
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 50) ? '' : 'City must be between 3 and 50 characters';
+                break;
+            case 'location.postalCode':
+                formErrors[id] = value === '' ? '' : validateZip(value)
+                break;
         }
 
         setErrors(prev => ({
             ...prev,
             [id]: formErrors[id],
         }))
-   }
+    }
+
+    const requiredFieldsFilled = (): boolean => {
+        const { title, instructorName, maxAttendance, attendanceCredit, enrollmentDeadline, hasExam, examCredit } = course;
+        if (title === '' || instructorName === '' || maxAttendance === 0 || attendanceCredit === 0 || enrollmentDeadline === null) {
+            console.log('required fields not filled');
+            return false;
+        }
+
+        if(hasExam && examCredit === null && examCredit === 0) {
+            console.log('required fields not filled');
+            return false;
+        }
+
+        return true;
+    }
 
     return (
         <form onSubmit={handleOnSubmit} className="max-w-2xl space-y-2">
+            <div className="border-b p-2">
+                <h1 className="text-xl font-bold">Course Information</h1>
+            </div>
             <TextInput
                 label="Title"
                 id="title"
@@ -204,30 +319,138 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     )}
                 </div>
             </div>
-            <div className="sm:flex sm:gap-2 sm:items-baseline space-y-2">
+            <div className="border-b p-2">
+                <h1 className="text-xl font-bold">Instructor</h1>
+            </div>
+            <div className="sm:flex sm:gap-2">
+            <div className="sm:w-1/2">
+                <TextInput
+                    label="Name"
+                    id="instructorName"
+                    placeholder="John Doe"
+                    defaultValue={course.instructorName}
+                    onBlur={handleValidation}
+                    onChange={handleOnChange}
+                    required
+                />
+            </div>
+            <div className="sm:w-1/2">
+                <EmailInput
+                    label="Email"
+                    id="instructorEmail"
+                    placeholder="Some@Example.com"
+                    defaultValue={course.instructorEmail || ''}
+                    onBlur={handleValidation}
+                    onChange={handleOnChange}
+                    error={errors.instructorEmail}
+                />
+            </div>
+            </div>
+            <div className="border-b p-2">
+                <h1 className="text-xl font-bold">Location</h1>
+            </div>
+            <TextInput
+                label="Description"
+                id="location.description"
+                placeholder="Jefferson County Courthouse..."
+                defaultValue={course.location?.description || ''}
+                onBlur={handleValidation}
+                onChange={handleOnChange}
+            />
+            <div className="sm:flex sm:gap-2 items-baseline space-y-2">
                 <div className="sm:w-1/2">
                     <TextInput
-                        label="Instructor Name"
-                        id="instructorName"
-                        placeholder="John Doe"
-                        defaultValue={course.instructorName}
+                        label="Room"
+                        id="location.room"
+                        placeholder="4B"
+                        defaultValue={course.location?.room || ''}
                         onBlur={handleValidation}
                         onChange={handleOnChange}
-                        required
                     />
                 </div>
                 <div className="sm:w-1/2">
-                    <EmailInput
-                        label="Instructor Email"
-                        id="instructorEmail"
-                        placeholder="Some@Example.com"
-                        defaultValue={course.instructorEmail || ''}
+                    <TextInput
+                        label="Link"
+                        id="location.remoteLink"
+                        placeholder="https://example.com"
+                        defaultValue={course.location?.remoteLink || ''}
                         onBlur={handleValidation}
                         onChange={handleOnChange}
-                 
+                        error={errors['location.remoteLink']}
                     />
                 </div>
             </div>
+            <TextInput
+                label="Address Line 1"
+                id="location.addressLine1"
+                placeholder="123 Main St"
+                defaultValue={course.location?.addressLine1 || ''}
+                onBlur={handleValidation}
+                onChange={handleOnChange}
+            />
+            <TextInput
+                label="Address Line 2"
+                id="location.addressLine2"
+                placeholder="Suite 101"
+                defaultValue={course.location?.addressLine2 || ''}
+                onBlur={handleValidation}
+                onChange={handleOnChange}
+            />
+            <div className="sm:flex sm:gap-2 sm:items-baseline space-y-2">
+                <div className="sm:w-1/3">
+                    <TextInput
+                        label="City"
+                        id="location.city"
+                        placeholder="Boise"
+                        defaultValue={course.location?.city || ''}
+                        onBlur={handleValidation}
+                        onChange={handleOnChange}
+                    />
+                </div>
+                <div className="sm:w-1/3">
+                    <SelectInput
+                        id="location.state"
+                        value={course.location?.state || ''}
+                        onChange={handleOnChange}
+                        options={states}
+                    />
+                </div>
+                <div className="sm:w-1/3">
+                    <TextInput
+                        label="Zip"
+                        id="location.postalCode"
+                        placeholder="83702"
+                        defaultValue={course.location?.postalCode || ''}
+                        onBlur={handleValidation}
+                        onChange={handleOnChange}
+                        onInput={handleIntInput}
+                        error={errors['location.postalCode']}
+                    />
+                </div>
+            </div>
+            <div className="border-b p-2">
+                <h1 className="text-xl font-bold">PDF</h1>
+            </div>
+            <div className="sm:flex sm:justify-between items-end space-y-2">
+                <div>
+                    <input
+                        type="file"
+                        accept=".pdf"
+                        className="file-input file-input-bordered w-full"
+                        id="pdf"
+                        ref={pdfInputRef}
+                        onChange={handlePDFChange}
+                    />
+                    {errors.pdf && <p className="text-error">{errors.pdf}</p>}
+                </div>
+                <button
+                    className="btn btn-error dark:text-white"
+                    onClick={handleRemovePDF}
+                >
+                    Remove
+                </button>
+            </div>
+            <div className="border-b p-2"/>
             <div className="flex justify-end gap-2">
                 {goBack && (
                     <button
@@ -237,6 +460,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                         Go Back
                     </button>
                 )}
+                
                 <button
                     type="submit"
                     className="btn btn-success dark:text-white"

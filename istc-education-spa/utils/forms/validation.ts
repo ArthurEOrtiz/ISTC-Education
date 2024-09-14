@@ -16,3 +16,8 @@ export const validateZip = (zip: string) => {
     const zipRegex = /^[0-9]{5}$/;
     return zip === '' || zipRegex.test(zip) ? '' : 'Invalid zip code';
 }
+
+export const validateURL = (url: string) => {
+    const urlRegex = /^(http|https):\/\/[^ "]+$/;
+    return url === '' || urlRegex.test(url) ? '' : 'Invalid URL';
+}
