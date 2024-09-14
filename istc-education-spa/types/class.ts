@@ -1,7 +1,8 @@
 interface Class {
     classId: number;
     courseId: number;
-    scheduleStart: Date;
-    scheduleEnd: Date;
+    date: Date,
+    start: string,
+    end: string,
     attendances?: Attendance[];
 }

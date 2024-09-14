@@ -6,7 +6,6 @@ import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
 import CourseForm from "./course-form";
 import CourseInfo from "./course-info";
-import { FaPlugCirclePlus } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa";
 
 const CreateCourse: React.FC = () => {
@@ -36,6 +35,16 @@ const CreateCourse: React.FC = () => {
         setStep(2);
     }
 
+    const handleAddClass = () => {
+        const today = new Date();
+        // Create constant for start and end that represent 9am and 5pm
+        const start = new Date(today.setHours(9, 0, 0, 0)).toTimeString();
+        const end = new Date(today.setHours(17, 0, 0, 0)).toTimeString().slice(0, 5);
+
+        console.log("Start: ", start);
+        console.log("End: ", end);
+        
+    }
     return (
         <>
             {step === 1 && (   
@@ -62,7 +71,7 @@ const CreateCourse: React.FC = () => {
 
                         <button
                             className="btn btn-success dark:text-white"
-                            onClick={() => {}}
+                            onClick={handleAddClass}
                         >
                             <FaPlus /> Class
                         </button>

@@ -39,7 +39,7 @@ namespace istc_education_api.Controllers
 				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.UserId == id);
 				if (user == null)
 				{
-					return NotFound();
+					return NotFound("User not found.");
 				}
 
 				return Ok(user);
@@ -163,11 +163,11 @@ namespace istc_education_api.Controllers
 			{
 				if (!UserExists(id))
 				{
-					return NotFound();
+					return NotFound("User no longer exists.");
 				}
 				else
 				{
-					_logger.LogError(ex, "An unexpected number of were affected during saving");
+					_logger.LogError(ex, "An unexpected number of row were affected during saving");
 					return BadRequest("Error updating user");
 				}
 			}

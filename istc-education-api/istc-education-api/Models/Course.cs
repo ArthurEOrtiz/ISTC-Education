@@ -39,16 +39,29 @@ namespace istc_education_api.Models
 
 		public bool HasPDF { get; set; }
 
-		public virtual Location? Location { get; set; } = new Location();
+		// So every course needs a location, even if its online. 
+		// I'm telling the computer to make one even if its blank.
+		public virtual Location Location { get; set; } = new Location();
 
-		public virtual PDF? PDF { get; set; } = new PDF();
+		// Storing pdf's in a blob as a hack for now.
+		// I'm gonna bring this up to supervision we need something better.
+		public virtual PDF? PDF { get; set; }
 
-		public virtual HashSet<Topic>? Topics { get; set; } = [];	
+		// This is the one many-to-many relationship in the database.
+		// I'm using a HashSet because it's a collection of unique items.
+		// I'm using a nullable type because it's possible for a course to have no topics.
+		public virtual HashSet<Topic>? Topics { get; set; }
 
-		public virtual HashSet<Exam>? Exams { get; set; } = [];
+		// same kind of logic here, but this is a one-to-many relationship.
+		public virtual HashSet<Exam>? Exams { get; set; }
 
-		public virtual HashSet<Class>? Classes { get; set; } = [];
+		// Here, I'm usig a combination of things.
+		// This should be a unique list of classes riiiighhht? 
+		// you cant carbon copy a class to another course, nor have the same class in
+		// the same course twice. this is because child classes are linked to attendance records
+		// which should never by modified after creation. and they are unique events in time and location.
+		public virtual HashSet<Class> Classes { get; set; } = [];
 
-		public virtual HashSet<WaitList>? WaitList { get; set; } = [];
+		public virtual HashSet<WaitList>? WaitList { get; set; }
 	}
 }

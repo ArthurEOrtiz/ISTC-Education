@@ -28,7 +28,7 @@ namespace istc_education_api.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error getting courses");
-				return BadRequest();
+				return BadRequest("Error getting courses.");
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace istc_education_api.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error getting course");
-				return BadRequest();
+				return BadRequest("Error getting course.");
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace istc_education_api.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error creating course");
-				return BadRequest("Error creating course");
+				return BadRequest("Error creating course.");
 			}
 		}
 
@@ -81,32 +81,75 @@ namespace istc_education_api.Controllers
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Update(int id, [FromBody] Course course)
 		{
+			if (id != course.CourseId)
+			{
+				return BadRequest("Course ID mismatch.");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
+
 			try
 			{
-				if (id != course.CourseId)
-				{
-					return BadRequest("Course ID mismatch");
-				}
-
-				if (!ModelState.IsValid)
-				{
-					return BadRequest(ModelState);
-				}
-
 				_context.Entry(course).State = EntityState.Modified;
 
+				_context.Entry(course.Location).State = EntityState.Modified;
+
+				if (course.HasPDF && course.PDF != null)
+				{
+					_context.Entry(course.PDF).State = EntityState.Modified;
+				} else if (!course.HasPDF && course.PDF != null)
+				{
+					throw new Exception("PDF cannot be attached to a course that does not have a PDF.");
+				}
+
+				if (course.Topics != null)
+				{
+					foreach (var topic in course.Topics)
+					{
+						_context.Entry(topic).State = EntityState.Modified;
+					}
+				}
+
+				if (course.Exams != null)
+				{
+					foreach (var exam in course.Exams)
+					{
+						_context.Entry(exam).State = EntityState.Modified;
+					}
+				}
+
+				if (course.Classes != null)
+				{
+					foreach (var @class in course.Classes)
+					{
+						_context.Entry(@class).State = EntityState.Modified;
+					}
+				}
+
+				if (course.WaitList != null)
+				{
+					foreach (var waitList in course.WaitList)
+					{
+						_context.Entry(waitList).State = EntityState.Modified;
+					}
+				}
+
 				await _context.SaveChangesAsync();
+
 				return NoContent();
 			}
 			catch (DbUpdateConcurrencyException ex)
 			{
 				if (!CourseExists(id))
 				{
-					return NotFound();
+					return NotFound("Course no longer exists.");
 				}
 				else
 				{
-					_logger.LogError(ex, "An unexpected number of were affected during saving");
+					_logger.LogError(ex, "An unexpected number of rows were affected during saving");
 					return BadRequest("Error updating course");
 				}
 			}

@@ -12,9 +12,11 @@ namespace istc_education_api.Models
 		[ForeignKey("Course")]
 		public int CourseId { get; set; }
 
-		public DateTime ScheduleStart { get; set; }
+		public DateOnly Date { get; set; }
 
-		public DateTime ScheduleEnd { get; set; }
+		public TimeOnly Start { get; set; }
+
+		public TimeOnly End { get; set;  }
 
 		public virtual HashSet<Attendance>? Attendances { get; set; } = [];
 	}
