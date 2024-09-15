@@ -34,7 +34,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         maxAttendance: 0,
         enrollmentDeadline: getTomorrowDate(),
         instructorName: "",
-        instructorEmail: "",
+        instructorEmail: null,
         hasExam: false,
         examCredit: null,
         hasPDF: false,
@@ -103,8 +103,15 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     ...prev,
                     location: {
                         ...prev.location as Location,
-                        [locationField]: value,
+                        [locationField]: value === '' ? null : value,
                     }
+                }));
+                break;
+            case id === "description":
+            case id === "instructorEmail":
+                setCourse(prev => ({
+                    ...prev,
+                    [id]: value === '' ? null : value,
                 }));
                 break;
             default:

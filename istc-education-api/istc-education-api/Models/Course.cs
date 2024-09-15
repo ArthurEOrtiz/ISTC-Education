@@ -24,7 +24,7 @@ namespace istc_education_api.Models
 
 		public int MaxAttendance { get; set; } 
 
-		public DateTime EnrollmentDeadline { get; set; }
+		public DateOnly EnrollmentDeadline { get; set; }
 
 		[Required(ErrorMessage = "Instructor Name is required.")]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Instructor name must be between 3 and 50 characters.")]
