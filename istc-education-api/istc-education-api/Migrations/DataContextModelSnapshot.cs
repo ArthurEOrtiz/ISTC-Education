@@ -34,7 +34,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("TopicsTopicId");
 
-                    b.ToTable("CourseTopic");
+                    b.ToTable("CourseTopic", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Attendance", b =>
@@ -60,7 +60,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Attendances");
+                    b.ToTable("Attendances", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Certification", b =>
@@ -94,7 +94,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Certifications");
+                    b.ToTable("Certifications", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Class", b =>
@@ -121,7 +121,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Classes", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Contact", b =>
@@ -167,7 +167,7 @@ namespace istc_education_api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Contacts");
+                    b.ToTable("Contacts", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Course", b =>
@@ -219,7 +219,7 @@ namespace istc_education_api.Migrations
 
                     b.HasKey("CourseId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Employer", b =>
@@ -248,7 +248,7 @@ namespace istc_education_api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Employers");
+                    b.ToTable("Employers", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Exam", b =>
@@ -274,7 +274,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Exams");
+                    b.ToTable("Exams", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Location", b =>
@@ -324,7 +324,7 @@ namespace istc_education_api.Migrations
                     b.HasIndex("CourseId")
                         .IsUnique();
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.PDF", b =>
@@ -352,7 +352,7 @@ namespace istc_education_api.Migrations
                     b.HasIndex("CourseId")
                         .IsUnique();
 
-                    b.ToTable("PDFs");
+                    b.ToTable("PDFs", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Student", b =>
@@ -377,7 +377,7 @@ namespace istc_education_api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.Topic", b =>
@@ -399,7 +399,7 @@ namespace istc_education_api.Migrations
 
                     b.HasKey("TopicId");
 
-                    b.ToTable("Topics");
+                    b.ToTable("Topics", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.User", b =>
@@ -433,7 +433,7 @@ namespace istc_education_api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("istc_education_api.Models.WaitList", b =>
@@ -462,7 +462,7 @@ namespace istc_education_api.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("WaitList");
+                    b.ToTable("WaitList", (string)null);
                 });
 
             modelBuilder.Entity("CourseTopic", b =>

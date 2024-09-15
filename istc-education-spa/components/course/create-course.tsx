@@ -36,15 +36,36 @@ const CreateCourse: React.FC = () => {
     }
 
     const handleAddClass = () => {
-        const today = new Date();
-        // Create constant for start and end that represent 9am and 5pm
-        const start = new Date(today.setHours(9, 0, 0, 0)).toTimeString();
-        const end = new Date(today.setHours(17, 0, 0, 0)).toTimeString().slice(0, 5);
+        let date: Date = new Date();
+       
+        const start: string = new Date(new Date().setHours(9, 0, 0, 0)).toTimeString().split(' ')[0];
+        const end: string = new Date(new Date().setHours(17, 0, 0, 0)).toTimeString().split(' ')[0];
 
-        console.log("Start: ", start);
-        console.log("End: ", end);
-        
+        if (course) {
+            if (course.classes.length > 0) {
+                const lastClass = course.classes[course.classes.length - 1];
+                date = new Date(lastClass.date);
+                date.setDate(date.getDate() + 1);
+            }
+
+            const newClass: Class = {
+                classId: 0,
+                courseId: course.courseId,
+                date: date.toISOString().split('T')[0], // date only
+                start,
+                end,
+            };
+
+            setCourse((prevCourse) => {
+                if (prevCourse) {
+                    return { ...prevCourse, classes: [ ...prevCourse.classes, newClass ] };
+                }
+                return null;
+            });
+        }
+        console.log(course?.classes);
     }
+
     return (
         <>
             {step === 1 && (   
@@ -75,6 +96,29 @@ const CreateCourse: React.FC = () => {
                         >
                             <FaPlus /> Class
                         </button>
+
+                        <button
+                            className="btn btn-error dark:text-white"
+                            onClick={() => setCourse({ ...course, classes: [] })}
+                        >
+                            Reset classes
+                        </button>
+
+                        <button
+                            className="btn btn-success dark:text-white"
+                            onClick={() => console.log(course)}
+                        >
+                            Log Course
+                        </button>
+
+                        <button
+                            className="btn btn-success dark:text-white"
+                            onClick={createCourse}
+                        >
+                            Create Course
+                        </button>
+
+
 
 
                     </div>

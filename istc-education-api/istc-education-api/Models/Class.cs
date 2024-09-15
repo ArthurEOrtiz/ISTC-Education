@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using istc_education_api.Validators;
+using Newtonsoft.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace istc_education_api.Models
@@ -14,10 +16,12 @@ namespace istc_education_api.Models
 
 		public DateOnly Date { get; set; }
 
+		[TimeRange("End", ErrorMessage = "Start time must be less than end time.")]
 		public TimeOnly Start { get; set; }
 
-		public TimeOnly End { get; set;  }
+		[TimeRange("Start", ErrorMessage = "End time must be greater than start time.")]
+		public TimeOnly End { get; set; }
 
-		public virtual HashSet<Attendance>? Attendances { get; set; } = [];
+		public virtual HashSet<Attendance>? Attendances { get; set; }
 	}
 }

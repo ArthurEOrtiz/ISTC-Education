@@ -4,11 +4,11 @@ interface ErrorBodyProps {
 
 const ErrorBody: React.FC<ErrorBodyProps> = ({ errors }) => {
     return (
-        <div>
+        <div className="bg-error-content border border-white rounded-md p-4">
             {typeof errors === "string" ? (
-                <p className="text-warning">{errors}</p>
+                <p className="text-error">{errors}</p>
             ) : (
-                <ul className="text-warning">
+                <ul className="text-error">
                     {Object.entries(errors as ErrorResponse).map(([key, value]) => (
                         <li key={key}>{value.join(' ')}</li>
                     ))}

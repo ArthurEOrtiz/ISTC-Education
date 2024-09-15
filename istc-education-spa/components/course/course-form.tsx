@@ -50,7 +50,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
             state: "Idaho",
             postalCode: null
         } as Location,
-    } as Course);
+        classes: [],
+    });
     const [ errors, setErrors ] = useState<FormError>({}); 
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
     const pdfInputRef = useRef<HTMLInputElement>(null);
@@ -222,12 +223,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
     const requiredFieldsFilled = (): boolean => {
         const { title, instructorName, maxAttendance, attendanceCredit, enrollmentDeadline, hasExam, examCredit } = course;
         if (title === '' || instructorName === '' || maxAttendance === 0 || attendanceCredit === 0 || enrollmentDeadline === null) {
-            console.log('required fields not filled');
             return false;
         }
 
         if(hasExam && examCredit === null && examCredit === 0) {
-            console.log('required fields not filled');
             return false;
         }
 

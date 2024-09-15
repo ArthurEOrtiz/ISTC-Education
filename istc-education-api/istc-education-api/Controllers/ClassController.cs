@@ -66,7 +66,7 @@ namespace istc_education_api.Controllers
 
 			try
 			{
-				var course = _context.Courses.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
+				var course = await _context.Courses.FirstOrDefaultAsync(c => c.CourseId == @class.CourseId);
 
 				if (course == null)
 				{

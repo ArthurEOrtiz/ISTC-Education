@@ -15,6 +15,6 @@ interface Course {
     pdf?: PDF;
     topics?: Topic[];
     exams?: Exam[];
-    classes?: Class[];
+    classes: Class[];
     waitList?: WaitList[];
 }
