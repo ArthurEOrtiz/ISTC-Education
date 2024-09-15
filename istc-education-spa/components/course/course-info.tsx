@@ -1,6 +1,6 @@
 'use client';   
 import { useState } from "react";
-import { FaPlus, FaTimes } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
 interface CourseInfoProps {
     course: Course;
@@ -12,6 +12,7 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
     const { 
         title, 
         description,
+        enrollmentDeadline,
         attendanceCredit, 
         maxAttendance, 
         instructorName, 
@@ -39,17 +40,20 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
             <div className="flex justify-between items-center gap-2">
                 <h2 className="text-2xl font-bold">{title}</h2>
                 <button 
-                    className={`btn btn-sm btn-circle font-extrabold text-white ${isExpanded ? "btn-error" : "btn-success"}`}
+                    className="btn btn-ghost btn-circle text-3xl"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
-                    {isExpanded ? <FaTimes /> : <FaPlus />}
+                    {isExpanded ? <FaAngleUp/> : <FaAngleDown/>}
                 </button>
             </div>
             
             <div className={`space-y-2 ${isExpanded ? "block" : "hidden"}`}>
                 <div className="border-b p-2" />
                 <p className="">{description}</p>
-                
+                <div className="flex gap-2">
+                    <p className="text-lg font-bold">Enrollment Deadline:</p>
+                    <p className="text-lg">{enrollmentDeadline}</p>
+                </div>
                 <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
                         <p  className="text-lg font-bold">Attendance Credit:</p>

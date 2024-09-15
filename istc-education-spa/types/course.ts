@@ -5,7 +5,7 @@ interface Course {
     description: string | null;
     attendanceCredit: number; // Required
     maxAttendance: number; // Required
-    enrollmentDeadline: Date;
+    enrollmentDeadline: string; // Required // date only
     instructorName: string  // Required
     instructorEmail: string | null;
     hasExam: boolean;

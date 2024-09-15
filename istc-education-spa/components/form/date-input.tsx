@@ -18,7 +18,7 @@ const DateInput: React.FC<DateInputProps> = ({ label, id, value, onChange, onBlu
                 type="date" 
                 className="input input-bordered w-1/2 max-w-xs" 
                 id={id}
-                defaultValue={value}
+                value={value}
                 onChange={onChange}
                 onBlur={onBlur}
             />

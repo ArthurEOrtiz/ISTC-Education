@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import CourseForm from "./course-form";
 import CourseInfo from "./course-info";
 import { FaPlus } from "react-icons/fa";
+import AddRemoveClass from "./course-add-remove-class";
 
 const CreateCourse: React.FC = () => {
     const [ course, setCourse ] = useState<Course | null>(null);
@@ -35,36 +36,7 @@ const CreateCourse: React.FC = () => {
         setStep(2);
     }
 
-    const handleAddClass = () => {
-        let date: Date = new Date();
-       
-        const start: string = new Date(new Date().setHours(9, 0, 0, 0)).toTimeString().split(' ')[0];
-        const end: string = new Date(new Date().setHours(17, 0, 0, 0)).toTimeString().split(' ')[0];
-
-        if (course) {
-            if (course.classes.length > 0) {
-                const lastClass = course.classes[course.classes.length - 1];
-                date = new Date(lastClass.date);
-                date.setDate(date.getDate() + 1);
-            }
-
-            const newClass: Class = {
-                classId: 0,
-                courseId: course.courseId,
-                date: date.toISOString().split('T')[0], // date only
-                start,
-                end,
-            };
-
-            setCourse((prevCourse) => {
-                if (prevCourse) {
-                    return { ...prevCourse, classes: [ ...prevCourse.classes, newClass ] };
-                }
-                return null;
-            });
-        }
-        console.log(course?.classes);
-    }
+    
 
     return (
         <>
@@ -81,6 +53,11 @@ const CreateCourse: React.FC = () => {
             {step === 2 && course && (
                 <div className="border border-info rounded-md p-4 space-y-2">
                     <CourseInfo course={course} expanded />
+                    <div className="border border-info rounded-md p-4">
+                        <h2 className="text-2xl font-bold">Classes</h2>
+                        <div className="border-b p-2" />
+                        <AddRemoveClass course={course} setCourse={setCourse} />
+                    </div>
                     <div className="flex justify-between">
 
                         <button
@@ -88,13 +65,6 @@ const CreateCourse: React.FC = () => {
                             onClick={() => setStep(1)}
                         >
                             Go Back
-                        </button>
-
-                        <button
-                            className="btn btn-success dark:text-white"
-                            onClick={handleAddClass}
-                        >
-                            <FaPlus /> Class
                         </button>
 
                         <button
@@ -117,10 +87,6 @@ const CreateCourse: React.FC = () => {
                         >
                             Create Course
                         </button>
-
-
-
-
                     </div>
                 </div>
             )}

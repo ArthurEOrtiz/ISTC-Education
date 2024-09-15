@@ -32,7 +32,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         description: null,
         attendanceCredit: 0,
         maxAttendance: 0,
-        enrollmentDeadline: getTomorrowDate(),
+        enrollmentDeadline: getTomorrowDate().toDateString(),
         instructorName: "",
         instructorEmail: null,
         hasExam: false,
@@ -77,7 +77,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         const { id, value } = e.target;
         
         switch (true) {
-            case id === "maxAttendance" || id === "attendanceCredit":
+            case id === "maxAttendance": 
+            case id === "attendanceCredit":
                 const intValue: number = value === '' ? 0 : parseInt(value);
                 setCourse(prev => ({
                     ...prev,
@@ -292,7 +293,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     <DateInput
                         label="Enrollment Deadline"
                         id="enrollmentDeadline"
-                        value={new Date(course.enrollmentDeadline).toISOString().split('T')[0]}
+                        value={course.enrollmentDeadline}
                         onChange={handleOnChange}
                         onBlur={handleValidation}
                         error={errors.enrollmentDeadline}
