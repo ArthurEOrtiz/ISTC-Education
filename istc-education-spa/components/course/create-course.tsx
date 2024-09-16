@@ -1,23 +1,31 @@
 'use client';
 import { postCourse } from "@/utils/api/courses";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
 import CourseForm from "./course-form";
 import CourseInfo from "./course-info";
-import { FaPlus } from "react-icons/fa";
 import AddRemoveClass from "./course-add-remove-class";
+import AddRemoveTopics from "./course-add-remove-topic";
 
 const CreateCourse: React.FC = () => {
     const [ course, setCourse ] = useState<Course | null>(null);
     const [ step, setStep ] = useState<number>(1);
+    const [ isCourseValid, setIsCourseValid ] = useState<boolean>(false);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
+    const [ saving, setSaving ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
 
+    useEffect(() => {
+        setIsCourseValid(!!course && course.classes.length > 0);
+    }, [course?.classes]);
+
     const createCourse = async () => {
+        
         if (course) {
+            setSaving(true);
             try {
                 const response = await postCourse(course);
                 if (response.success) {
@@ -27,6 +35,8 @@ const CreateCourse: React.FC = () => {
                 }
             } catch (error) {
                 setError("An error occurred while creating the course");
+            } finally {
+                setSaving(false);
             }
         }
     }
@@ -36,14 +46,12 @@ const CreateCourse: React.FC = () => {
         setStep(2);
     }
 
-    
-
     return (
         <>
             {step === 1 && (   
                 <div className="border border-info rounded-md p-4">
                     <CourseForm
-                        submitText="Create Course"
+                        submitText="Next"
                         goBack
                         course={course || undefined}
                         onSubmit={handleCourseFormSubmit}
@@ -51,27 +59,25 @@ const CreateCourse: React.FC = () => {
                 </div>
             )}
             {step === 2 && course && (
-                <div className="border border-info rounded-md p-4 space-y-2">
+                <div className="border border-info rounded-md sm:w-2/3 p-2 space-y-2">
                     <CourseInfo course={course} expanded />
+                    <div className="border border-info rounded-md p-4">
+                        <h2 className="text-2xl font-bold">Topics</h2>
+                        <div className="border-b p-2" />
+                        <AddRemoveTopics course={course} setCourse={setCourse} />
+                    </div>
                     <div className="border border-info rounded-md p-4">
                         <h2 className="text-2xl font-bold">Classes</h2>
                         <div className="border-b p-2" />
                         <AddRemoveClass course={course} setCourse={setCourse} />
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between p-4">
 
                         <button
                             className="btn btn-error dark:text-white"
                             onClick={() => setStep(1)}
                         >
                             Go Back
-                        </button>
-
-                        <button
-                            className="btn btn-error dark:text-white"
-                            onClick={() => setCourse({ ...course, classes: [] })}
-                        >
-                            Reset classes
                         </button>
 
                         <button
@@ -84,8 +90,9 @@ const CreateCourse: React.FC = () => {
                         <button
                             className="btn btn-success dark:text-white"
                             onClick={createCourse}
+                            disabled={!isCourseValid}
                         >
-                            Create Course
+                            {saving ? <span className="loading loading-spinner"></span> : "PostCourse"}
                         </button>
                     </div>
                 </div>
@@ -99,12 +106,20 @@ const CreateCourse: React.FC = () => {
                 >
                     <div className="space-y-2">
                         <h2 className="text-xl font-bold">Course Created Successfully</h2>
-                        <button
-                            className="btn btn-success dark:text-white"
-                            onClick={() => router.push('/admin')}
-                        >
-                            Go to Admin Dashboard
-                        </button>
+                        <div className="flex justify-between">
+                            <button
+                                className="btn btn-success dark:text-white"
+                                onClick={() => router.push('/admin')}
+                            >
+                                Go to Admin Dashboard
+                            </button>
+                            <button
+                                className="btn btn-success dark:text-white"
+                                onClick={() => router.push('/course')}
+                            >
+                                Go to Course Page
+                            </button>
+                        </div>
                     </div>
                 </ModalBase>
             )}

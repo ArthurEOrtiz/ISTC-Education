@@ -73,6 +73,7 @@ const DashboardPage:React.FC = async () => {
     // Finally we need to check if the user is an admin or not.
     const isAdmin: boolean = await isUserAdmin(IPId);
     const { contact, employer } = serverUser;
+    
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">

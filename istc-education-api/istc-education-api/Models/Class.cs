@@ -22,6 +22,6 @@ namespace istc_education_api.Models
 		[TimeRange("Start", ErrorMessage = "End time must be greater than start time.")]
 		public TimeOnly End { get; set; }
 
-		public virtual HashSet<Attendance>? Attendances { get; set; }
+		public virtual ICollection<Attendance>? Attendances { get; set; }
 	}
 }

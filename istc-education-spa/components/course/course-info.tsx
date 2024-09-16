@@ -1,4 +1,5 @@
 'use client';   
+import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import { useState } from "react";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 
@@ -35,8 +36,10 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
 
     const { fileName, data } = pdf ? pdf : { fileName: "", data: "" };
 
+    const deadLine: string = convertDateToMMDDYYYY(enrollmentDeadline);
+
     return (
-        <div className="border border-info rounded-md p-4 max-w-3xl">
+        <div className="p-4 w-full max-w-3xl">
             <div className="flex justify-between items-center gap-2">
                 <h2 className="text-2xl font-bold">{title}</h2>
                 <button 
@@ -52,7 +55,7 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
                 <p className="">{description}</p>
                 <div className="flex gap-2">
                     <p className="text-lg font-bold">Enrollment Deadline:</p>
-                    <p className="text-lg">{enrollmentDeadline}</p>
+                    <p className="text-lg">{deadLine}</p>
                 </div>
                 <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
@@ -75,24 +78,26 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
                 )}
 
                 <div className="border-b" />
+                <p className="text-2xl font-bold">Instructor</p>
 
                 <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
-                        <p className="text-lg font-bold">Instructor:</p>
+                        <p className="text-lg font-bold">Name:</p>
                         <p className="text-lg">{instructorName}</p>
                     </div>
-                    <div className="flex gap-2">
-                        <p className="text-lg font-bold">Email:</p>
-                        <p className="text-lg">{instructorEmail}</p>
-                    </div>
+
+                    {instructorEmail && (
+                        <div className="flex gap-2">
+                            <p className="text-lg font-bold">Email:</p>
+                            <p className="text-lg">{instructorEmail}</p>
+                        </div>
+                    )}
                 </div>
 
                 <div className="border-b" />
-
-                <div className="flex gap-2">
-                    <p className="text-lg font-bold">Location:</p>
-                    <p className="text-lg">{locationDescription}</p>
-                </div>
+                
+                <p className="text-2xl font-bold">Location</p>
+                <p className="text-lg">{locationDescription}</p>
 
                 <div>
                     <p className="text-lg">{addressLine1}</p>
@@ -103,11 +108,8 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
                 {hasPDF && (
                     <>
                         <div className="border-b" />
-
-                        <div className="flex gap-2">
-                            <p className="text-lg font-bold">PDF:</p>
-                            <a href={`data:application/pdf;base64,${data}`} download={fileName} className="text-lg text-info">{fileName}</a>
-                        </div>
+                        <p className="text-2xl font-bold">PDF</p>
+                        <a href={`data:application/pdf;base64,${data}`} download={fileName} className="text-lg text-info">{fileName}</a>
                     </>
                 )}
             </div>

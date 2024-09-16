@@ -16,6 +16,6 @@ namespace istc_education_api.Models
 		[StringLength(500, MinimumLength = 3, ErrorMessage ="Description must be between 3 and 500 characters.")]
 		public string? Description { get; set; }
 
-		public virtual HashSet<Course> Courses { get; set; } = [];
+		public virtual ICollection<Course>? Courses { get; set; } 
 	}
 }

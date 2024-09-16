@@ -32,7 +32,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         description: null,
         attendanceCredit: 0,
         maxAttendance: 0,
-        enrollmentDeadline: getTomorrowDate().toDateString(),
+        enrollmentDeadline: getTomorrowDate().toISOString().split("T")[0], // YYYY-MM-DD
         instructorName: "",
         instructorEmail: null,
         hasExam: false,
@@ -249,7 +249,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
             <TextInput
                 label="Title"
                 id="title"
-                placeholder="Underwater Basket Weaving"
+                placeholder="Ubran Renewal"
                 defaultValue={course.title}
                 onBlur={handleValidation}
                 onChange={handleOnChange}

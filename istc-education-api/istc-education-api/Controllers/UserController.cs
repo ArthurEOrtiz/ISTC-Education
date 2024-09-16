@@ -6,8 +6,6 @@ using System.Net;
 
 namespace istc_education_api.Controllers
 {
-	[ApiController]
-	[Route("[controller]")]
 	public class UserController : BaseController<UserController>
 	{
 		public UserController(DataContext context, ILogger<UserController> logger) : base(context, logger)

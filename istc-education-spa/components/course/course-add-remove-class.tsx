@@ -7,7 +7,7 @@ interface AddRemoveClassProps {
 }
 
 const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) => {
-    const [date, setDate] = useState<string>('');
+    const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [start, setStart] = useState<string>('09:00:00');
     const [end, setEnd] = useState<string>('17:00:00');
     const [errors, setErrors] = useState<FormError>({});
@@ -18,9 +18,9 @@ const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) =>
             const date = new Date(lastClass.date);
             date.setDate(date.getDate() + 1);
             setDate(date.toISOString().split('T')[0]);
-        } else {
-            setDate(new Date().toISOString().split('T')[0]);
-        }
+            setStart(lastClass.start);
+            setEnd(lastClass.end);
+        } 
     }, [course]);
 
     const handleAddClass = () => {
@@ -128,7 +128,7 @@ const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) =>
                                     <FaTimes/>
                                 </button>
                             </div>
-                            <div className="sm:flex sm:justify-between space-y-2 items-end">
+                            <div className="sm:flex sm:justify-between sm:gap-1 space-y-2 items-end">
                                 <label className="input input-bordered flex items-center gap-2">
                                     <p className="font-bold text-xl">Date:</p>
                                     <input

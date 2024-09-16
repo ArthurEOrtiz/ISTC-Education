@@ -6,8 +6,6 @@ using System.Net;
 
 namespace istc_education_api.Controllers
 {
-	[ApiController]
-	[Route("[controller]")]
 	public class CourseController : BaseController<Course>
 	{
 		public CourseController(DataContext context, ILogger<Course> logger) : base(context, logger)
@@ -21,7 +19,7 @@ namespace istc_education_api.Controllers
 			try
 			{
 				var courses = await _context.Courses
-					.Include(c => c.Exams)
+					.Include(c => c.Classes)
 					.ToListAsync();
 				return Ok(courses);
 			}
@@ -38,12 +36,11 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var course = await _context.Courses
-					.Include(c => c.Exams)
-					.FirstOrDefaultAsync(c => c.CourseId == id);
+				var course = await GetCourseQuery().FirstOrDefaultAsync(c => c.CourseId == id);
+
 				if (course == null)
 				{
-					return NotFound();
+					return NotFound("Course not found.");
 				}
 
 				return Ok(course);
@@ -97,45 +94,6 @@ namespace istc_education_api.Controllers
 
 				_context.Entry(course.Location).State = EntityState.Modified;
 
-				if (course.HasPDF && course.PDF != null)
-				{
-					_context.Entry(course.PDF).State = EntityState.Modified;
-				} else if (!course.HasPDF && course.PDF != null)
-				{
-					throw new Exception("PDF cannot be attached to a course that does not have a PDF.");
-				}
-
-				if (course.Topics != null)
-				{
-					foreach (var topic in course.Topics)
-					{
-						_context.Entry(topic).State = EntityState.Modified;
-					}
-				}
-
-				if (course.Exams != null)
-				{
-					foreach (var exam in course.Exams)
-					{
-						_context.Entry(exam).State = EntityState.Modified;
-					}
-				}
-
-				if (course.Classes != null)
-				{
-					foreach (var @class in course.Classes)
-					{
-						_context.Entry(@class).State = EntityState.Modified;
-					}
-				}
-
-				if (course.WaitList != null)
-				{
-					foreach (var waitList in course.WaitList)
-					{
-						_context.Entry(waitList).State = EntityState.Modified;
-					}
-				}
 
 				await _context.SaveChangesAsync();
 
@@ -186,6 +144,17 @@ namespace istc_education_api.Controllers
 		private bool CourseExists(int id)
 		{
 			return _context.Courses.Any(c => c.CourseId == id);
+		}
+
+		private IQueryable<Course> GetCourseQuery()
+		{
+			return _context.Courses
+				.Include(c => c.Location)
+				.Include(c => c.PDF)
+				.Include(c => c.Topics)
+				.Include(c => c.Exams) 
+				.Include(c => c.Classes)
+				.Include(c => c.WaitList);
 		}
 	}
 }

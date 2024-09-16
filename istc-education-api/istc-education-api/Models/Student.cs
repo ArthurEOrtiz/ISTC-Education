@@ -16,12 +16,12 @@ namespace istc_education_api.Models
 
 		public bool MappingCertified { get; set; } = false;
 
-		public virtual HashSet<Certification>? Certifications { get; set; }
+		public virtual ICollection<Certification>? Certifications { get; set; }
 
-		public virtual HashSet<Attendance>? Attendances { get; set; }
+		public virtual ICollection<Attendance>? Attendances { get; set; }
 
-		public virtual HashSet<Exam>? Exams { get; set; }
+		public virtual ICollection<Exam>? Exams { get; set; }
 
-		public virtual HashSet<WaitList>? WaitLists { get; set; }
+		public virtual ICollection<WaitList>? WaitLists { get; set; }
 	}
 }

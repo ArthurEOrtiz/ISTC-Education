@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace istc_education_api.Controllers
 {
+	[ApiController]
+	[Route("[controller]")]
 	public abstract class BaseController<T> : ControllerBase
 	{
 		protected readonly DataContext _context;

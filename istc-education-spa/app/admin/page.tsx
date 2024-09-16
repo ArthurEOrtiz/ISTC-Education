@@ -6,7 +6,7 @@ const AdminPage: React.FC = async () => {
             <h1 className="text-3xl font-bold"> Admin Dashboard </h1>
             <div className="border border-info rounded-md p-4">
                 <h2 className="text-xl font-bold">Admin Actions</h2>
-                <div className="flex flex-col space-y-2">
+                <div className="flex gap-2">
                     <Link href="/course/create" className="btn btn-success dark:text-white">
                         Create Course
                     </Link>

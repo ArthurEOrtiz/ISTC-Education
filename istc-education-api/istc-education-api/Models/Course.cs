@@ -9,9 +9,9 @@ namespace istc_education_api.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public int CourseId { get; set; }
 
-		[RegularExpression("UpComing|InProgress|Archived", 
-			ErrorMessage = "Status must be 'UpComing''InProgress' or 'Archived'.")]
-		public string Status { get; set; } = "UpComing";
+		[Required(ErrorMessage = "Status is required.")]
+		[EnumDataType(typeof(CourseStatus), ErrorMessage ="Status must be 'UpComing', 'InProgress', 'Completed', 'Cancelled', or 'Archived'.")]
+		public CourseStatus Status { get; set; } = CourseStatus.UpComing;
 
 		[Required(ErrorMessage = "Title is required.")]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters.")]
@@ -50,18 +50,14 @@ namespace istc_education_api.Models
 		// This is the one many-to-many relationship in the database.
 		// I'm using a HashSet because it's a collection of unique items.
 		// I'm using a nullable type because it's possible for a course to have no topics.
-		public virtual HashSet<Topic>? Topics { get; set; }
+		public virtual ICollection<Topic>? Topics { get; set; }
 
-		// same kind of logic here, but this is a one-to-many relationship.
-		public virtual HashSet<Exam>? Exams { get; set; }
 
-		// Here, I'm usig a combination of things.
-		// This should be a unique list of classes riiiighhht? 
-		// you cant carbon copy a class to another course, nor have the same class in
-		// the same course twice. this is because child classes are linked to attendance records
-		// which should never by modified after creation. and they are unique events in time and location.
-		public virtual HashSet<Class> Classes { get; set; } = [];
+		public virtual ICollection<Exam>? Exams { get; set; }
 
-		public virtual HashSet<WaitList>? WaitList { get; set; }
+
+		public virtual ICollection<Class> Classes { get; set; } = new HashSet<Class>();
+
+		public virtual ICollection<WaitList>? WaitList { get; set; }
 	}
 }
