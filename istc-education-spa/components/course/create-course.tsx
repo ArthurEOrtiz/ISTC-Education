@@ -23,7 +23,6 @@ const CreateCourse: React.FC = () => {
     }, [course?.classes]);
 
     const createCourse = async () => {
-        
         if (course) {
             setSaving(true);
             try {
@@ -69,7 +68,7 @@ const CreateCourse: React.FC = () => {
                     <div className="border border-info rounded-md p-4">
                         <h2 className="text-2xl font-bold">Classes</h2>
                         <div className="border-b p-2" />
-                        <AddRemoveClass course={course} setCourse={setCourse} />
+                        <AddRemoveClass course={course} setCourse={setCourse as any} />
                     </div>
                     <div className="flex justify-between p-4">
 
@@ -117,7 +116,7 @@ const CreateCourse: React.FC = () => {
                                 className="btn btn-success dark:text-white"
                                 onClick={() => router.push('/course')}
                             >
-                                Go to Course Page
+                                Go to Courses
                             </button>
                         </div>
                     </div>

@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import TextInput from "../form/text-input";
 import { validateEmail, validateLength, validateURL, validateZip } from "@/utils/forms/validation";
 import { useRouter } from "next/navigation";
@@ -15,10 +15,11 @@ interface CourseFormProps {
     course?: Course;
     submitText?: string;
     goBack?: boolean;
-    onSubmit: (course: Course) => void;
+    onSubmit?: (course: Course) => void;
+    setCourse?: Dispatch<SetStateAction<Course>>;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitText="Submit", goBack = false, onSubmit }) => {
+const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCourse: setExternalCourse, submitText="Submit", goBack = false, onSubmit }) => {
     const getTomorrowDate = (): string => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -70,7 +71,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
 
     const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onSubmit(course);
+        onSubmit && onSubmit(course);
     }
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -80,12 +81,24 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
             case id === "maxAttendance": 
             case id === "attendanceCredit":
                 const intValue: number = value === '' ? 0 : parseInt(value);
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        [id]: intValue,
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: intValue,
                 }));
                 break;
             case id === "hasExam":
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        [id]: !course.hasExam,
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: !course.hasExam,
@@ -93,6 +106,12 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                 break;
             case id === "examCredit":
                 const examCredit: number | null = value === '' ? null : parseInt(value);
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        [id]: examCredit,
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: examCredit,
@@ -100,22 +119,45 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                 break;
             case id.startsWith("location"):
                 const locationField = id.split('.')[1];
+                const newLocationValue = value === '' ? null : value;
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        location: {
+                            ...prev.location as Location,
+                            [locationField]: newLocationValue,
+                        }
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
                     location: {
                         ...prev.location as Location,
-                        [locationField]: value === '' ? null : value,
+                        [locationField]: newLocationValue,
                     }
                 }));
                 break;
             case id === "description":
             case id === "instructorEmail":
+                const newValue = value === '' ? null : value;
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        [id]: newValue,
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
-                    [id]: value === '' ? null : value,
+                    [id]: newValue,
                 }));
                 break;
             default:
+                if (setExternalCourse) {
+                    setExternalCourse(prev => ({
+                        ...prev,
+                        [id]: value,
+                    }));
+                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: value,
@@ -134,6 +176,18 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     const splitResult = e.target.result.split(',');
                     if (splitResult.length > 1) {
                         const base64 = splitResult[1];
+                        if (setExternalCourse) {
+                            setExternalCourse(prev => ({
+                                ...prev,
+                                hasPDF: true,
+                                pdf: {
+                                    pdfId: 0,
+                                    courseId: 0,
+                                    fileName,
+                                    data: base64,
+                                }
+                            }));
+                        }
                         setCourse(prev => ({
                             ...prev,
                             hasPDF: true,
@@ -167,6 +221,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
             pdfInputRef.current.value = '';
         }
         setErrors(prev => ({ ...prev, pdf: '' }));
+        if (setExternalCourse) {
+            setExternalCourse(prev => ({ ...prev, hasPDF: false, pdf: undefined }));
+        }
         setCourse(prev => ({ ...prev, hasPDF: false, pdf: undefined }))
     }
 
@@ -439,17 +496,26 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                 <h1 className="text-xl font-bold">PDF</h1>
             </div>
             <div className="sm:flex sm:justify-between items-end space-y-2">
-                <div>
-                    <input
-                        type="file"
-                        accept=".pdf"
-                        className="file-input file-input-bordered w-full"
-                        id="pdf"
-                        ref={pdfInputRef}
-                        onChange={handlePDFChange}
-                    />
-                    {errors.pdf && <p className="text-error">{errors.pdf}</p>}
-                </div>
+                {!course.hasPDF ? (
+                    <div>
+                        <input
+                            type="file"
+                            accept=".pdf"
+                            className="file-input file-input-bordered w-full"
+                            id="pdf"
+                            ref={pdfInputRef}
+                            onChange={handlePDFChange}
+                        />
+                        {errors.pdf && <p className="text-error">{errors.pdf}</p>}
+                    </div>
+                ) : (
+                    <a 
+                        className="link link-info text-xl" 
+                        href={`data:application/pdf;base64,${course.pdf?.data}`} 
+                        download={course.pdf?.fileName}>
+                            {course.pdf?.fileName}
+                    </a>
+                )}
                 <button
                     className="btn btn-error dark:text-white"
                     onClick={handleRemovePDF}
@@ -457,7 +523,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                     Remove
                 </button>
             </div>
-            <div className="border-b p-2"/>
+            {goBack || onSubmit && (
+                <div className="border-b p-2"/>
+            )}
             <div className="flex justify-end gap-2">
                 {goBack && (
                     <button
@@ -467,14 +535,15 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
                         Go Back
                     </button>
                 )}
-                
-                <button
-                    type="submit"
-                    className="btn btn-success dark:text-white"
-                    disabled={!isFormValid}
-                >
-                    {submitText}
-                </button>
+                {onSubmit && (
+                    <button
+                        type="submit"
+                        className="btn btn-success dark:text-white"
+                        disabled={!isFormValid}
+                    >
+                        {submitText}
+                    </button>
+                )}
             </div>
         </form>
     );

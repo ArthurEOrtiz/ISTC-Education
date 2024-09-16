@@ -6,9 +6,9 @@ using System.Net;
 
 namespace istc_education_api.Controllers
 {
-	public class TopicsController : BaseController<Topic>
+	public class TopicController : BaseController<Topic>
 	{
-		public TopicsController(DataContext context, ILogger<Topic> logger) : base(context, logger)
+		public TopicController(DataContext context, ILogger<Topic> logger) : base(context, logger)
 		{
 		}
 

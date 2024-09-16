@@ -3,7 +3,7 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 
 interface AddRemoveClassProps {
     course: Course;
-    setCourse: Dispatch<SetStateAction<Course | null>>;
+    setCourse: Dispatch<SetStateAction<Course>>;
 }
 
 const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) => {

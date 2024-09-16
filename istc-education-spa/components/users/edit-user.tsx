@@ -48,7 +48,7 @@ export const EditUser: React.FC<EditUserProps> = ({ user, isAdmin = false }) => 
                 <UserForm
                     user={user}
                     submitText="Update User"
-                    goBack={true}   
+                    goBack={!isAdmin}
                     onSubmit={handleSubmit}
                     onError={setErrors}
                 />

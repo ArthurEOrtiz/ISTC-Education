@@ -13,6 +13,9 @@ const AdminPage: React.FC = async () => {
                     <Link href="/user/create" className="btn btn-success dark:text-white">
                         Create User
                     </Link>
+                    <Link href="/topic/create" className="btn btn-success dark:text-white">
+                        Create Topic
+                    </Link>
                 </div>
             </div>
         </div>

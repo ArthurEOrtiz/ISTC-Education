@@ -11,7 +11,7 @@ export const getAllCourses = async () => {
     }
 }
 
-export const getCourse = async (id: number) => {
+export const getCourse = async (id: number): Promise<Course | null> => {
     try {
         const response = await axiosInstance.get(`/Course/${id}`);
         return response.data as Course;
