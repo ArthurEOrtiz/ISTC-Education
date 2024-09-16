@@ -23,7 +23,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     const [user, setUser] = useState<User>({
         userId: 0,
         ipId: IPId || '',
-        status: 'Active',
+        status: incomingUser ? incomingUser.status : 'AdminRegistered',
         firstName: '',
         lastName: '',
         middleName: null,
@@ -396,7 +396,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             </div>
             <SelectInput
                 id="employer.employerName"
-                options={['Initial', 'Other', 'Tax Commission', ...idahoCounties]}
                 value={user.employer?.employerName || 'Initial'}
                 onBlur={handleValidation}
                 onChange={(e) => {
@@ -410,7 +409,14 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                 }}
                 error={errors['employer.employerName']}
                 required
-            />
+            >
+                <option value="Initial" disabled>Select Employer</option>
+                <option value="Other">Other</option>
+                <option value="Tax Commission">Tax Commission</option>
+                {idahoCounties.map((county, index) => (
+                    <option key={index} value={county}>{county}</option>
+                ))}
+            </SelectInput>
             {otherEmployer !== null &&
                 <TextInput
                     id="employer.otherEmployerName"

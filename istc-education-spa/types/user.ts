@@ -1,7 +1,7 @@
 interface User {
     userId: number;
     ipId: string | null;
-    status: 'Active' | 'Archived';
+    status: 'Active' | 'AdminRegistered' | 'Archived';
     firstName: string;
     lastName: string;
     middleName: string | null;

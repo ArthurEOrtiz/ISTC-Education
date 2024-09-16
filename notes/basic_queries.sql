@@ -24,6 +24,9 @@ FROM Attendances;
 --FROM Locations;
 
 --SELECT *
+--FROM PDFs;
+
+--SELECT *
 --FROM Exams;
 
 --SELECT *

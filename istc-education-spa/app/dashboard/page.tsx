@@ -34,6 +34,7 @@ const DashboardPage:React.FC = async () => {
     if (!primaryEmailAddress) {
         throw new Error('User does not have a primary email address, please contact support');
     }
+
     const { emailAddress } = primaryEmailAddress;
 
     // Next we get the user from the server, using the primary email address
@@ -64,6 +65,7 @@ const DashboardPage:React.FC = async () => {
         // FORNOW: I will use an console log to make sure the user is being updated correctly.
         console.log(`Updating user record with IP ID: ${IPId}`);
         serverUser.ipId = IPId;
+        serverUser.status = "Active";
         const response = await putUser(serverUser);
         if (!response.success) {
             throw new Error("Error updating user record with Identity Provider ID");
@@ -86,7 +88,7 @@ const DashboardPage:React.FC = async () => {
                         {isUserNew && (
                             <div className="border border-warning bg-warning-content rounded-md p-4">
                                 <h2 className="text-warning text-xl font-bold">WELCOME NEW USER!</h2>
-                                <p className="text-warning">Please revie your personal information below, click on edit to make any changes.</p>
+                                <p className="text-warning">Please review your personal information below, click on edit to make any changes.</p>
                             </div>
                         )}
                         <div className="md:flex md:justify-between space-y-2 items-baseline gap-2">

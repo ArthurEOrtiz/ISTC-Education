@@ -23,7 +23,7 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
             <div className="sm:w-2/3 sm:flex sm:justify-center">
                 <CourseInfo course={course} expanded />
             </div>
-            <div className="w-full max-w-3xl p-4">
+            <div className="w-full sm:w-2/3 max-w-3xl px-4">
                 <h2 className="text-2xl font-bold">Classes</h2>
                 <div className="space-y-2 mt-2">
                     {course.classes.map((cls) => {

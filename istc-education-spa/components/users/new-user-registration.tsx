@@ -19,6 +19,11 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
 
     const registerUser = async () => {
         if (user) {
+            
+            if (user.status === "AdminRegistered") {
+                user.status = "Active";
+            }
+
             try {
                 const response = await postUser(user);
                 if (response.success) {
@@ -62,16 +67,10 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
                             )}
                         </>
                     )}
-                    {step === 2 && (
+                    {step === 2 && user && (
                         <div className="space-y-4">
                             <h2 className="text-xl font-bold">Review User Information</h2>
-                            
-                            {user && <UserInfo user={user} />}
-
-                            {/* <div className="border border-primary rounded-md p-4">
-                                <pre>{JSON.stringify(user, null, 2)}</pre>
-                            </div> */}
-
+                            <UserInfo user={user} />
                             <div className="flex justify-end space-x-2">
                                 <button
                                     onClick={() => setStep(1)}

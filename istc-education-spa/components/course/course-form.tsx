@@ -19,10 +19,10 @@ interface CourseFormProps {
 }
 
 const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitText="Submit", goBack = false, onSubmit }) => {
-    const getTomorrowDate = () => {
+    const getTomorrowDate = (): string => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow;
+        return tomorrow.toISOString().split("T")[0];
     };
 
     const [ course, setCourse ] = useState<Course>({
@@ -32,7 +32,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse,submitTe
         description: null,
         attendanceCredit: 0,
         maxAttendance: 0,
-        enrollmentDeadline: getTomorrowDate().toISOString().split("T")[0], // YYYY-MM-DD
+        enrollmentDeadline: getTomorrowDate(), 
         instructorName: "",
         instructorEmail: null,
         hasExam: false,

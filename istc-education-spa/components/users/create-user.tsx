@@ -10,6 +10,7 @@ import UserInfo from "./user-info";
 const CreateUser: React.FC = () => {
     const [ user, setUser ] = useState<User | null>(null);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
+    const [ saving, setSaving ] = useState<boolean>(false);
     const [ previewUser, setPreviewUser ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
@@ -17,6 +18,7 @@ const CreateUser: React.FC = () => {
     const registerUser = async () => {
         if (user) {
             try {
+                setSaving(true);
                 const response = await postUser(user);
                 if (response.success) {
                     setSuccess(true);
@@ -26,6 +28,7 @@ const CreateUser: React.FC = () => {
             } catch (error) {
                 setError("An error occurred while registering the user");
             } finally {
+                setSaving(false);
                 setPreviewUser(false);
             }
         }
@@ -83,7 +86,7 @@ const CreateUser: React.FC = () => {
                                 className="btn btn-success dark:text-white"
                                 onClick={() => registerUser()}
                             >
-                                Register User
+                                {saving ? <span className="loading loading-spinner"></span> : "Submit"}
                             </button>
                         </div>
                     </div>

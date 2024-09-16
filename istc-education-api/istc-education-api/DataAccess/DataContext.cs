@@ -29,6 +29,10 @@ namespace istc_education_api.DataAccess
 			modelBuilder.Entity<Course>()
 				.Property(c => c.Status)
 				.HasConversion<string>();
+
+			modelBuilder.Entity<User>()
+				.Property(c => c.Status)
+				.HasConversion<string>();
 		}
 	}
 }
