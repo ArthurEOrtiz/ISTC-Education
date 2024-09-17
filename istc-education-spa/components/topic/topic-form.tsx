@@ -58,7 +58,7 @@ const TopicForm: React.FC<TopicFormProps> = ({ topic:incomingTopic, submitText, 
                 formErrors[id] = validateLength(value, 3, 50) ? '' : 'Title must be between 3 and 50 characters';
                 break;
             case 'description':
-                formErrors[id] = validateLength(value, 3, 500) ? '' : 'Description must be between 3 and 500 characters';
+                formErrors[id] = value === '' ? '' : validateLength(value, 3, 500) ? '' : 'Description must be between 3 and 500 characters';
                 break;
         }
 

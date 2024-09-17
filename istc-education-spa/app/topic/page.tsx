@@ -1,6 +1,8 @@
 import { getAllTopics } from "@/utils/api/topic";
 import { isUserAdmin } from "@/utils/api/users";
 import { auth } from "@clerk/nextjs/server";
+import Link from "next/link";
+import { FaPlus } from "react-icons/fa";
 
 const TopicIndexPage: React.FC = async() => {
     const {userId: IPId} = auth();
@@ -28,6 +30,14 @@ const TopicIndexPage: React.FC = async() => {
                             <p>{topic.description}</p>
                         </div>
                     ))}
+                </div>
+                <div className="flex justify-end mt-2">
+                   <Link
+                        href="/topic/create"
+                        className="btn btn-success dark:text-white"
+                    >
+                        <FaPlus/> Topic
+                    </Link>
                 </div>
             </div>
         </div>

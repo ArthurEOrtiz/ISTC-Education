@@ -6,6 +6,7 @@ import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
 import TopicForm from "./topic-form";
 import TopicInfo from "./topic-info";
+import { FaTrash } from "react-icons/fa";
 
 const CreateTopic: React.FC = () => {
     const [ topic, setTopic ] = useState<Topic | null>(null);

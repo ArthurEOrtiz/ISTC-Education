@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, FocusEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, FocusEvent } from 'react';
 
 interface TextInputProps {
   label: string;
@@ -14,24 +14,24 @@ interface TextInputProps {
 }
 
 const TextInput: React.FC<TextInputProps> = ({ label, id, placeholder, value, defaultValue, onBlur, onChange, onInput, error, required }) => (
-        <div className={`${required ? 'border border-error rounded-md' : ''} w-full p-1`}>
-            <label className="input input-bordered flex items-center gap-2">
-                {label}
-                <input 
-                    type="text" 
-                    className="grow" 
-                    placeholder={placeholder}
-                    id={id}
-                    value={value}
-                    defaultValue={defaultValue}
-                    onBlur={onBlur}
-                    onChange={onChange}
-                    onInput={onInput}
-                />
-            </label>
-            {error && <p className="text-sm text-error mt-1">{error}</p>}
-            {required && <p className="text-sm text-error mt-1">Required</p>}
-        </div>
+    <div className={`${required ? 'border border-error rounded-md' : ''} w-full p-1`}>
+        <label className="input input-bordered flex items-center gap-2">
+            {label}
+            <input 
+                type="text" 
+                className="grow" 
+                placeholder={placeholder}
+                id={id}
+                value={value}
+                defaultValue={defaultValue}
+                onBlur={onBlur}
+                onChange={onChange}
+                onInput={onInput}
+            />
+        </label>
+        {error && <p className="text-sm text-error mt-1">{error}</p>}
+        {required && <p className="text-sm text-error mt-1">Required</p>}
+    </div>
 );
 
 export default TextInput;

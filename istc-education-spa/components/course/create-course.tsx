@@ -10,7 +10,36 @@ import AddRemoveClass from "./course-add-remove-class";
 import AddRemoveTopics from "./course-add-remove-topic";
 
 const CreateCourse: React.FC = () => {
-    const [ course, setCourse ] = useState<Course | null>(null);
+    const getTomorrowDate = (): string => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString().split("T")[0];
+    };
+
+    const [ course, setCourse ] = useState<Course>({
+        courseId: 0,
+        status: 'UpComing',
+        title: '',
+        description: null,
+        attendanceCredit: 0,
+        maxAttendance: 0,
+        enrollmentDeadline: getTomorrowDate(),
+        instructorName: '',
+        instructorEmail: null,
+        hasExam: false,
+        examCredit: null,
+        hasPDF: false,
+        location: {
+            locationId: 0,
+            description: '',
+            addressLine1: '',
+            addressLine2: '',
+            city: '',
+            state: '',
+            postalCode: '',
+        } as Location,
+        classes: [],
+    } as Course);
     const [ step, setStep ] = useState<number>(1);
     const [ isCourseValid, setIsCourseValid ] = useState<boolean>(false);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
@@ -19,8 +48,8 @@ const CreateCourse: React.FC = () => {
     const router = useRouter();
 
     useEffect(() => {
-        setIsCourseValid(!!course && course.classes.length > 0);
-    }, [course?.classes]);
+        setIsCourseValid(course.classes.length > 0);
+    }, [course.classes]);
 
     const createCourse = async () => {
         if (course) {
@@ -40,8 +69,7 @@ const CreateCourse: React.FC = () => {
         }
     }
 
-    const handleCourseFormSubmit = (course: Course) => {
-        setCourse(course);
+    const handleCourseFormSubmit = () => {
         setStep(2);
     }
 
@@ -53,12 +81,13 @@ const CreateCourse: React.FC = () => {
                         submitText="Next"
                         goBack
                         course={course || undefined}
+                        setCourse={setCourse}
                         onSubmit={handleCourseFormSubmit}
                     />
                 </div>
             )}
-            {step === 2 && course && (
-                <div className="border border-info rounded-md sm:w-2/3 p-2 space-y-2">
+            {step === 2 && (
+                <div className="sm:w-2/3 p-2 space-y-2">
                     <CourseInfo course={course} expanded />
                     <div className="border border-info rounded-md p-4">
                         <h2 className="text-2xl font-bold">Topics</h2>
@@ -68,7 +97,7 @@ const CreateCourse: React.FC = () => {
                     <div className="border border-info rounded-md p-4">
                         <h2 className="text-2xl font-bold">Classes</h2>
                         <div className="border-b p-2" />
-                        <AddRemoveClass course={course} setCourse={setCourse as any} />
+                        <AddRemoveClass course={course} setCourse={setCourse} />
                     </div>
                     <div className="flex justify-between p-4">
 

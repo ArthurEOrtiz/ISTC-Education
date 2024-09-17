@@ -90,10 +90,27 @@ namespace istc_education_api.Controllers
 
 			try
 			{
-				_context.Entry(course).State = EntityState.Modified;
+				var existingCourse = await GetCourseQuery().FirstOrDefaultAsync(c => c.CourseId == id);
 
-				_context.Entry(course.Location).State = EntityState.Modified;
+				if (existingCourse == null)
+				{
+					return NotFound("Course not found.");
+				}
 
+				_context.Entry(existingCourse).CurrentValues.SetValues(course);
+				_context.Entry(existingCourse.Location).CurrentValues.SetValues(course.Location);
+
+				if (course.PDF != null)
+				{
+					_context.Entry(existingCourse.PDF!).CurrentValues.SetValues(course.PDF);
+				}
+
+				UpdateClasses(existingCourse, course.Classes);
+				
+				if (course.Topics != null)
+				{
+					UpdateTopics(existingCourse, course.Topics);
+				}
 
 				await _context.SaveChangesAsync();
 
@@ -151,10 +168,71 @@ namespace istc_education_api.Controllers
 			return _context.Courses
 				.Include(c => c.Location)
 				.Include(c => c.PDF)
-				.Include(c => c.Topics)
-				.Include(c => c.Exams) 
+				//.Include(c => c.Topics)
+				.Include(c => c.Exams)
 				.Include(c => c.Classes)
 				.Include(c => c.WaitList);
+		}
+
+		private void UpdateClasses(Course existingCourse, ICollection<Class> updatedClasses)
+		{
+			// Remove classes that are no longer in the updated list
+			foreach (var existingClass in existingCourse.Classes.ToList())
+			{
+				if (!updatedClasses.Any(c => c.ClassId == existingClass.ClassId))
+				{
+					_context.Classes.Remove(existingClass);
+				}
+			}
+
+			// Update existing classes or add new ones
+			foreach (var updatedClass in updatedClasses) {
+				var existingClass = existingCourse.Classes
+					.FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
+				
+				if (existingClass != null)
+				{
+					_context.Entry(existingClass).CurrentValues.SetValues(updatedClass);
+				}
+				else
+				{
+					existingCourse.Classes.Add(updatedClass);
+				}
+			}
+		}
+
+		private static void UpdateTopics(Course existingCourse, ICollection<Topic> updatedTopics)
+		{
+			// Topics have a many to many relationship with courses. When updating the topics
+			// of a course, we do not need to delete any topics from the database. We only need to
+			// edit the relationship between the course and the topics.
+
+
+			// First Check if the existing course has any topics
+			if (existingCourse.Topics != null)
+			{
+				// Remove topics that are no longer in the updated list
+				foreach (var existingTopic in existingCourse.Topics.ToList())
+				{
+					if (!updatedTopics.Any(t => t.TopicId == existingTopic.TopicId))
+					{
+						existingCourse.Topics.Remove(existingTopic);
+					}
+				}
+
+				// Add new topics to the course
+				foreach (var updatedTopic in updatedTopics)
+				{
+					if (!existingCourse.Topics.Any(t => t.TopicId == updatedTopic.TopicId))
+					{
+						existingCourse.Topics.Add(updatedTopic);
+					}
+				}
+			} else
+			{
+				// If the existing course has no topics, just add the new topics to the course
+				existingCourse.Topics = updatedTopics;
+			}
 		}
 	}
 }

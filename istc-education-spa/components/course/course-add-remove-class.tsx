@@ -168,8 +168,8 @@ const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) =>
                     </div>
                 ))
             ) : (
-                <div className="mt-1">
-                    <h2 className="text-error">No classes have been added</h2>
+                <div className="bg-error-content rounded-md p-4 mt-1">
+                    <h2 className="text-error font-bold">No classes have been added</h2>
                 </div>
             )}
 

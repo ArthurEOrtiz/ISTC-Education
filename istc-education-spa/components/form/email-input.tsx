@@ -1,7 +1,8 @@
 import { ChangeEvent, FocusEvent } from "react";
+import { FaEnvelope } from "react-icons/fa";
 
 interface EmailInputProps {
-    label: string;
+    label?: string;
     id: string;
     placeholder: string;
     defaultValue?: string;
@@ -15,7 +16,10 @@ interface EmailInputProps {
 const EmailInput: React.FC<EmailInputProps> = ({ label, id, placeholder, defaultValue, onBlur, onChange, error, isEmailChecking, required }) => (
     <div className={`${required ? 'border border-error rounded-md' : ''} p-1`}>
         <label className="input input-bordered flex items-center gap-2">
-            {label}
+            <div className="flex items-center gap-2">
+                <span>{label}</span>
+                <FaEnvelope />
+            </div>
             <input 
                 type="email" 
                 className="grow" 

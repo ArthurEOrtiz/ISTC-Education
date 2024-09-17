@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace istc_education_api.Models
 {
@@ -16,6 +17,7 @@ namespace istc_education_api.Models
 		[StringLength(500, MinimumLength = 5, ErrorMessage ="Description must be between 3 and 500 characters.")]
 		public string? Description { get; set; }
 
+		[JsonIgnore]
 		public virtual ICollection<Course>? Courses { get; set; } 
 	}
 }

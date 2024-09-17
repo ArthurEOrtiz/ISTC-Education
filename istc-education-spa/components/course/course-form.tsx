@@ -12,57 +12,39 @@ import { states } from "@/utils/forms/constants";
 import { handleIntInput } from "@/utils/forms/handlers";
 
 interface CourseFormProps {
-    course?: Course;
+    course: Course;
     submitText?: string;
     goBack?: boolean;
+    archivable?: boolean;
     onSubmit?: (course: Course) => void;
-    setCourse?: Dispatch<SetStateAction<Course>>;
+    setCourse: Dispatch<SetStateAction<Course>>;
 }
 
-const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCourse: setExternalCourse, submitText="Submit", goBack = false, onSubmit }) => {
-    const getTomorrowDate = (): string => {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow.toISOString().split("T")[0];
-    };
-
-    const [ course, setCourse ] = useState<Course>({
-        courseId:  0,
-        status: "UpComing",
-        title: "",
-        description: null,
-        attendanceCredit: 0,
-        maxAttendance: 0,
-        enrollmentDeadline: getTomorrowDate(), 
-        instructorName: "",
-        instructorEmail: null,
-        hasExam: false,
-        examCredit: null,
-        hasPDF: false,
-        location: {
-            locationId: 0,
-            courseId: 0,
-            description: null,
-            room: null,
-            remoteLink: null,
-            addressLine1: null,
-            addressLine2: null,
-            city: null,
-            state: "Idaho",
-            postalCode: null
-        } as Location,
-        classes: [],
-    });
+const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="Submit", goBack = false, archivable = false, onSubmit }) => {
     const [ errors, setErrors ] = useState<FormError>({}); 
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
     const pdfInputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
 
     useEffect(() => {
-        if (incomingCourse) {
-            setCourse(incomingCourse);
+        if(new Date(course.enrollmentDeadline) < new Date()) {
+            setCourse(prev => ({
+                ...prev,
+                status: 'Archived',
+            }));
+        } else if (new Date(course.enrollmentDeadline) == new Date()) {
+            setCourse(prev => ({
+                ...prev,
+                status: 'InProgress',
+            }));
+        } else {
+            setCourse(prev => ({
+                ...prev,
+                status: 'UpComing',
+            }));
         }
-    }, [incomingCourse]);
+    }, [course.enrollmentDeadline]);
+
 
     useEffect(() => {
         const formErrors = Object.values(errors);
@@ -81,24 +63,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
             case id === "maxAttendance": 
             case id === "attendanceCredit":
                 const intValue: number = value === '' ? 0 : parseInt(value);
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        [id]: intValue,
-                    }));
-                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: intValue,
                 }));
                 break;
             case id === "hasExam":
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        [id]: !course.hasExam,
-                    }));
-                }
+                
                 setCourse(prev => ({
                     ...prev,
                     [id]: !course.hasExam,
@@ -106,12 +77,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
                 break;
             case id === "examCredit":
                 const examCredit: number | null = value === '' ? null : parseInt(value);
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        [id]: examCredit,
-                    }));
-                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: examCredit,
@@ -120,15 +85,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
             case id.startsWith("location"):
                 const locationField = id.split('.')[1];
                 const newLocationValue = value === '' ? null : value;
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        location: {
-                            ...prev.location as Location,
-                            [locationField]: newLocationValue,
-                        }
-                    }));
-                }
                 setCourse(prev => ({
                     ...prev,
                     location: {
@@ -140,28 +96,17 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
             case id === "description":
             case id === "instructorEmail":
                 const newValue = value === '' ? null : value;
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        [id]: newValue,
-                    }));
-                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: newValue,
                 }));
                 break;
             default:
-                if (setExternalCourse) {
-                    setExternalCourse(prev => ({
-                        ...prev,
-                        [id]: value,
-                    }));
-                }
                 setCourse(prev => ({
                     ...prev,
                     [id]: value,
                 }));
+                break;
         }
     }
 
@@ -176,18 +121,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
                     const splitResult = e.target.result.split(',');
                     if (splitResult.length > 1) {
                         const base64 = splitResult[1];
-                        if (setExternalCourse) {
-                            setExternalCourse(prev => ({
-                                ...prev,
-                                hasPDF: true,
-                                pdf: {
-                                    pdfId: 0,
-                                    courseId: 0,
-                                    fileName,
-                                    data: base64,
-                                }
-                            }));
-                        }
                         setCourse(prev => ({
                             ...prev,
                             hasPDF: true,
@@ -221,9 +154,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
             pdfInputRef.current.value = '';
         }
         setErrors(prev => ({ ...prev, pdf: '' }));
-        if (setExternalCourse) {
-            setExternalCourse(prev => ({ ...prev, hasPDF: false, pdf: undefined }));
-        }
         setCourse(prev => ({ ...prev, hasPDF: false, pdf: undefined }))
     }
 
@@ -245,7 +175,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
                 formErrors[id] = parseInt(value) > 0 ? '' : 'Attendance Credit must be greater than 0';
                 break;
             case 'enrollmentDeadline':
-                formErrors[id] = value === '' ? 'Enrollment Deadline is required' : new Date(value) > new Date() ? '' : 'Enrollment Deadline must be in the future';
+                formErrors[id] = archivable ? '' : new Date(value) > new Date() ? '' : 'Enrollment Deadline must be in the future';
                 break;
             case 'examCredit':
                 formErrors[id] = course.hasExam && (parseInt(value) > 0) ? '' : 'Exam Credit must be greater than 0';
@@ -400,7 +330,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course: incomingCourse, setCour
             </div>
             <div className="sm:w-1/2">
                 <EmailInput
-                    label="Email"
                     id="instructorEmail"
                     placeholder="Some@Example.com"
                     defaultValue={course.instructorEmail || ''}
