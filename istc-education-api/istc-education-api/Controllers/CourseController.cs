@@ -100,10 +100,7 @@ namespace istc_education_api.Controllers
 				_context.Entry(existingCourse).CurrentValues.SetValues(course);
 				_context.Entry(existingCourse.Location).CurrentValues.SetValues(course.Location);
 
-				if (course.PDF != null)
-				{
-					_context.Entry(existingCourse.PDF!).CurrentValues.SetValues(course.PDF);
-				}
+				UpdatePDF(existingCourse, course.PDF);
 
 				UpdateClasses(existingCourse, course.Classes);
 				
@@ -168,7 +165,7 @@ namespace istc_education_api.Controllers
 			return _context.Courses
 				.Include(c => c.Location)
 				.Include(c => c.PDF)
-				//.Include(c => c.Topics)
+				.Include(c => c.Topics)
 				.Include(c => c.Exams)
 				.Include(c => c.Classes)
 				.Include(c => c.WaitList);
@@ -232,6 +229,31 @@ namespace istc_education_api.Controllers
 			{
 				// If the existing course has no topics, just add the new topics to the course
 				existingCourse.Topics = updatedTopics;
+			}
+		}
+
+		private void UpdatePDF(Course existingCourse, PDF? updatedPDF)
+		{
+			// If the update pdf is null remove the pdf attached the the existing course.
+			if (updatedPDF == null && existingCourse.PDF != null)
+			{
+				_context.PDFs.Remove(existingCourse.PDF);
+				existingCourse.PDF = null;
+				existingCourse.HasPDF = false;
+			}
+			else if (updatedPDF != null)
+			{
+				// If the existing course has no pdf, add the new pdf to the course.
+				if (existingCourse.PDF == null)
+				{
+					existingCourse.PDF = updatedPDF;
+					existingCourse.HasPDF = true;
+				}
+				else
+				{
+					// If the existing course has a pdf, update the pdf.
+					_context.Entry(existingCourse.PDF).CurrentValues.SetValues(updatedPDF);
+				}
 			}
 		}
 	}
