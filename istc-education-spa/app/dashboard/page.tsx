@@ -99,7 +99,7 @@ const DashboardPage:React.FC = async () => {
                                     <p>{contact.phone}</p>
                                     <p>{contact.addressLine1}</p>
                                     <p>{contact.addressLine2}</p>
-                                    <p>{contact.city}, {contact.state} {contact.postalCode}</p>
+                                    <p>{contact.city} {contact.state} {contact.postalCode}</p>
                                 </div>
                             )}
                            {employer && (

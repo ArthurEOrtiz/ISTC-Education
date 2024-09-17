@@ -11,7 +11,8 @@ interface EditUserProps {
     isAdmin?: boolean;   
 }
 
-export const EditUser: React.FC<EditUserProps> = ({ user, isAdmin = false }) => {
+export const EditUser: React.FC<EditUserProps> = ({ user: incomingUser, isAdmin = false }) => {
+    const [ user, setUser ] = useState<User>(incomingUser);
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
@@ -33,21 +34,16 @@ export const EditUser: React.FC<EditUserProps> = ({ user, isAdmin = false }) => 
         }
     }
 
-    if (isSubmitting) {
-        return  (
-            <>            
-                <p className="text-3xl font-bold">Updating User...</p>
-                <span className="loading loading-spinner loading-lg"></span>
-            </>
-        )
-    }
+    
 
     return (
         <>
             <div className="border border-info rounded-md p-2">
                 <UserForm
                     user={user}
+                    setUser={setUser}
                     submitText="Update User"
+                    submitting={isSubmitting}
                     goBack={!isAdmin}
                     onSubmit={handleSubmit}
                     onError={setErrors}

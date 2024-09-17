@@ -1,7 +1,7 @@
 'use client';
 import { getUserByEmail } from "@/utils/api/users";
 import { idahoCounties, states } from "@/utils/forms/constants";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import TextInput from "../form/text-input";
 import EmailInput from "../form/email-input";
 import CustomPhoneInput from "../form/phone-input";
@@ -11,48 +11,16 @@ import { useRouter } from "next/navigation";
 import { handleIntInput } from "@/utils/forms/handlers";
 
 interface UserFormProps {
-    user?: User;
-    IPId?: string;
+    user: User;
+    setUser: Dispatch<SetStateAction<User>>;
     submitText?: string;
+    submitting?: boolean;
     goBack?: boolean;    
     onError: (error: string) => void;
-    onSubmit: (user: User) => void;
+    onSubmit?: (user: User) => void;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitText = "Submit", goBack = false, onSubmit, onError }) => {
-    const [user, setUser] = useState<User>({
-        userId: 0,
-        ipId: IPId || '',
-        status: incomingUser ? incomingUser.status : 'AdminRegistered',
-        firstName: '',
-        lastName: '',
-        middleName: null,
-        isAdmin: false,
-        isStudent: true,
-        contact: {
-            contactId: 0,
-            userId: 0,
-            email: '',
-            phone: null,
-            addressLine1: null,
-            addressLine2: null,
-            city: 'Boise',
-            state: 'Idaho',
-            postalCode: null,
-        },
-        employer: {
-            employerId: 0,
-            userId: 0,
-            employerName: 'Initial',
-            jobTitle: '',
-        },
-        student: {
-            studentId: 0,
-            userId: 0,
-            appraiserCertified: false,
-            mappingCertified: false,
-        },
-    } as User);
+const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit", submitting = false,  goBack = false, onSubmit, onError }) => {
     const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
     const [ errors, setErrors ] = useState<FormError>({});
     const [ isEmailChecking, setIsEmailChecking ] = useState<boolean>(false);
@@ -60,23 +28,18 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     const router = useRouter();
 
     useEffect(() => {
-        // If user.employer.employerName is not any of the idahoCounties.
-        if (incomingUser) {
-            if (incomingUser.employer && 
-                !idahoCounties.includes(incomingUser.employer.employerName) &&
-                incomingUser.employer.employerName !== 'Tax Commission') {
-                    // Now set the user to incomingUser but with employer.employerName set to 'Other'
-                    const incomingUserCopy = { ...incomingUser,
-                        employer: {
-                            ...incomingUser.employer,
-                            employerName: 'Other',
-                        }
-                    };
-                    setUser(incomingUserCopy);
-                    setOtherEmployer(incomingUser.employer.employerName);
-            } else {
-                setUser(incomingUser);
-            }
+        // If the employer name is not any of the predefined options(counties or "Tax Commision"), set it to 'Other'
+        if (!idahoCounties.includes(user.employer.employerName) && 
+            user.employer.employerName !== 'Tax Commission' &&
+            user.employer.employerName !== 'Initial') {
+            setOtherEmployer(user.employer.employerName);
+            setUser(prev => ({
+                ...prev,
+                employer: {
+                    ...prev.employer,
+                    employerName: 'Other',
+                },
+            }));
         }
     }, []);
 
@@ -87,9 +50,9 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
     }, [
         user.firstName, 
         user.lastName, 
-        user.contact?.email, 
-        user.employer?.employerName,
-        user.employer?.jobTitle,
+        user.contact.email, 
+        user.employer.employerName,
+        user.employer.jobTitle,
         otherEmployer,
         errors
     ]);    
@@ -101,7 +64,7 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             submittingUser.employer.employerName = otherEmployer;
         }
         
-        onSubmit(submittingUser);
+        onSubmit && onSubmit(submittingUser);
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -266,9 +229,12 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
         });
 
         if (allRequiredFieldsFilled) {
-            if (user.employer?.employerName === 'Other') {
-               
+            if (user.employer.employerName === 'Other') {
                 return otherEmployer !== null && otherEmployer.trim() !== '';
+            }
+
+            if(user.employer.employerName === 'Initial') {
+                return false;
             }
             return true;
         }
@@ -309,7 +275,6 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
             />
             <div className="w-full sm:flex sm:justify-between sm:items-baseline sm:space-x-2 space-y-2">
                 <EmailInput
-                    label="Email"
                     id="contact.email"
                     placeholder="some@example.com"
                     defaultValue={user.contact?.email}
@@ -452,9 +417,9 @@ const UserForm: React.FC<UserFormProps> = ({ user: incomingUser, IPId, submitTex
                 <button 
                     type="submit"
                     className="btn btn-success dark:text-white"
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || submitting}
                 >
-                    {submitText}
+                    {submitting ? <span className="loading loading-spinner"></span> : submitText}
                 </button>
             </div>
         </form>

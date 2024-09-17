@@ -30,10 +30,10 @@ FROM Attendances;
 --FROM Exams;
 
 --SELECT *
---FROM Topics;
-
---SELECT *
 --FROM WaitList;
 
 --SELECT *
 --FROM Topics;
+
+--SELECT *
+--FROM CourseTopic;

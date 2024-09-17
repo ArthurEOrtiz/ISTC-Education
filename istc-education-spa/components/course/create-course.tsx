@@ -35,7 +35,7 @@ const CreateCourse: React.FC = () => {
             addressLine1: '',
             addressLine2: '',
             city: '',
-            state: '',
+            state: 'Idaho',
             postalCode: '',
         } as Location,
         classes: [],
@@ -52,20 +52,18 @@ const CreateCourse: React.FC = () => {
     }, [course.classes]);
 
     const createCourse = async () => {
-        if (course) {
-            setSaving(true);
-            try {
-                const response = await postCourse(course);
-                if (response.success) {
-                    setSuccess(true);
-                } else {
-                    setError(response.error ?? "An unknown error occurred");
-                }
-            } catch (error) {
-                setError("An error occurred while creating the course");
-            } finally {
-                setSaving(false);
+        setSaving(true);
+        try {
+            const response = await postCourse(course);
+            if (response.success) {
+                setSuccess(true);
+            } else {
+                setError(response.error ?? "An unknown error occurred");
             }
+        } catch (error) {
+            setError("An error occurred while creating the course");
+        } finally {
+            setSaving(false);
         }
     }
 
@@ -80,7 +78,7 @@ const CreateCourse: React.FC = () => {
                     <CourseForm
                         submitText="Next"
                         goBack
-                        course={course || undefined}
+                        course={course}
                         setCourse={setCourse}
                         onSubmit={handleCourseFormSubmit}
                     />

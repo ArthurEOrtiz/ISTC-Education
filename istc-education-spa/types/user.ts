@@ -7,8 +7,8 @@ interface User {
     middleName: string | null;
     isAdmin: boolean;
     isStudent: boolean;
-    contact?: Contact;
-    employer?: Employer;
+    contact: Contact;
+    employer: Employer;
     student?: Student;
 }
 

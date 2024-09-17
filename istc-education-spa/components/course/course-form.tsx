@@ -452,7 +452,7 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
                     Remove
                 </button>
             </div>
-            {goBack || onSubmit && (
+            {goBack && (
                 <div className="border-b p-2"/>
             )}
             <div className="flex justify-end gap-2">

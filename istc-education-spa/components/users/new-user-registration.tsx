@@ -12,28 +12,53 @@ interface NewUserRegistrationProps {
 }
 
 const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
-    const [ user, setUser ] = useState<User | null>(null);
+    const [user, setUser] = useState<User>({
+        userId: 0,
+        ipId: IPId,
+        status: "Active",
+        firstName: '',
+        lastName: '',
+        middleName: null,
+        isAdmin: false,
+        isStudent: true,
+        contact: {
+            contactId: 0,
+            userId: 0,
+            email: '',
+            phone: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: null,
+            state: 'Idaho',
+            postalCode: null,
+        },
+        employer: {
+            employerId: 0,
+            userId: 0,
+            employerName: 'Initial',
+            jobTitle: '',
+        },
+        student: {
+            studentId: 0,
+            userId: 0,
+            appraiserCertified: false,
+            mappingCertified: false,
+        },
+    } as User);
     const [ step, setStep ] = useState<number>(1);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
     const router = useRouter();
 
     const registerUser = async () => {
-        if (user) {
-            
-            if (user.status === "AdminRegistered") {
-                user.status = "Active";
+        try {
+            const response = await postUser(user);
+            if (response.success) {
+                router.refresh();
+            } else {
+                setError(response.error ?? "An unknown error occurred");
             }
-
-            try {
-                const response = await postUser(user);
-                if (response.success) {
-                    router.refresh();
-                } else {
-                    setError(response.error ?? "An unknown error occurred");
-                }
-            } catch (error) {
-                setError("An error occurred while registering the user");
-            }
+        } catch (error) {
+            setError("An error occurred while registering the user");
         }
     }
 
@@ -43,29 +68,16 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
                 <h1 className="text-3xl font-bold"> New User Registration </h1>
                 <div className="lg:w-2/3 border border-info rounded-md p-4">
                     {step === 1 && (
-                        <>
-                            {user === null ? (
-                                <UserForm
-                                    IPId={IPId}
-                                    submitText="Next"
-                                    onSubmit={(user) => {
-                                        setUser(user);
-                                        setStep(2);
-                                    }}
-                                    onError={(error) => setError(error)}
-                                />
-                            ) : (
-                                <UserForm
-                                    user={user}
-                                    submitText="Next"
-                                    onSubmit={(user) => {
-                                        setUser(user);
-                                        setStep(2);
-                                    }}
-                                    onError={(error) => setError(error)}
-                                />
-                            )}
-                        </>
+                        <UserForm
+                            user={user}
+                            setUser={setUser}
+                            submitText="Next"
+                            onSubmit={(user) => {
+                                setUser(user);
+                                setStep(2);
+                            }}
+                            onError={(error) => setError(error)}
+                        />
                     )}
                     {step === 2 && user && (
                         <div className="space-y-4">
@@ -74,9 +86,9 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
                             <div className="flex justify-end space-x-2">
                                 <button
                                     onClick={() => setStep(1)}
-                                    className=" btn btn-warning  dark:text-white"
+                                    className=" btn btn-error dark:text-white"
                                 >
-                                    Edit
+                                    Back
                                 </button>
                                 <button
                                     onClick={registerUser}

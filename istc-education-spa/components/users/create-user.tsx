@@ -8,7 +8,39 @@ import ErrorBody from "../modal/error-body";
 import UserInfo from "./user-info";
 
 const CreateUser: React.FC = () => {
-    const [ user, setUser ] = useState<User | null>(null);
+    const [user, setUser] = useState<User>({
+        userId: 0,
+        ipId: '',
+        status: "AdminRegistered",
+        firstName: '',
+        lastName: '',
+        middleName: null,
+        isAdmin: false,
+        isStudent: true,
+        contact: {
+            contactId: 0,
+            userId: 0,
+            email: '',
+            phone: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: null,
+            state: 'Idaho',
+            postalCode: null,
+        },
+        employer: {
+            employerId: 0,
+            userId: 0,
+            employerName: 'Initial',
+            jobTitle: '',
+        },
+        student: {
+            studentId: 0,
+            userId: 0,
+            appraiserCertified: false,
+            mappingCertified: false,
+        },
+    } as User);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ previewUser, setPreviewUser ] = useState<boolean>(false);
@@ -40,7 +72,8 @@ const CreateUser: React.FC = () => {
                 <UserForm
                     submitText="Next"
                     goBack
-                    user={user || undefined}
+                    user={user}
+                    setUser={setUser}
                     onSubmit={(user) => {
                         setPreviewUser(true);
                         setUser(user)
@@ -66,7 +99,7 @@ const CreateUser: React.FC = () => {
                     </div>
                 </ModalBase>
             )}
-            {previewUser && user && (
+            {previewUser && (
                 <ModalBase
                     title="User Preview"
                     width="w-1/2"

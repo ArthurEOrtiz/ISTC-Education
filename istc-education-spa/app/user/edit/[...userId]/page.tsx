@@ -26,6 +26,7 @@ const UserEditPage: React.FC<UserEditPageProps> =  async ({ params }) => {
     const isAdmin: boolean = await isUserAdmin(IPId);
 
     if (isAdmin){
+        // If the user is an admin, they can edit any user
         return (
             <div className="w-full flex flex-col items-center space-y-2">
                 <h1 className="text-3xl font-bold"> Edit User </h1>
@@ -35,6 +36,7 @@ const UserEditPage: React.FC<UserEditPageProps> =  async ({ params }) => {
             </div>
         )
     } else if (user.ipId === IPId) {
+        // If the user is not an admin, they can only edit their own user
         return (
             <div className="w-full flex flex-col items-center space-y-2">
                 <h1 className="text-3xl font-bold"> Edit User </h1>
@@ -44,6 +46,7 @@ const UserEditPage: React.FC<UserEditPageProps> =  async ({ params }) => {
             </div>
         )
     } else {
+        // If the user is not an admin and they are not the user they are trying to edit
         throw new Error("You are not authorized to edit this user");
     }
 }
