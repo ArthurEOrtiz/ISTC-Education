@@ -29,10 +29,13 @@ const UserIndexPage: React.FC = async() => {
                 </div>
                 <div className="flex flex-col space-y-2">
                     {users.map((user, index) => (
-                        <div key={index} className="border border-info rounded-md flex gap-2 items-center p-4">
+                        <Link 
+                            key={index}
+                            href={`/user/edit/${user.userId}`} 
+                            className="border border-info hover:bg-info rounded-md flex gap-2 items-center p-4">
                             <p className="text-2xl font-bold border-r border-info pr-2">{user.firstName} {user.middleName} {user.lastName}</p>
                             <p className="text-xl">{user.contact.email}</p>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>
