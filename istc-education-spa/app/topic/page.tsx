@@ -25,10 +25,13 @@ const TopicIndexPage: React.FC = async() => {
             <div className="w-full lg:w-2/3 p-4">
                 <div className="flex flex-col space-y-2">
                     {topics.map((topic, index) => (
-                        <div key={index} className="border border-info rounded-md p-4">
+                        <Link 
+                            key={index} 
+                            className="border border-info rounded-md flex justify-center p-4"
+                            href={`/topic/${topic.topicId}`}
+                            >
                             <p className="text-2xl font-bold">{topic.title}</p>
-                            <p>{topic.description}</p>
-                        </div>
+                        </Link>
                     ))}
                 </div>
                 <div className="flex justify-end mt-2">

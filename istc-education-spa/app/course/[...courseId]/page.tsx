@@ -24,15 +24,15 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
                 <CourseInfo course={course} expanded />
             </div>
             <div className="w-full sm:w-2/3 max-w-3xl px-4">
-                <h2 className="text-2xl font-bold">Classes</h2>
+                <h2 className="text-xl font-bold">Classes</h2>
                 <div className="space-y-2 mt-2">
-                    {course.classes.map((cls) => {
+                    {course.classes.map((cls, index) => {
                         const date: string = convertDateToMMDDYYYY(cls.date);
                         const start: string = convertTo12HourFormat(cls.start);
                         const end: string = convertTo12HourFormat(cls.end);
                         return (
-                            <div className="border border-info rounded-md flex justify-between p-4">
-                                <p className="text-xl font-bold">{date}</p>
+                            <div key={index} className="border border-info rounded-md flex justify-between p-4">
+                                <p className="font-bold">{date}</p>
                                 <p>{start} - {end}</p>
                             </div>
                         );

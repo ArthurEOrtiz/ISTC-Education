@@ -1,4 +1,5 @@
 using istc_education_api.DataAccess;
+using istc_education_api.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -25,7 +26,7 @@ builder.Services.AddSwaggerGen();
 //    });
 //});
 
-
+builder.Services.AddHostedService<CourseStatusUpdater>();
 builder.Services.AddDbContext<DataContext>(options => 
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
 ));

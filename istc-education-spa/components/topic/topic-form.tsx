@@ -1,32 +1,22 @@
 import { validateLength } from "@/utils/forms/validation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
 import TextInput from "../form/text-input";
 import TextAreaInput from "../form/textarea-input";
 import { useRouter } from "next/navigation";
 
 interface TopicFormProps {
-    topic?: Topic;
+    topic: Topic;
+    setTopic: Dispatch<SetStateAction<Topic>>;
     submitText: string;
+    submitting?: boolean;
     goBack?: boolean;
     onSubmit: (topic: Topic) => void;
 }
 
-const TopicForm: React.FC<TopicFormProps> = ({ topic:incomingTopic, submitText, goBack, onSubmit }) => {
-    const [ topic, setTopic ] = useState<Topic>({
-        topicId: 0,
-        title: "",
-        description: null,
-    });
-
+const TopicForm: React.FC<TopicFormProps> = ({ topic, setTopic, submitText, submitting = false, goBack, onSubmit }) => {
     const [ errors, setErrors ] = useState<FormError>({});
     const [ isFormValid, setIsFormValid ] = useState<boolean>(false);
     const router = useRouter();
-
-    useEffect(() => {
-        if (incomingTopic) {
-            setTopic(incomingTopic);
-        }
-    }, [incomingTopic]);
 
     const handleOnSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -108,9 +98,9 @@ const TopicForm: React.FC<TopicFormProps> = ({ topic:incomingTopic, submitText, 
                 <button
                     type="submit"
                     className="btn btn-success dark:text-white"
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || submitting}
                 >
-                    {submitText}
+                    {submitting ? <span className="loading loading-spinner"></span> : submitText}
                 </button>
             </div>
         </form>

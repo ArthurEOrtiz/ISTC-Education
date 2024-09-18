@@ -13,7 +13,7 @@ interface PhoneInputProps {
 }
 
 const CustomPhoneInput: React.FC<PhoneInputProps> = ({ label, id, defaultCountry, value, onBlur, onChange, error, required }) => (
-    <div className={`${required ? 'border border-error rounded-md' : ''} p-1`}>
+    <div className={`${required ? 'border border-error rounded-md' : ''} w-full p-1`}>
         <label className="input input-bordered flex items-center gap-2 w-full">
             {label}
             <PhoneInput 

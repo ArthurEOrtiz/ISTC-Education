@@ -1,6 +1,6 @@
 interface Course {
     courseId: number;
-    status: 'UpComing' | 'InProgress' | 'Archived';
+    status: 'UpComing' | 'InProgress' | 'Completed' | 'Archived' | 'Cancelled'; // Required
     title: string; // Required
     description: string | null;
     attendanceCredit: number; // Required

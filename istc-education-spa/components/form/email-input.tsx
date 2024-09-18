@@ -14,18 +14,30 @@ interface EmailInputProps {
 }
 
 const EmailInput: React.FC<EmailInputProps> = ({ label, id, placeholder, defaultValue, onBlur, onChange, error, isEmailChecking, required }) => (
-    <div className={`${required ? 'border border-error rounded-md' : ''} p-1`}>
+    <div className={`${required ? 'border border-error rounded-md' : ''} w-full space-y-2 p-1`}>
         <label className="input input-bordered flex items-center gap-2">
             <div className="flex items-center gap-2">
                 <span>{label}</span>
                 <FaEnvelope />
             </div>
-            <input 
-                type="email" 
-                className="grow" 
+            <input
+                type="email"
+                className="grow"
                 placeholder={placeholder}
                 id={id}
                 defaultValue={defaultValue}
+                onBlur={onBlur}
+                onChange={onChange}
+            />
+        </label>
+
+
+        <label className="input input-bordered flex items-center gap-2">
+            <input
+                type="email"
+                className="grow"
+                placeholder="Confirm Email"
+                id="check-email"
                 onBlur={onBlur}
                 onChange={onChange}
             />

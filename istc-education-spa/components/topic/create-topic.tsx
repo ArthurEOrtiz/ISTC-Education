@@ -1,15 +1,18 @@
 'use client';
 import { postTopic } from "@/utils/api/topic";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ModalBase from "../modal/modal-base";
-import ErrorBody from "../modal/error-body";
 import { useRouter } from "next/navigation";
 import TopicForm from "./topic-form";
 import TopicInfo from "./topic-info";
-import { FaTrash } from "react-icons/fa";
+
 
 const CreateTopic: React.FC = () => {
-    const [ topic, setTopic ] = useState<Topic | null>(null);
+    const [ topic, setTopic ] = useState<Topic>({
+        topicId: 0,
+        title: "",
+        description: null,
+    });
     const [ step, setStep ] = useState<number>(1);
     const [ errors, setError ] = useState<string | ErrorResponse | null>(null);
     const [ saving, setSaving ] = useState<boolean>(false);
@@ -34,11 +37,6 @@ const CreateTopic: React.FC = () => {
         }
     }
 
-    const handleTopicFormSubmit = (topic: Topic) => {
-        setTopic(topic);
-        setStep(2);
-    }
-
     return (
         <>
             {step === 1 && (   
@@ -46,12 +44,13 @@ const CreateTopic: React.FC = () => {
                     <TopicForm
                         submitText="Next"
                         goBack
-                        topic={topic || undefined}
-                        onSubmit={handleTopicFormSubmit}
+                        topic={topic}
+                        setTopic={setTopic}
+                        onSubmit={() => setStep(2)}
                     />
                 </div>
             )}
-            {step === 2 && topic && (
+            {step === 2 && (
                 <div className="border border-info sm:w-1/3 rounded-md p-4">
                     <div className="p-4">
                         <TopicInfo topic={topic} />
@@ -68,7 +67,7 @@ const CreateTopic: React.FC = () => {
                             onClick={createTopic}
                             disabled={saving}
                         >
-                            {saving ? "Saving..." : "Create Topic"}
+                            {saving ? <span className="loading loading-spinner"></span> : "Create Topic"}
                         </button>
                     </div>
                     {success && (

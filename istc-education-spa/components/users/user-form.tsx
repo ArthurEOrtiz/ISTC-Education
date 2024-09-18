@@ -71,6 +71,8 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
         const { id, value } = e.target;
 
         switch(true) {
+            case id === 'check-email':
+                break;
             case id.startsWith('contact'):
                 const contactField = id.split('.')[1];
                 setUser(prev => {
@@ -146,6 +148,9 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
             case 'contact.email':
                 formErrors[id] =  await validateEmail(value);
                 break;
+            case 'check-email':
+                formErrors["contact.email"] = value === user.contact.email ? '' : 'Emails do not match';
+                break;
             case 'contact.phone':
                 formErrors[id] = validatePhone(value);
                 break;
@@ -172,10 +177,19 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
                 break;
         }
 
-        setErrors(prev => ({
-            ...prev,
-            [id]: formErrors[id],
-        }));
+        if (id !== 'check-email'){
+            setErrors(prev => ({
+                ...prev,
+                [id]: formErrors[id],
+            }));
+        } else {
+            setErrors(prev => ({
+                ...prev,
+                'contact.email': formErrors['contact.email'],
+            }));
+        }
+            
+        
     }
 
     const validateEmail =  async (email: string) => {

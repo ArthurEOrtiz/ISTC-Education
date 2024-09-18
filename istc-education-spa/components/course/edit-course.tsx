@@ -16,6 +16,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
     const [ course, setCourse ] = useState<Course>(incomingCourse);
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ saving, setSaving ] = useState<boolean>(false);
+    const [ archiveConfirmationModal, setArchiveConfirmationModal ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
 
@@ -35,7 +36,6 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
         }
     }
 
-
     return(
         <>
             <div className="flex flex-col items-center">
@@ -53,6 +53,32 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                     <h2 className="text-xl font-bold">Classes</h2>
                     <div className="border-b" />
                     <AddRemoveClass course={course} setCourse={setCourse} />
+                </div>
+                <div className="w-full border-b my-2" />
+                <div className="w-full">
+                    <div className="flex justify-between">
+                        <h2 className="text-xl font-bold">Status</h2>
+                        <p className={`text-xl ${course.status === "InProgress" || course.status === "UpComing"? "text-success" : "text-error"}`}>{course.status}</p>
+                    </div>
+                    {course.status === "InProgress" || 
+                     course.status === "UpComing" ||
+                     course.status === "Completed" && (
+                        <div className="flex justify-start gap-2">
+                            <button 
+                                className="btn btn-error dark:text-white"
+                                onClick={() => setArchiveConfirmationModal(true)}
+                            >
+                                Archive Course
+                            </button>
+                            <button 
+                                className="btn btn-success dark:text-white"
+                                onClick={() => setCourse({...course, status: "Cancelled"})}
+                            >
+                                Cancel Course
+                            </button>
+                        </div>
+                    )}
+
                 </div>
                 <div className="w-full border-b my-2" />
                 <div className="w-full flex justify-end gap-2">
@@ -92,6 +118,36 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                                 onClick={() => router.push('/admin')}
                             >
                                 Go to Admin Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </ModalBase>
+            )}
+            {archiveConfirmationModal && (
+                <ModalBase
+                    title="Archive Course"
+                    width="w-1/2"
+                    isOpen={archiveConfirmationModal}
+                    onClose={() => setArchiveConfirmationModal(false)}
+                >
+                    <div className="space-y-2">
+                        <div>
+                            <h2 className="font-bold">Are you sure you want to archive this course?</h2>
+                            <p></p>
+                            <p>This action cannot be undone!</p>
+                        </div>
+                        <div className="flex flex-row justify-end space-x-2">
+                            <button
+                                className="btn btn-error dark:text-white"
+                                onClick={() => setCourse({...course, status: "Archived"})}
+                            >
+                                Archive
+                            </button>
+                            <button
+                                className="btn btn-warning"
+                                onClick={() => setArchiveConfirmationModal(false)}
+                            >
+                                Cancel
                             </button>
                         </div>
                     </div>

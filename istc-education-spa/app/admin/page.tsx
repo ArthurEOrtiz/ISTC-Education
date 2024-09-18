@@ -7,13 +7,13 @@ const AdminPage: React.FC = async () => {
             <div className="border border-info rounded-md p-4">
                 <h2 className="text-xl font-bold">Admin Actions</h2>
                 <div className="flex gap-2">
-                    <Link href="/course/create" className="btn btn-success dark:text-white">
-                        Create Course
+                    <Link href="/course/edit" className="btn btn-primary">
+                        Edit Courses
                     </Link>
-                    <Link href="/user/create" className="btn btn-success dark:text-white">
-                        Create User
+                    <Link href="/user" className="btn btn-primary">
+                        Edit Users
                     </Link>
-                    <Link href="/topic/create" className="btn btn-success dark:text-white">
+                    <Link href="/topic/create" className="btn btn-primary">
                         Create Topic
                     </Link>
                 </div>

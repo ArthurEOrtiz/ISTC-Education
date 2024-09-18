@@ -19,7 +19,6 @@ export const getCourse = async (id: number): Promise<Course | null> => {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
             return null;
         } else {
-            console.error(error);
             throw new Error('Error fetching course by id');
         }
     }

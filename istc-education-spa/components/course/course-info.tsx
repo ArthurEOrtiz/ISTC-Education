@@ -52,19 +52,19 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
             
             <div className={`space-y-2 ${isExpanded ? "block" : "hidden"}`}>
                 <div className="border-b p-2" />
-                <p className="">{description}</p>
+                <p >{description}</p>
                 <div className="flex gap-2">
-                    <p className="text-lg font-bold">Enrollment Deadline:</p>
-                    <p className="text-lg">{deadLine}</p>
+                    <p className="font-bold">Enrollment Deadline:</p>
+                    <p>{deadLine}</p>
                 </div>
                 <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
-                        <p  className="text-lg font-bold">Attendance Credit:</p>
-                        <p className="text-lg">{attendanceCredit}</p>
+                        <p  className="font-bold">Attendance Credit:</p>
+                        <p>{attendanceCredit}</p>
                     </div>
                     <div className="flex gap-2">
-                        <p className="text-lg font-bold">Max Attendance:</p>
-                        <p className="text-lg">{maxAttendance}</p>
+                        <p className="font-bold">Max Attendance:</p>
+                        <p>{maxAttendance}</p>
                     </div>
                 </div>
                 {hasExam && (
@@ -78,37 +78,37 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, expanded = false }) => 
                 )}
 
                 <div className="border-b" />
-                <p className="text-2xl font-bold">Instructor</p>
+                <p className="text-xl font-bold">Instructor</p>
 
                 <div className="flex justify-between gap-2">
                     <div className="flex gap-2">
-                        <p className="text-lg font-bold">Name:</p>
-                        <p className="text-lg">{instructorName}</p>
+                        <p className="font-bold">Name:</p>
+                        <p >{instructorName}</p>
                     </div>
 
                     {instructorEmail && (
                         <div className="flex gap-2">
-                            <p className="text-lg font-bold">Email:</p>
-                            <p className="text-lg">{instructorEmail}</p>
+                            <p className="font-bold">Email:</p>
+                            <p>{instructorEmail}</p>
                         </div>
                     )}
                 </div>
 
                 <div className="border-b" />
                 
-                <p className="text-2xl font-bold">Location</p>
-                <p className="text-lg">{locationDescription}</p>
+                <p className="text-xl font-bold">Location</p>
+                <p>{locationDescription}</p>
 
                 <div>
-                    <p className="text-lg">{addressLine1}</p>
-                    <p className="text-lg">{addressLine2}</p>
-                    <p className="text-lg">{city} {state} {postalCode}</p>
+                    <p>{addressLine1}</p>
+                    <p>{addressLine2}</p>
+                    <p>{city} {state} {postalCode}</p>
                 </div>
 
                 {hasPDF && (
                     <>
                         <div className="border-b" />
-                        <p className="text-2xl font-bold">PDF</p>
+                        <p className="text-xl font-bold">PDF</p>
                         <a href={`data:application/pdf;base64,${data}`} download={fileName} className="text-lg text-info">{fileName}</a>
                     </>
                 )}

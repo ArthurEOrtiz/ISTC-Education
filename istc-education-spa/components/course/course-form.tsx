@@ -27,23 +27,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
     const router = useRouter();
 
     useEffect(() => {
-        if(new Date(course.enrollmentDeadline) < new Date()) {
-            setCourse(prev => ({
-                ...prev,
-                status: 'Archived',
-            }));
-        } else if (new Date(course.enrollmentDeadline) == new Date()) {
-            setCourse(prev => ({
-                ...prev,
-                status: 'InProgress',
-            }));
-        } else {
-            setCourse(prev => ({
-                ...prev,
-                status: 'UpComing',
-            }));
-        }
-    }, [course.enrollmentDeadline]);
+        updateCourseStatus();
+    }, [course.classes]);
 
 
     useEffect(() => {
@@ -226,6 +211,34 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
         }
 
         return true;
+    }
+
+    const updateCourseStatus = () => {
+        if (course.classes.length > 0 && 
+            course.status !==  'Cancelled' && 
+            course.status !== 'Archived') {
+            const today = new Date();
+            const firstClass = new Date(course.classes[0].date);
+            const lastClass = new Date(course.classes[course.classes.length - 1].date);
+        
+
+            if (today >= firstClass && today <= lastClass) {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'InProgress',
+                }));
+            } else if (today > lastClass) {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'Completed',
+                }));
+            } else {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'UpComing',
+                }));
+            }
+        }
     }
 
     return (
