@@ -1,3 +1,4 @@
+'use client';
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import { FaEnvelope } from "react-icons/fa";
 

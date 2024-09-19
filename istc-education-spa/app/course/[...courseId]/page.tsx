@@ -1,7 +1,10 @@
+import CourseEnrollmentActions from "@/components/attendance/course-enrollment-actions";
 import CourseInfo from "@/components/course/course-info";
 import { getCourse } from "@/utils/api/courses";
+import { getAttendanceRecords } from "@/utils/api/student";
 import { convertDateToMMDDYYYY, convertTo12HourFormat } from "@/utils/global-functions";
 import { SignedIn } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
 interface CourseDetailsPageProps {
@@ -18,12 +21,16 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
         return notFound();
     }
 
+    const { primaryEmailAddress } = await currentUser() ?? { primaryEmailAddress: null };   
+
+    const student: Student | null = primaryEmailAddress ? await getAttendanceRecords(primaryEmailAddress.emailAddress) : null;
+
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <div className="sm:w-2/3 sm:flex sm:justify-center">
                 <CourseInfo course={course} expanded />
             </div>
-            <div className="w-full sm:w-2/3 max-w-3xl px-4">
+            <div className="w-full sm:w-2/3 max-w-3xl space-y-2 px-4">
                 <h2 className="text-xl font-bold">Classes</h2>
                 <div className="space-y-2 mt-2">
                     {course.classes.map((cls, index) => {
@@ -38,14 +45,11 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
                         );
                     })}
                 </div>
+                <SignedIn>
+                    <CourseEnrollmentActions course={course} student={student} />
+                </SignedIn>
             </div>
-            <SignedIn>
-                <div className="flex justify-end w-full max-w-3xl p-4">
-                    <button className="btn btn-success dark:text-white">
-                        Apply
-                    </button>
-                </div>
-            </SignedIn>
+            
         </div>
     );
 

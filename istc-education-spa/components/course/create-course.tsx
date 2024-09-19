@@ -31,12 +31,12 @@ const CreateCourse: React.FC = () => {
         hasPDF: false,
         location: {
             locationId: 0,
-            description: '',
-            addressLine1: '',
-            addressLine2: '',
-            city: '',
+            description: null,
+            addressLine1: null,
+            addressLine2: null,
+            city: null,
             state: 'Idaho',
-            postalCode: '',
+            postalCode: null,
         } as Location,
         classes: [],
     } as Course);
@@ -58,10 +58,10 @@ const CreateCourse: React.FC = () => {
             if (response.success) {
                 setSuccess(true);
             } else {
-                setError(response.error ?? "An unknown error occurred");
+                setError(response.error ?? "An unknown error occurred.");
             }
         } catch (error) {
-            setError("An error occurred while creating the course");
+            setError("An error occurred while creating the course.");
         } finally {
             setSaving(false);
         }
@@ -85,41 +85,43 @@ const CreateCourse: React.FC = () => {
                 </div>
             )}
             {step === 2 && (
-                <div className="sm:w-2/3 p-2 space-y-2">
+                <div className="sm:w-2/3 flex flex-col items-center p-2 space-y-2">
                     <CourseInfo course={course} expanded />
-                    <div className="border border-info rounded-md p-4">
-                        <h2 className="text-2xl font-bold">Topics</h2>
-                        <div className="border-b p-2" />
-                        <AddRemoveTopics course={course} setCourse={setCourse} />
-                    </div>
-                    <div className="border border-info rounded-md p-4">
-                        <h2 className="text-2xl font-bold">Classes</h2>
-                        <div className="border-b p-2" />
-                        <AddRemoveClass course={course} setCourse={setCourse} />
-                    </div>
-                    <div className="flex justify-between p-4">
+                    <div className="max-w-3xl w-full space-y-2">
+                        <div className="border border-info rounded-md p-4">
+                            <h2 className="text-2xl font-bold">Topics</h2>
+                            <div className="border-b p-2" />
+                            <AddRemoveTopics course={course} setCourse={setCourse} />
+                        </div>
+                        <div className="border border-info rounded-md p-4">
+                            <h2 className="text-2xl font-bold">Classes</h2>
+                            <div className="border-b p-2" />
+                            <AddRemoveClass course={course} setCourse={setCourse} />
+                        </div>
+                        <div className="flex justify-between p-4">
 
-                        <button
-                            className="btn btn-error dark:text-white"
-                            onClick={() => setStep(1)}
-                        >
-                            Go Back
-                        </button>
+                            <button
+                                className="btn btn-error dark:text-white"
+                                onClick={() => setStep(1)}
+                            >
+                                Go Back
+                            </button>
 
-                        <button
-                            className="btn btn-success dark:text-white"
-                            onClick={() => console.log(course)}
-                        >
-                            Log Course
-                        </button>
+                            <button
+                                className="btn btn-success dark:text-white"
+                                onClick={() => console.log(course)}
+                            >
+                                Log Course
+                            </button>
 
-                        <button
-                            className="btn btn-success dark:text-white"
-                            onClick={createCourse}
-                            disabled={!isCourseValid}
-                        >
-                            {saving ? <span className="loading loading-spinner"></span> : "PostCourse"}
-                        </button>
+                            <button
+                                className="btn btn-success dark:text-white"
+                                onClick={createCourse}
+                                disabled={!isCourseValid}
+                            >
+                                {saving ? <span className="loading loading-spinner"></span> : "PostCourse"}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

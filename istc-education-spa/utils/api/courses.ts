@@ -35,7 +35,8 @@ export const postCourse = async (course: Course): Promise<ApiResponse> => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if(error.response?.status === 400) {
-                const errors = error.response.data.errors as ErrorResponse;
+                console.log(error.response);
+                const errors: ErrorResponse | string = error.response.data.errors ?? error.response.data;
                 if (errors) {
                     return { success: false, error: errors};
                 } else {
@@ -59,7 +60,7 @@ export const putCourse = async (course: Course): Promise<ApiResponse> => {
     } catch (error) {
         if (axios.isAxiosError(error)) {
             if (error.response?.status === 400) {
-                const errors: ErrorResponse = error.response.data.errors;
+                const errors: ErrorResponse | string = error.response.data.errors ?? error.response.data;
                 if (errors) {
                     return { success: false, error: errors}
                 } else {

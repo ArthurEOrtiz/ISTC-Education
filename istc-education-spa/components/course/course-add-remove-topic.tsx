@@ -65,19 +65,10 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
         return course.topics?.find( t => t.topicId === topic.topicId) ? true : false
     }
 
-    const getTopics = async () => {
-        const topics = await getAllTopics();
-        if (topics) {
-            setTopics(topics);
-        } else {
-            setError("Error fetching topics");
-        }
-    }
-
     return (
         <>
             {course.topics && course.topics.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                     {course.topics.map( (topic) => (
                         <div key={topic.topicId} className="bg-info p-2 rounded-md">
                             <div className="flex justify-between gap-2">

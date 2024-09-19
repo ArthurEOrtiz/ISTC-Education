@@ -63,6 +63,17 @@ namespace istc_education_api.Controllers
 
 			try
 			{
+				if (course.Topics != null)
+				{
+					foreach (var topic in course.Topics)
+					{
+						if (_context.Entry(topic).State == EntityState.Detached)
+						{
+							_context.Topics.Attach(topic);
+						}
+					}
+				}
+
 				_context.Courses.Add(course);
 				await _context.SaveChangesAsync();
 				return CreatedAtAction(nameof(Details), new { id = course.CourseId }, course);

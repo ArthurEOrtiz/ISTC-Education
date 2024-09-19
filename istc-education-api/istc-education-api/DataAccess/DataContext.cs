@@ -21,6 +21,7 @@ namespace istc_education_api.DataAccess
 		public DbSet<Student> Students { get; set; } = default!;
 		public DbSet<Topic> Topics { get; set; } = default!;
 		public DbSet<User> Users { get; set; } = default!;
+		public DbSet<WaitList> WaitLists { get; set; } = default!;
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
