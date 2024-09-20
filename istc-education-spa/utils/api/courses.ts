@@ -73,6 +73,15 @@ export const putCourse = async (course: Course): Promise<ApiResponse> => {
     }
 }
 
+export const getCourseEnrollments = async (courseId: number): Promise<[]> => {
+    try {
+        const response = await axiosInstance.get(`/Course/Enrollment/${courseId}`);
+        return response.data as [];
+    } catch (error) {
+        throw new Error('Error fetching course enrollments');
+    }
+}
+
 export const deleteCourse = async (id: number): Promise<boolean> => {
     try {
         const response = await axiosInstance.delete(`/Course/${id}`);

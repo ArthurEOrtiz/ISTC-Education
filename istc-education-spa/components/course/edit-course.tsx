@@ -7,6 +7,10 @@ import { useRouter } from "next/navigation";
 import { putCourse } from "@/utils/api/courses";
 import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { convertDateToMMDDYYYY } from "@/utils/global-functions";
+import ClassAttendanceModalBody from "../attendance/class-attendance-modal-body";
+import CourseEnrollmentModalBody from "../attendance/course-enrollment-modal-body";
 
 interface EditCourseProps {
     course: Course;
@@ -16,7 +20,14 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
     const [ course, setCourse ] = useState<Course>(incomingCourse);
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ saving, setSaving ] = useState<boolean>(false);
+    const [ infoExpanded, setInfoExpanded ] = useState<boolean>(false);
+    const [ topicsExpanded, setTopicsExpanded ] = useState<boolean>(false);
+    const [ classesExpanded, setClassesExpanded ] = useState<boolean>(false);
+    const [ attendanceExpanded, setAttendanceExpanded ] = useState<boolean>(true);
     const [ archiveConfirmationModal, setArchiveConfirmationModal ] = useState<boolean>(false);
+    const [ attendanceModal, setAttendanceModal ] = useState<boolean>(false);
+    const [ enrollmentModal, setEnrollmentModal ] = useState<boolean>(false);
+    const [ selectedClass, setSelectedClass ] = useState<Class | null>(null);   
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
 
@@ -38,48 +49,105 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
 
     return(
         <>
-            <div className="flex flex-col items-center">
-                <CourseForm
-                    course={course}
-                    setCourse={setCourse}
-                    submitText="Update Information"
-                />
-                <div className="w-full max-w-2xl space-y-2">
-                    <h2 className="text-xl font-bold">Topics</h2>
-                    <div className="border-b" />
+            <div className="w-full max-w-2xl flex flex-col items-center">
+                <div className="w-full flex justify-between">
+                    <h2 className="text-2xl font-bold">{course.title}</h2>
+                    <div className="flex justify-between items-center gap-2">
+                        <button 
+                            className="btn btn-ghost btn-circle text-3xl"
+                            onClick={() => setInfoExpanded(!infoExpanded)}
+                        >
+                            {infoExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        </button>
+                    </div>
+                </div>
+                <div className={`${infoExpanded ? "block" : "hidden"}`}>
+                    <CourseForm
+                        course={course}
+                        setCourse={setCourse}
+                        submitText="Update Information"
+                    />
+                </div>
+                <div className="w-full flex justify-between">
+                    <h2 className="text-2xl font-bold">Topics</h2>
+                    <div className="flex justify-between items-center gap-2">
+                        <button 
+                            className="btn btn-ghost btn-circle text-3xl"
+                            onClick={() => setTopicsExpanded(!topicsExpanded)}
+                        >
+                            {topicsExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        </button>
+                    </div>
+                </div>
+
+                <div className={`w-full ${topicsExpanded ? "block" : "hidden"}`}>
                     <AddRemoveTopics course={course} setCourse={setCourse} />
                 </div>
-                <div className="w-full max-w-2xl space-y-2">
-                    <h2 className="text-xl font-bold">Classes</h2>
-                    <div className="border-b" />
+
+                <div className="w-full flex justify-between">
+                    <h2 className="text-2xl font-bold">Classes</h2>
+                    <div className="flex justify-between items-center gap-2">
+                        <button 
+                            className="btn btn-ghost btn-circle text-3xl"
+                            onClick={() => setClassesExpanded(!classesExpanded)}
+                        >
+                            {classesExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        </button>
+                    </div>
+                </div>
+
+                <div className={`w-full ${classesExpanded ? "block" : "hidden"}`}>
                     <AddRemoveClass course={course} setCourse={setCourse} />
                 </div>
-                <div className="w-full border-b my-2" />
-                <div className="w-full">
-                    <div className="flex justify-between">
-                        <h2 className="text-xl font-bold">Status</h2>
-                        <p className={`text-xl ${course.status === "InProgress" || course.status === "UpComing"? "text-success" : "text-error"}`}>{course.status}</p>
+
+                <div className="w-full flex justify-between">
+                    <h2 className="text-2xl font-bold">Attendance</h2>
+                    <div className="flex justify-between items-center gap-2">
+                        <button 
+                            className="btn btn-ghost btn-circle text-3xl"
+                            onClick={() => setAttendanceExpanded(!attendanceExpanded)}
+                        >
+                            {attendanceExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        </button>
                     </div>
-                    {course.status === "InProgress" || 
-                     course.status === "UpComing" ||
-                     course.status === "Completed" && (
-                        <div className="flex justify-start gap-2">
+                </div>
+
+                <div className={`w-full ${attendanceExpanded ? "block" : "hidden"}`}>
+                    {course.classes.length > 0 ? (
+                        <div className="flex flex-col gap-2">
                             <button 
-                                className="btn btn-error dark:text-white"
-                                onClick={() => setArchiveConfirmationModal(true)}
+                                className="btn btn-info"
+                                onClick={() => setEnrollmentModal(true)}
                             >
-                                Archive Course
+                                Manage Enrollment
                             </button>
-                            <button 
-                                className="btn btn-success dark:text-white"
-                                onClick={() => setCourse({...course, status: "Cancelled"})}
-                            >
-                                Cancel Course
-                            </button>
+                            {course.classes.map((cls, index) => {
+                                const date: string = convertDateToMMDDYYYY(cls.date);
+                                return (
+                                    <div key={index} className="border border-info rounded-md flex justify-between items-center p-4">
+                                        <p className="text-xl">{date}</p>
+                                        <button
+                                            className="btn btn-info"
+                                            onClick={() => {
+                                                setAttendanceModal(true);
+                                                setSelectedClass(cls);
+                                            }}
+                                        >
+                                            View Attendance
+                                        </button>
+                                    </div>
+                                );
+                            }
+                            )}
+                        </div>
+                    ) : (
+                        <div className="bg-error-content rounded-md p-4">
+                            <h2 className="text-error font-bold">No classes have been added</h2>
                         </div>
                     )}
-
                 </div>
+                
+               
                 <div className="w-full border-b my-2" />
                 <div className="w-full flex justify-end gap-2">
                     <button 
@@ -97,6 +165,34 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                     
                 </div>
             </div>
+            {enrollmentModal && (
+                <ModalBase
+                    title="Manage Enrollment"
+                    width="sm:w-2/3"
+                    isOpen={enrollmentModal}
+                    onClose={() => setEnrollmentModal(false)}
+                >
+                    <CourseEnrollmentModalBody 
+                        course={course} 
+                        onError={(error) => {setErrors(error)}} 
+                    />
+                </ModalBase>
+            )}
+
+            {attendanceModal && selectedClass && (
+                <ModalBase
+                    title="Attendance"
+                    width="w-1/2"
+                    isOpen={attendanceModal}
+                    onClose={() =>{
+                        setAttendanceModal(false);
+                        setSelectedClass(null)
+                    }}
+                >
+                    <ClassAttendanceModalBody cls={selectedClass} />
+                </ModalBase>  
+            )}
+            
             {success && (
                 <ModalBase
                     title="Success"

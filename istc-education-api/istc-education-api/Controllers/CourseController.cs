@@ -166,6 +166,36 @@ namespace istc_education_api.Controllers
 			}
 		}
 
+		[HttpGet("Enrollment/{courseId}")]
+		public async Task<IActionResult> GetCourseEnrollment(int courseId)
+		{
+			try
+			{
+				var users = await _context.Courses
+					.Where(c => c.CourseId == courseId)
+					.SelectMany(c => c.Classes)
+					.SelectMany(c => c.Attendances!)
+					.Select(a => a.StudentId)
+					.Distinct()
+					.Join(_context.Users
+						.Include(u => u.Contact)
+						.Include(u => u.Student),
+								studentId => studentId,
+								user => user.Student!.StudentId,
+								(studentId, user) => user)
+					.ToListAsync();
+
+			
+				return Ok(users);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting course enrollment");
+				return BadRequest("Error getting course enrollment.");
+			}
+		}
+
+
 		private bool CourseExists(int id)
 		{
 			return _context.Courses.Any(c => c.CourseId == id);

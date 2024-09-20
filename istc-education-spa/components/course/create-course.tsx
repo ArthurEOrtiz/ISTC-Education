@@ -49,6 +49,7 @@ const CreateCourse: React.FC = () => {
 
     useEffect(() => {
         setIsCourseValid(course.classes.length > 0);
+        updateCourseStatus();
     }, [course.classes]);
 
     const createCourse = async () => {
@@ -69,6 +70,34 @@ const CreateCourse: React.FC = () => {
 
     const handleCourseFormSubmit = () => {
         setStep(2);
+    }
+
+    const updateCourseStatus = () => {
+        if (course.classes.length > 0 && 
+            course.status !==  'Cancelled' && 
+            course.status !== 'Archived') {
+            const today = new Date();
+            const firstClass = new Date(course.classes[0].date);
+            const lastClass = new Date(course.classes[course.classes.length - 1].date);
+        
+
+            if (today >= firstClass && today <= lastClass) {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'InProgress',
+                }));
+            } else if (today > lastClass) {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'Completed',
+                }));
+            } else {
+                setCourse(prev => ({
+                    ...prev,
+                    status: 'UpComing',
+                }));
+            }
+        }
     }
 
     return (

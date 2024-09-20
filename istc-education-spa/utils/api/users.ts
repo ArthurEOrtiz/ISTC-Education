@@ -3,9 +3,10 @@ import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 import { clerkClient } from "@clerk/nextjs/server";
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (page:number, limit:number, search?:string ) => {
     try {
-        const response = await axiosInstance.get('/User');
+        const url = search ? `/User?page=${page}&limit=${limit}&search=${search}` : `/User?page=${page}&limit=${limit}`;
+        const response = await axiosInstance.get(url);
         return response.data as User[];
     } catch (error) {
         throw new Error('Error fetching all users');    
@@ -50,6 +51,19 @@ export const getUserByIPId = async (IPId: string): Promise<User | null> => {
         }
     }
 };
+
+export const getUserByStudentId = async (studentId: number): Promise<User | null> => {
+    try {
+        const response = await axiosInstance.get(`/User/StudentId/${studentId}`);
+        return response.data as User;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return null;
+        } else {
+            throw new Error('Error fetching user by studentId');
+        }
+    }
+}
 
 export const postUser = async (user: User): Promise<ApiResponse> => {
     try {

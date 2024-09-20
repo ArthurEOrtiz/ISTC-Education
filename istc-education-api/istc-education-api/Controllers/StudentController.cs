@@ -2,6 +2,7 @@
 using istc_education_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using System.Net;
 
 namespace istc_education_api.Controllers
@@ -61,6 +62,130 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error checking if student is enrolled.");
 			}
 		}
+
+		[HttpPost("Enroll/{courseId}/{studentId}")]
+		[ProducesResponseType((int)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> Enroll(int courseId, int studentId)
+		{
+			try
+			{
+				var student = await _context.Students
+					.Include(s => s.Attendances)
+					.FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+				if (student == null)
+				{
+					return NotFound("Student not found.");
+				}
+
+				var course = await _context.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+				if (course == null)
+				{
+					return NotFound("Course not found.");
+				}
+
+				if (course.Status != CourseStatus.UpComing && course.Status != CourseStatus.InProgress)
+				{
+					return BadRequest("Course is not available for enrollment.");
+				}
+
+				// Check if student is already enrolled
+				var existingEnrollment = course.Classes
+					.SelectMany(c => c.Attendances)
+					.Any(a => a.StudentId == studentId);
+
+				if (existingEnrollment)
+				{
+					return BadRequest("Student is already enrolled in this course.");
+				}
+
+				// Check if student is waitlisted
+				var waitList = await _context.WaitLists
+					.Where(w => w.StudentId == studentId && w.CourseId == courseId)
+					.FirstOrDefaultAsync();
+
+				if (waitList != null && waitList.ToEnroll)
+				{
+					_context.WaitLists.Remove(waitList);
+				}
+
+				var attendances = new List<Attendance>();
+
+				foreach (var @class in course.Classes)
+				{
+					var attendance = new Attendance
+					{
+						StudentId = studentId,
+						ClassId = @class.ClassId,
+						HasAttended = false
+					};
+
+					attendances.Add(attendance);
+				}
+				
+
+				student.Attendances ??= []; // Ensure Attendances is not null
+				student.Attendances.AddRange(attendances);
+				await _context.SaveChangesAsync();
+
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error enrolling student");
+				return BadRequest("Error enrolling student.");
+			}
+		}
+
+		[HttpPost("Unenroll/{courseId}/{studentId}")]
+		[ProducesResponseType((int)HttpStatusCode.NoContent)]
+		public async Task<IActionResult> Unenroll(int courseId, int studentId)
+		{
+			try
+			{
+				var student = await _context.Students
+					.Include(s => s.Attendances)
+					.FirstOrDefaultAsync(s => s.StudentId == studentId);
+
+				if (student == null)
+				{
+					return NotFound("Student not found.");
+				}
+
+				var course = await _context.Courses
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+
+				if (course == null)
+				{
+					return NotFound("Course not found.");
+				}
+
+				var attendances = student.Attendances?
+					.Where(a => course.Classes.Any(c => c.ClassId == a.ClassId))
+					.ToList() ?? new List<Attendance>();
+
+				if (student.Attendances != null)
+				{
+					attendances.ForEach(a => student.Attendances.Remove(a));
+				}
+
+				await _context.SaveChangesAsync();
+
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error unenrolling student");
+				return BadRequest("Error unenrolling student.");
+			}
+		}
+
 
 		[HttpPost("AddWaitQueue/{courseId}/{studentId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -142,8 +267,5 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error removing student from waitlist.");
 			}
 		}
-
-
-
 	}
 }

@@ -14,11 +14,37 @@ namespace istc_education_api.Controllers
 
 		[HttpGet]
 		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> Index()
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int limit = 10, [FromQuery] string? search = null)
 		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
 			try
 			{
-				var users = await GetUserQuery().ToListAsync();
+				var query = _context.Users
+					.Include(u => u.Contact)
+					.Include(u => u.Student)
+					.AsQueryable();
+
+				if (!string.IsNullOrEmpty(search))
+				{
+					query = query.Where(u => 
+						u.FirstName.Contains(search) ||
+						u.MiddleName!.Contains(search) ||
+						u.LastName.Contains(search) ||
+						u.Contact!.Email.Contains(search));
+				}
+
+				query = query.OrderBy(u => u.LastName);
+
+				var users = await query
+					.Skip((page - 1) * limit)
+					.Take(limit)
+					.ToListAsync();
+
 				return Ok(users);
 			}
 			catch (Exception ex)
@@ -96,6 +122,32 @@ namespace istc_education_api.Controllers
 			{
 				_logger.LogError(ex, "Error getting user");
 				return BadRequest("Error getting user");
+			}
+		}
+
+		[HttpGet("StudentId/{studentId}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		public async Task<IActionResult> GetUserByStudentId(int studentId)
+		{
+			try
+			{
+				var user = await _context.Users
+					.Include(u => u.Contact)
+					.Include(u => u.Student)
+					.Where(u => u.Student != null && u.Student.StudentId == studentId)
+					.FirstOrDefaultAsync();
+
+				if (user == null)
+				{
+					return NotFound("User not found.");
+				}
+
+				return Ok(user);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting user.");
+				return BadRequest();
 			}
 		}
 

@@ -25,12 +25,31 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
 
     const student: Student | null = primaryEmailAddress ? await getAttendanceRecords(primaryEmailAddress.emailAddress) : null;
 
+    const statusColor = course.status === 'UpComing' ? 'text-info' : course.status === 'InProgress' ? 'text-success' : 'text-error';
+    const readableStatus = course.status === 'UpComing' ? 'Upcoming' : course.status === 'InProgress' ? 'In Progress' : 'Completed';
+
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <div className="sm:w-2/3 sm:flex sm:justify-center">
                 <CourseInfo course={course} expanded />
             </div>
             <div className="w-full sm:w-2/3 max-w-3xl space-y-2 px-4">
+                <div className="flex gap-2 items-center">
+                    <h2 className="text-xl font-bold">Status:</h2>
+                    <p className={`${statusColor}`}>{readableStatus}</p>
+                </div>
+                {course.topics && course.topics.length > 0 && (
+                    <>
+                        <h2 className="text-xl font-bold">Topics</h2>
+                        <div className="flex flex-wrap gap-2">
+                            {course.topics?.map((topic, index) => (
+                                <div key={index} className="border border-info rounded-md p-4">
+                                    <p className="font-bold">{topic.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
                 <h2 className="text-xl font-bold">Classes</h2>
                 <div className="space-y-2 mt-2">
                     {course.classes.map((cls, index) => {

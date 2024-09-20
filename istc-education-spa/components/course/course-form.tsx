@@ -27,11 +27,6 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
     const router = useRouter();
 
     useEffect(() => {
-        updateCourseStatus();
-    }, [course.classes]);
-
-
-    useEffect(() => {
         const formErrors = Object.values(errors);
         setIsFormValid(formErrors.every(err => err === '') && requiredFieldsFilled());
     }, [course, errors]);
@@ -213,39 +208,10 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
         return true;
     }
 
-    const updateCourseStatus = () => {
-        if (course.classes.length > 0 && 
-            course.status !==  'Cancelled' && 
-            course.status !== 'Archived') {
-            const today = new Date();
-            const firstClass = new Date(course.classes[0].date);
-            const lastClass = new Date(course.classes[course.classes.length - 1].date);
-        
-
-            if (today >= firstClass && today <= lastClass) {
-                setCourse(prev => ({
-                    ...prev,
-                    status: 'InProgress',
-                }));
-            } else if (today > lastClass) {
-                setCourse(prev => ({
-                    ...prev,
-                    status: 'Completed',
-                }));
-            } else {
-                setCourse(prev => ({
-                    ...prev,
-                    status: 'UpComing',
-                }));
-            }
-        }
-    }
+    
 
     return (
         <form onSubmit={handleOnSubmit} className="max-w-2xl space-y-2">
-            <div className="border-b p-2">
-                <h1 className="text-xl font-bold">Course Information</h1>
-            </div>
             <TextInput
                 label="Title"
                 id="title"

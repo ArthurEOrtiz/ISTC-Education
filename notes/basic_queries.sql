@@ -2,38 +2,41 @@
 SELECT *
 FROM Users;
 
---SELECT *
---FROM Contacts;
+SELECT *
+FROM Contacts;
 
---SELECT *
---FROM Employers;
+SELECT *
+FROM Employers;
 
 SELECT *
 FROM Students;
 
+SELECT *
+FROM Attendances;
+
+SELECT *
+FROM Certifications;
+
 --SELECT *
---FROM Attendances;
+--FROM Courses;
 
-SELECT *
-FROM Courses;
+--SELECT *
+--FROM Classes;
 
-SELECT *
-FROM Classes;
+--SELECT *
+--FROM Locations;
 
-SELECT *
-FROM Locations;
+--SELECT *
+--FROM PDFs;
 
-SELECT *
-FROM PDFs;
+--SELECT *
+--FROM Exams;
 
-SELECT *
-FROM Exams;
+--SELECT *
+--FROM WaitLists;
 
-SELECT *
-FROM WaitLists;
+--SELECT *
+--FROM Topics;
 
-SELECT *
-FROM Topics;
-
-SELECT *
-FROM CourseTopic;
+--SELECT *
+--FROM CourseTopic;

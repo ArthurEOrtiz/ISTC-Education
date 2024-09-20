@@ -1,10 +1,8 @@
 'use client';
-
 import { addWaitQueue, isStudenEnrolled, removeWaitQueue } from "@/utils/api/student";
 import { useEffect, useState } from "react";
 import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
-import { useRouter } from "next/navigation";
 
 interface CourseEnrollmentActionsProps {
     course: Course;
@@ -18,7 +16,7 @@ const CourseEnrollmentActions: React.FC<CourseEnrollmentActionsProps> = ({ cours
     const [ applying, setApplying ] = useState(false);
     const [ error, setError ] = useState<string | ErrorResponse | null>(null);
     const { courseId, status } = course;
-    const router = useRouter();
+
 
     useEffect(() => {
         if (student) {
