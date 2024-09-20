@@ -10,7 +10,6 @@ import ErrorBody from "../modal/error-body";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import ClassAttendanceModalBody from "../attendance/class-attendance-modal-body";
-import CourseEnrollmentModalBody from "../attendance/course-enrollment-modal-body";
 
 interface EditCourseProps {
     course: Course;
@@ -26,7 +25,6 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
     const [ attendanceExpanded, setAttendanceExpanded ] = useState<boolean>(true);
     const [ archiveConfirmationModal, setArchiveConfirmationModal ] = useState<boolean>(false);
     const [ attendanceModal, setAttendanceModal ] = useState<boolean>(false);
-    const [ enrollmentModal, setEnrollmentModal ] = useState<boolean>(false);
     const [ selectedClass, setSelectedClass ] = useState<Class | null>(null);   
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
@@ -117,7 +115,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                         <div className="flex flex-col gap-2">
                             <button 
                                 className="btn btn-info"
-                                onClick={() => setEnrollmentModal(true)}
+                                onClick={() => router.push(`/course/enrollment/${course.courseId}`)}
                             >
                                 Manage Enrollment
                             </button>
@@ -165,19 +163,6 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                     
                 </div>
             </div>
-            {enrollmentModal && (
-                <ModalBase
-                    title="Manage Enrollment"
-                    width="sm:w-2/3"
-                    isOpen={enrollmentModal}
-                    onClose={() => setEnrollmentModal(false)}
-                >
-                    <CourseEnrollmentModalBody 
-                        course={course} 
-                        onError={(error) => {setErrors(error)}} 
-                    />
-                </ModalBase>
-            )}
 
             {attendanceModal && selectedClass && (
                 <ModalBase

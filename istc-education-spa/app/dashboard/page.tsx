@@ -62,8 +62,6 @@ const DashboardPage:React.FC = async () => {
 
     if (isUserNew) {
         // If the user is new, we need to update the user record with the IP ID from the clerk client.
-        // FORNOW: I will use an console log to make sure the user is being updated correctly.
-        console.log(`Updating user record with IP ID: ${IPId}`);
         serverUser.ipId = IPId;
         serverUser.status = "Active";
         const response = await putUser(serverUser);

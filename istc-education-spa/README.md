@@ -6,6 +6,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 - [Clerk](https://clerk.com/)
 - [axios](https://www.npmjs.com/package/axios)
 - [react-phone-number-input](https://www.npmjs.com/package/react-phone-number-input)
+- [use-debounce](https://www.npmjs.com/package/use-debounce)
 
 ## Helpful Documents
 - [Clerk - Organizations, Roles, and Permissions](https://clerk.com/docs/organizations/overview)

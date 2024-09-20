@@ -82,6 +82,15 @@ export const getCourseEnrollments = async (courseId: number): Promise<[]> => {
     }
 }
 
+export const getCourseWaitlist = async (courseId: number): Promise<[]> => {
+    try {
+        const response = await axiosInstance.get(`/Course/WaitList/${courseId}`);
+        return response.data as [];
+    } catch (error) {
+        throw new Error('Error fetching course wait list');
+    }
+}
+
 export const deleteCourse = async (id: number): Promise<boolean> => {
     try {
         const response = await axiosInstance.delete(`/Course/${id}`);

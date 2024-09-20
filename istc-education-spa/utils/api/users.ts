@@ -13,7 +13,7 @@ export const getAllUsers = async (page:number, limit:number, search?:string ) =>
     }
 }
 
-export const getUser = async (id: number) => {
+export const getUser = async (id: number): Promise<User | null> => {
     try {
         const response = await axiosInstance.get(`/User/${id}`);
         return response.data as User;
@@ -26,42 +26,56 @@ export const getUser = async (id: number) => {
     }
 }
 
-export const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string): Promise<User | null> => {
     try {
-        const response = await axiosInstance.get(`/User/Email/${email}`);
-        return response.data as User;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        const response = await axiosInstance.get(`/User?email=${email}`);
+        if (response.data.length === 0) {
             return null;
-        } else {
+        }
+
+        if (response.data.length > 1) {
             throw new Error('Error fetching user by email');
         }
+
+        return response.data[0] as User;
+    } catch (error) {
+        throw new Error('Error fetching user by email');
     }
 }
 
 export const getUserByIPId = async (IPId: string): Promise<User | null> => {
     try {
-        const response = await axiosInstance.get(`/User/IPId/${IPId}`);
-        return response.data as User;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        const response = await axiosInstance.get(`/User?IPId=${IPId}`);
+
+        if (response.data.length === 0) {
             return null;
-        } else {
+        }
+
+        if (response.data.length > 1) {
             throw new Error('Error fetching user by IPId');
         }
+
+        return response.data[0] as User
+    } catch (error) {
+        throw new Error('Error fetching user by IPId');
     }
 };
 
 export const getUserByStudentId = async (studentId: number): Promise<User | null> => {
     try {
-        const response = await axiosInstance.get(`/User/StudentId/${studentId}`);
-        return response.data as User;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 404) {
+        const response = await axiosInstance.get(`/User?studentId=${studentId}`);
+      
+        if (response.data.length === 0) {
             return null;
-        } else {
+        }
+
+        if (response.data.length > 1) {
             throw new Error('Error fetching user by studentId');
         }
+
+        return response.data[0] as User;
+    } catch (error) {
+        throw new Error('Error fetching user by studentId');
     }
 }
 

@@ -167,6 +167,8 @@ namespace istc_education_api.Controllers
 		}
 
 		[HttpGet("Enrollment/{courseId}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
 		public async Task<IActionResult> GetCourseEnrollment(int courseId)
 		{
 			try
@@ -195,6 +197,34 @@ namespace istc_education_api.Controllers
 			}
 		}
 
+		[HttpGet("WaitList/{courseId}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> GetCourseWaitlist(int courseId)
+		{
+			try
+			{
+				var users = await _context.Courses
+					.Where(c => c.CourseId == courseId)
+					.SelectMany(c => c.WaitList!)
+					.Select(w => w.StudentId)
+					.Distinct()
+					.Join(_context.Users
+						.Include(u => u.Contact)
+						.Include(u => u.Student),
+								studentId => studentId,
+								user => user.Student!.StudentId,
+								(studentId, user) => user)
+					.ToListAsync();
+
+				return Ok(users);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting course wait list");
+				return BadRequest("Error getting course wait list.");
+			}
+		}
 
 		private bool CourseExists(int id)
 		{

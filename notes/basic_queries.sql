@@ -11,11 +11,11 @@ FROM Employers;
 SELECT *
 FROM Students;
 
-SELECT *
-FROM Attendances;
+--SELECT *
+--FROM Attendances;
 
-SELECT *
-FROM Certifications;
+--SELECT *
+--FROM Certifications;
 
 --SELECT *
 --FROM Courses;

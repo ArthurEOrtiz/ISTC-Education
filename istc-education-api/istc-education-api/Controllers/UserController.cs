@@ -15,19 +15,31 @@ namespace istc_education_api.Controllers
 		[HttpGet]
 		[ProducesResponseType((int)HttpStatusCode.OK)]
 		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
-		public async Task<IActionResult> Index([FromQuery] int page = 1, [FromQuery] int limit = 10, [FromQuery] string? search = null)
+		public async Task<IActionResult> Index(
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] string? search = null,
+			[FromQuery] string? IPId = null,
+			[FromQuery] string? email = null,
+			[FromQuery] int? studentId = null)
+			
 		{
 			if (page < 1 || limit < 1)
 			{
 				return BadRequest("Invalid page or limit");
 			}
+			
+			if (IPId != null || email != null || studentId.HasValue)
+			{
+				if (!string.IsNullOrEmpty(search))
+				{
+					return BadRequest("Cannot provide IPId, email, or studentId with search");
+				}
+			}
 
 			try
 			{
-				var query = _context.Users
-					.Include(u => u.Contact)
-					.Include(u => u.Student)
-					.AsQueryable();
+				var query = GetUserQuery().AsQueryable();
 
 				if (!string.IsNullOrEmpty(search))
 				{
@@ -36,6 +48,21 @@ namespace istc_education_api.Controllers
 						u.MiddleName!.Contains(search) ||
 						u.LastName.Contains(search) ||
 						u.Contact!.Email.Contains(search));
+				}
+
+				if(!string.IsNullOrEmpty(IPId))
+				{
+					query = query.Where(u => u.IPId == IPId);
+				}
+
+				if (!string.IsNullOrEmpty(email))
+				{
+					query = query.Where(u => u.Contact!.Email == email);
+				}
+
+				if (studentId.HasValue)
+				{
+					query = query.Where(u => u.Student != null && u.Student.StudentId == studentId);
 				}
 
 				query = query.OrderBy(u => u.LastName);
@@ -71,82 +98,6 @@ namespace istc_education_api.Controllers
 			catch (Exception ex)
 			{
 				_logger.LogError(ex, "Error getting user");
-				return BadRequest();
-			}
-		}
-
-		[HttpGet("IPId/{IPId}")]
-		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> GetUserByIdentityProviderId(string IPId)
-		{
-			try
-			{
-				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.IPId == IPId);
-
-				if (user == null)
-				{
-					return NotFound("User not found");
-				}
-
-				return Ok(user);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting user");
-				return BadRequest("Error getting user");
-			}
-		}
-
-		[HttpGet("Email/{email}")]
-		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> GetUserByEmail(string email)
-		{
-			try
-			{
-				var contact = await _context.Contacts.FirstOrDefaultAsync(c => c.Email == email);
-
-				if (contact == null) {
-					return NotFound("Contact not found");
-				}
-
-				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.UserId == contact.UserId);
-
-				if (user == null)
-				{
-					return NotFound("User not found");
-				}
-
-				return Ok(user);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting user");
-				return BadRequest("Error getting user");
-			}
-		}
-
-		[HttpGet("StudentId/{studentId}")]
-		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> GetUserByStudentId(int studentId)
-		{
-			try
-			{
-				var user = await _context.Users
-					.Include(u => u.Contact)
-					.Include(u => u.Student)
-					.Where(u => u.Student != null && u.Student.StudentId == studentId)
-					.FirstOrDefaultAsync();
-
-				if (user == null)
-				{
-					return NotFound("User not found.");
-				}
-
-				return Ok(user);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting user.");
 				return BadRequest();
 			}
 		}
