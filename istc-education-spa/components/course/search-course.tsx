@@ -11,56 +11,34 @@ interface SearchCourseProps {
     children: React.ReactNode;
 }
 
-const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, children}) => {
+const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, children }) => {
     const [search, setSearch] = useState<string>("");
-    const [upcoming , setUpcoming] = useState<boolean>(true);
-    const [inProgress , setInProgress] = useState<boolean>(true);
-    const [completed , setCompleted] = useState<boolean>(false);
-    const [cancelled , setCancelled] = useState<boolean>(false);
-    const [archived , setArchived] = useState<boolean>(false);
-    const [url , setUrl] = useState<string>(`edit?page=${page}&limit=${limit}&status=["UpComing","InProgress"]`);
+    const [filters, setFilters] = useState({
+        UpComing: true,
+        InProgress: true,
+        Completed: false,
+        Cancelled: false,
+        Archived: false,
+    });
+    const [url, setUrl] = useState<string>(`edit?page=${page}&limit=${limit}&status=["UpComing","InProgress"]`);
     const [query] = useDebounce(search, 500);
     const router = useRouter();
 
     useEffect(() => {
-        if (!query) {
-            router.push(url);
-            return;
-        }
-        
-        const urlPlusSearch = `${url}&search=${query}`;
-        router.push(urlPlusSearch);
+        const status = (Object.keys(filters) as (keyof typeof filters)[]) 
+            .filter(key => filters[key])
+        const baseUrl = `edit?page=${page}&limit=${limit}&status=${JSON.stringify(status)}`;
+        setUrl(query ? `${baseUrl}&search=${query}` : baseUrl);
+        router.push(query ? `${baseUrl}&search=${query}` : baseUrl);
+    }, [filters, query, page, limit, router]);
 
-    }, [query, url, router]);
+    const handlePageChange = (newPage: number) => {
+        router.push(url.replace(`page=${page}`, `page=${newPage}`));
+    };
 
-    useEffect(() => {
-        const status = [];
-        if (upcoming) {
-            status.push("UpComing");
-        }
-        if (inProgress) {
-            status.push("InProgress");
-        }
-        if (completed) {
-            status.push("Completed");
-        }
-        if (cancelled) {
-            status.push("Cancelled");
-        }
-        if (archived) {
-            status.push("Archived");
-        }
-        const url = `edit?page=${page}&limit=${limit}&status=${JSON.stringify(status)}`;
-        setUrl(url);
-    }, [upcoming, inProgress, completed, cancelled, archived]);
-
-    const handleNextPage = () => {
-       setUrl(url.replace(`page=${page}`, `page=${page + 1}`));
-    }
-
-    const handlePreviousPage = () => {
-        setUrl(url.replace(`page=${page}`, `page=${page - 1}`));
-    }
+    const toggleFilter = (filter: keyof typeof filters) => {
+        setFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
+    };
 
     return (
         <>
@@ -76,35 +54,15 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                     <FaSearch/>
                 </label>
                 <div className="join">
-                    <button 
-                        className={`btn join-item ${upcoming ? 'btn-info': ''}`}
-                        onClick={() => setUpcoming(!upcoming)}
+                    {(Object.keys(filters) as (keyof typeof filters)[]).map(filter => (
+                        <button 
+                            key={filter}
+                            className={`btn join-item ${filters[filter] ? 'btn-info' : ''}`}
+                            onClick={() => toggleFilter(filter as keyof typeof filters)}
                         >
-                            Upcoming
-                    </button>
-                    <button 
-                        className={`btn join-item ${inProgress ? 'btn-info': ''}`}
-                        onClick={() => setInProgress(!inProgress)}
-                        >
-                            In Progress
-                    </button>
-                    <button 
-                        className={`btn join-item ${completed ? 'btn-info': ''}`}
-                        onClick={() => setCompleted(!completed)}
-                        >
-                            Completed
-                    </button>
-                    <button 
-                        className={`btn join-item ${cancelled ? 'btn-info': ''}`}
-                        onClick={() => setCancelled(!cancelled)}
-                        >
-                            Cancelled</button>
-                    <button 
-                        className={`btn join-item ${archived ? 'btn-info': ''}`}
-                        onClick={() => setArchived(!archived)}
-                        >
-                            Archived
-                    </button>
+                            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                        </button>
+                    ))}
                 </div>
             </div>
             <>
@@ -114,16 +72,16 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                 <button 
                     className="btn btn-info"
                     disabled={page === 1}
-                    onClick={handlePreviousPage}
-                    >
-                        Previous
+                    onClick={() => handlePageChange(page - 1)}
+                >
+                    Previous
                 </button>
                 <button 
                     className="btn btn-info"
                     disabled={courseCount < limit}
-                    onClick={handleNextPage}
-                    >
-                        Next
+                    onClick={() => handlePageChange(page + 1)}
+                >
+                    Next
                 </button>
             </div>
         </>
