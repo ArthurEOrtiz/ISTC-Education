@@ -32,7 +32,7 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <h1 className="text-3xl font-bold"> Users </h1>
-            <div className="w-full lg:w-2/3 space-y-2 p-4">
+            <div className="w-full max-w-2xl space-y-2 p-4">
                 <div>
                     <SearchUser/>
                 </div>
@@ -41,7 +41,7 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
                         <FaPlus/> User
                     </Link>
                 </div>
-                <div className="flex flex-col space-y-2">
+                <div className="space-y-2">
                     {users.map((user, index) => (
                         <Link 
                             key={index}
@@ -55,12 +55,12 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
                 <div className="flex justify-between">
                     <Link 
                         href={`/user?page=${page - 1}&limit=${limit}`}
-                        className={`btn ${page === 1 ? 'btn-disabled' : 'btn-info dark:text-white'}`}>
+                        className={`btn ${page === 1 ? 'btn-disabled' : 'btn-info'}`}>
                             Previous
                     </Link>
                     <Link 
                         href={`/user?page=${page + 1}&limit=${limit}`}
-                        className={`btn ${users.length < limit ? 'btn-disabled' : 'btn-info dark:text-white'}`}>
+                        className={`btn ${users.length < limit ? 'btn-disabled' : 'btn-info'}`}>
                             Next
                     </Link>  
 

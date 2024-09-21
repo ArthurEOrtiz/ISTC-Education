@@ -7,7 +7,7 @@ interface AddRemoveClassProps {
 }
 
 const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) => {
-    const [date, setDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState<string>(course.enrollmentDeadline);
     const [start, setStart] = useState<string>('09:00:00');
     const [end, setEnd] = useState<string>('17:00:00');
     const [errors, setErrors] = useState<FormError>({});

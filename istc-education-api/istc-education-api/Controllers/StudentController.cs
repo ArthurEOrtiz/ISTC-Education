@@ -108,7 +108,7 @@ namespace istc_education_api.Controllers
 					.Where(w => w.StudentId == studentId && w.CourseId == courseId)
 					.FirstOrDefaultAsync();
 
-				if (waitList != null && waitList.ToEnroll)
+				if (waitList != null)
 				{
 					_context.WaitLists.Remove(waitList);
 				}
@@ -226,7 +226,6 @@ namespace istc_education_api.Controllers
 					StudentId = studentId,
 					CourseId = courseId,
 					DateAdded = DateTime.UtcNow,
-					ToEnroll = true
 				};
 
 				_context.WaitLists.Add(waitList);

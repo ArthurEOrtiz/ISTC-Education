@@ -166,6 +166,9 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
             case 'instructorEmail':
                 formErrors[id] = value === '' ? '' : validateEmail(value)
                 break;
+            case 'check-email':
+                formErrors["instructorEmail"] = value === course.instructorEmail ? '' : 'Emails do not match';
+                break;
             case 'location.description':
                 formErrors[id] = value === '' ? '' : validateLength(value, 10, 100) ? '' : 'Location Description must be between 10 and 100 characters';
                 break;
@@ -187,6 +190,14 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
             case 'location.postalCode':
                 formErrors[id] = value === '' ? '' : validateZip(value)
                 break;
+        }
+
+        if(id === 'check-email') {
+            setErrors(prev => ({
+                ...prev,
+                instructorEmail: formErrors['instructorEmail'],
+            }));
+            return;
         }
 
         setErrors(prev => ({

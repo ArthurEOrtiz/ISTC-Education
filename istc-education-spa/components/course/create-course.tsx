@@ -127,7 +127,7 @@ const CreateCourse: React.FC = () => {
                             <div className="border-b p-2" />
                             <AddRemoveClass course={course} setCourse={setCourse} />
                         </div>
-                        <div className="flex justify-between p-4">
+                        <div className="flex justify-end gap-2">
 
                             <button
                                 className="btn btn-error dark:text-white"
@@ -136,12 +136,7 @@ const CreateCourse: React.FC = () => {
                                 Go Back
                             </button>
 
-                            <button
-                                className="btn btn-success dark:text-white"
-                                onClick={() => console.log(course)}
-                            >
-                                Log Course
-                            </button>
+                           
 
                             <button
                                 className="btn btn-success dark:text-white"
@@ -157,24 +152,24 @@ const CreateCourse: React.FC = () => {
             {success && (
                 <ModalBase
                     title="Success"
-                    width="w-1/2"
+                    width="w-1/3"
                     isOpen={success}
-                    onClose={() => {}}
+                    onClose={() => {router.push('/course/edit')}}
                 >
                     <div className="space-y-2">
-                        <h2 className="text-xl font-bold">Course Created Successfully</h2>
+                        <h2 className="text-xl font-bold">Course Created Successfully!</h2>
                         <div className="flex justify-between">
                             <button
-                                className="btn btn-success dark:text-white"
+                                className="btn btn-info"
                                 onClick={() => router.push('/admin')}
                             >
-                                Go to Admin Dashboard
+                                Admin Dashboard
                             </button>
                             <button
-                                className="btn btn-success dark:text-white"
-                                onClick={() => router.push('/course')}
+                                className="btn btn-info"
+                                onClick={() => router.push('/course/edit')}
                             >
-                                Go to Courses
+                                Back to Edit Courses
                             </button>
                         </div>
                     </div>

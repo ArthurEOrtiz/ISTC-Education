@@ -32,6 +32,8 @@ const CourseEnrollmentPage: React.FC<CourseEnrollmentPageProps> = async ({params
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
+            <h1 className="text-3xl font-bold">Course Enrollment</h1>
+            <h2 className="text-2xl font-bold">{course.title}</h2>
             <ManageCourseEnrollment course={course} />
         </div>
     );

@@ -2,9 +2,19 @@
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 
-export const getAllCourses = async () => {
+export const getAllCourses = async (page: number, limit:number, statuses?:string[], startDate?:Date,  endDate?:Date, search?:string ) => {
+    const startDateOnlystring =  startDate?.toISOString().split('T')[0];
+    const endDateOnlystring = endDate?.toISOString().split('T')[0];
+    
+    let url = `/Course?page=${page}&limit=${limit}${startDate ? `&startDate=${startDateOnlystring}` : ''}${endDate ? `&endDate=${endDateOnlystring}` : ''}${search ? `&search=${search}` : ''}`;
+
+    const effectiveStatuses = Array.isArray(statuses) ? statuses : ["UpComing", "InProgress"];
+    for (const status of effectiveStatuses) {
+        url += `&status=${status}`;
+    }
+    
     try {
-        const response = await axiosInstance.get('/Course');
+        const response = await axiosInstance.get(url);
         return response.data as Course[];
     } catch (error) {
         throw new Error('Error fetching all courses');    

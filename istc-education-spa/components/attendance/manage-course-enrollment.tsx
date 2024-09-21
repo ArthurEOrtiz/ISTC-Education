@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaAngleDown, FaAngleUp, FaPlus, FaSearch, FaTimes } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
+import UserList from "./user-list";
 
 interface ManageCourseEnrollmentProps {
     course: Course;
@@ -18,6 +19,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
     const [ loadingUsers, setLoadingUsers ] = useState<boolean>(true);
     const [ waitlistUsers, setWaitlistUsers ] = useState<User[]>([]);
     const [ loadingWaitlistUsers, setLoadingWaitlistUsers ] = useState<boolean>(true);
+    const [ isWaitlistExpanded, setIsWaitlistExpanded ] = useState<boolean>(true);
     const [ isStudentsExpanded, setIsStudentsExpanded ] = useState<boolean>(true);
     const [ page, setPage ] = useState<number>(1);
     const [ limit ] = useState<number>(5);
@@ -71,109 +73,89 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
     
     return (
         <div className="w-full max-w-2xl space-y-2">
-            <div>
-                <h2 className="text-2xl font-bold">Enrolled Students</h2>
-                <div className="space-y-2">
-                   {!loadingEnrolledUsers && enrolledUsers.length > 0 ? (
-                        enrolledUsers.map((user, index) => (
-                            <div key={index} className="border border-info rounded-md flex justify-between p-4">
-                                <div className="flex gap-2">
-                                    <p className="font-bold">{user.lastName}, {user.firstName} {user.middleName}</p>
-                                    <p>{user.contact.email}</p>
-                                </div>
-                                <div>
-                                    <button 
-                                        className="btn btn-error btn-circle btn-sm dark:text-white"
-                                        onClick={() => handleRemoveUserFromEnrolled(user.userId)}>
-                                            <FaTimes/>
-                                </button>
-                                </div>
-                            </div>
-                        )
-                    )
-                    ) : !loadingEnrolledUsers && enrolledUsers.length === 0 ? (
-                        <div className="bg-error-content p-4 rounded-md">
-                            <p className="text-error">No students enrolled</p>
-                        </div>
-                    ) : (
-                        <div className="flex justify-center">   
-                            <span className="loading loading-spinner loading-lg"></span>
+            <h2 className="text-2xl font-bold">Enrolled Students</h2>
+            <div className="space-y-2">
+                <UserList
+                    users={enrolledUsers}
+                    loading={loadingEnrolledUsers}
+                    onClick={(u) => handleRemoveUserFromEnrolled(u.userId)}
+                    add={false}
+                    nullText="No students enrolled"
+                />
+            </div>
+       
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Students</h2>
+                <button 
+                    className="btn btn-ghost btn-circle text-3xl"
+                    onClick={() => setIsStudentsExpanded(!isStudentsExpanded)}>
+                        {isStudentsExpanded ? <FaAngleDown/> : <FaAngleUp/>}
+                </button>
+            </div>
+            {isStudentsExpanded && (
+                <>
+                    <label className="input input-bordered input-info flex items-center gap-2">
+                        <input 
+                            type="text" 
+                            className="grow" 
+                            placeholder="Search students . . . " 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                        <FaSearch/>
+                    </label>
+                    <div className="space-y-2 mt-2">
+                        <UserList
+                            users={users}
+                            loading={loadingUsers}
+                            onClick={handleEnrollUser}
+                            add={true}
+                            nullText="No students found"
+                        />
+                    </div>
+                    {users.length > 0 && (
+                        <div className="flex justify-between mt-2">
+                            <button 
+                                className="btn btn-info dark:text-white"
+                                disabled={page === 1}
+                                onClick={() => setPage(page - 1)}
+                            >
+                                Previous
+                            </button>
+                            <button 
+                                className="btn btn-info dark:text-white"
+                                disabled={users.length < limit}
+                                onClick={() => setPage(page + 1)}
+                                >
+                                    Next
+                            </button>
                         </div>
                     )}
-                </div>
-            </div>
-            <div>
-                <div className="flex justify-between items-center">
-                    <h2 className="text-2xl font-bold">Students</h2>
-                    <button 
-                        className="btn btn-ghost btn-circle text-3xl"
-                        onClick={() => setIsStudentsExpanded(!isStudentsExpanded)}>
-                            {isStudentsExpanded ? <FaAngleDown/> : <FaAngleUp/>}
-                    </button>
-                </div>
-                {isStudentsExpanded && (
-                    <>
-                        <label className="input input-bordered input-info flex items-center gap-2">
-                            <input 
-                                type="text" 
-                                className="grow" 
-                                placeholder="Search students . . . " 
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                            <FaSearch/>
-                        </label>
-                        <div className="space-y-2 mt-2">
-                            {!loadingUsers && users.length > 0 ? (
-                                users.map((user, index) => (
-                                    <div key={index} className="border border-info rounded-md flex justify-between p-4">
-                                        <div className="flex gap-2">
-                                            <p className="font-bold">{user.firstName} {user.lastName}</p>
-                                            <p>{user.contact.email}</p>
-                                        </div>
-                                        <div>
-                                            <button 
-                                                className="btn btn-success btn-circle btn-sm dark:text-white"
-                                                onClick={() => handleEnrollUser(user)}
-                                                disabled={handleDisabledEnrollButton(user)}>
-                                                    <FaPlus/>
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : !loadingUsers && users.length === 0 ? (
-                                <div className="bg-error-content p-4 rounded-md">
-                                    <p className="text-error">No students found</p>
-                                </div>
-                            ) : (
-                                <div className="flex justify-center">   
-                                    <span className="loading loading-spinner loading-lg"></span>
-                                </div>
-                            )}
-                        </div>
-                        {users.length > 0 && (
-                            <div className="flex justify-between mt-2">
-                                <button 
-                                    className="btn btn-info dark:text-white"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    Previous
-                                </button>
-                                <button 
-                                    className="btn btn-info dark:text-white"
-                                    disabled={users.length < limit}
-                                    onClick={() => setPage(page + 1)}
-                                    >
-                                        Next
-                                </button>
-                            </div>
-                        )}
-                    </>
-                )}
+                </>
+            )}
 
+            <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Waitlist</h2>
+                <button 
+                    className="btn btn-ghost btn-circle text-3xl"
+                    onClick={() => setIsWaitlistExpanded(!isWaitlistExpanded)}>
+                        {isWaitlistExpanded ? <FaAngleDown/> : <FaAngleUp/>}
+                </button>
             </div>
-            <div className="border-b" />
+            {isWaitlistExpanded && (
+                <div className="space-y-2">
+                    <UserList
+                        users={waitlistUsers}
+                        loading={loadingWaitlistUsers}
+                        onClick={handleEnrollUser}
+                        add={true}
+                        nullText="No students in waitlist"
+                    />
+                </div>
+            )}
+        
+            <div className="border-b "/>
+
             <div className="w-full flex justify-end gap-2"> 
                 <button 
                     className="btn btn-error dark:text-white"
@@ -186,7 +168,6 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                         Save Changes
                 </button>
             </div>
-
         </div>
     );
 

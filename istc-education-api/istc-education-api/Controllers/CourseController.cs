@@ -14,14 +14,65 @@ namespace istc_education_api.Controllers
 
 		[HttpGet]
 		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> Index()
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> Index(
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] string? search = null,
+			[FromQuery] DateOnly? startDate = null,
+			[FromQuery] DateOnly? endDate = null,
+			[FromQuery] List<string>? status = null
+			)
 		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
 			try
 			{
-				var courses = await _context.Courses
-					.Include(c => c.Classes)
+				var query = GetCourseQuery().AsQueryable();
+
+				if (!string.IsNullOrEmpty(search))
+				{
+					query = query.Where(c =>
+						c.Title.Contains(search) ||
+						c.Description!.Contains(search) ||
+						c.Location!.Description!.Contains(search) ||
+						c.Location!.AddressLine1!.Contains(search) ||
+						c.Location!.AddressLine2!.Contains(search) ||
+						c.Location!.City!.Contains(search) ||
+						c.Location!.State!.Contains(search) ||
+						c.Location!.PostalCode!.Contains(search));
+				}
+
+				if (startDate.HasValue)
+				{
+					query = query.Where(c => c.Classes.Any(c => c.Date >= startDate));
+				}
+
+				if (endDate.HasValue)
+				{
+					query = query.Where(c => c.Classes.Any(c => c.Date <= endDate));
+					
+				}
+
+				if (status != null && status.Count > 0)
+				{
+					var statusEnums = status.Select(s => Enum.Parse<CourseStatus>(s)).ToList();
+					query = query.Where(c => statusEnums.Contains(c.Status));
+				}
+
+				// Order by the first class start date
+				query = query.OrderBy(c => c.Classes.Min(c => c.Date));
+
+				var courses = await query
+					.Skip((page - 1) * limit)
+					.Take(limit)
 					.ToListAsync();
+
 				return Ok(courses);
+
 			}
 			catch (Exception ex)
 			{
@@ -114,7 +165,7 @@ namespace istc_education_api.Controllers
 				UpdatePDF(existingCourse, course.PDF);
 
 				UpdateClasses(existingCourse, course.Classes);
-				
+
 				if (course.Topics != null)
 				{
 					UpdateTopics(existingCourse, course.Topics);
@@ -187,7 +238,7 @@ namespace istc_education_api.Controllers
 								(studentId, user) => user)
 					.ToListAsync();
 
-			
+
 				return Ok(users);
 			}
 			catch (Exception ex)
@@ -254,10 +305,11 @@ namespace istc_education_api.Controllers
 			}
 
 			// Update existing classes or add new ones
-			foreach (var updatedClass in updatedClasses) {
+			foreach (var updatedClass in updatedClasses)
+			{
 				var existingClass = existingCourse.Classes
 					.FirstOrDefault(c => c.ClassId == updatedClass.ClassId);
-				
+
 				if (existingClass != null)
 				{
 					_context.Entry(existingClass).CurrentValues.SetValues(updatedClass);
@@ -296,7 +348,8 @@ namespace istc_education_api.Controllers
 						existingCourse.Topics.Add(updatedTopic);
 					}
 				}
-			} else
+			}
+			else
 			{
 				// If the existing course has no topics, just add the new topics to the course
 				existingCourse.Topics = updatedTopics;

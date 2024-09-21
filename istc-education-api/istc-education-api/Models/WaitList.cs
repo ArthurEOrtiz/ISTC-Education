@@ -16,7 +16,5 @@ namespace istc_education_api.Models
 		public int StudentId { get; set; }
 
 		public DateTime DateAdded { get; set; }
-
-		public bool ToEnroll { get; set; }
 	}
 }

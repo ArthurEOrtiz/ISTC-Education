@@ -21,7 +21,8 @@ namespace istc_education_api.Controllers
 			[FromQuery] string? search = null,
 			[FromQuery] string? IPId = null,
 			[FromQuery] string? email = null,
-			[FromQuery] int? studentId = null)
+			[FromQuery] int? studentId = null
+			)
 			
 		{
 			if (page < 1 || limit < 1)
