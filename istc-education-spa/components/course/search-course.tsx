@@ -78,7 +78,7 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                 </button>
                 <button 
                     className="btn btn-info"
-                    disabled={courseCount < limit}
+                    disabled={courseCount <= limit}
                     onClick={() => handlePageChange(page + 1)}
                 >
                     Next
