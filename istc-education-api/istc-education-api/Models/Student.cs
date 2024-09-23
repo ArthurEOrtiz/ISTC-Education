@@ -16,6 +16,8 @@ namespace istc_education_api.Models
 
 		public bool MappingCertified { get; set; } = false;
 
+		public int AccumulatedCredits { get; set; } = 0;
+
 		public virtual ICollection<Certification>? Certifications { get; set; }
 
 		public virtual ICollection<Attendance>? Attendances { get; set; }

@@ -37,6 +37,7 @@ const CreateUser: React.FC = () => {
         student: {
             studentId: 0,
             userId: 0,
+            accumulatedCredits: 0,
             appraiserCertified: false,
             mappingCertified: false,
         },

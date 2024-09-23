@@ -41,6 +41,7 @@ const NewUserRegistration: React.FC<NewUserRegistrationProps> = ({ IPId }) => {
         student: {
             studentId: 0,
             userId: 0,
+            accumulatedCredits: 0,
             appraiserCertified: false,
             mappingCertified: false,
         },

@@ -4,7 +4,13 @@ import { currentUser, User as ClerkUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const DashboardPage:React.FC = async () => {
+interface DashboardPageProps {
+    searchParams: {
+        [key: string]: string | string[] | undefined;
+    };
+}
+
+const DashboardPage:React.FC<DashboardPageProps> = async ({ searchParams }) => {
     /*
     * This is the dashboard for the user.
     * It will display the user's information and allow them to edit it.
@@ -72,8 +78,11 @@ const DashboardPage:React.FC = async () => {
 
     // Finally we need to check if the user is an admin or not.
     const isAdmin: boolean = await isUserAdmin(IPId);
-    const { contact, employer } = serverUser;
+    const { contact, employer, student } = serverUser;
     
+
+    const showEnrolledCourses = searchParams.enrolledCourses
+    const showWaitlistedCourses = searchParams.waitlistedCourses
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
@@ -90,18 +99,37 @@ const DashboardPage:React.FC = async () => {
                             </div>
                         )}
                         <div className="md:flex md:justify-between space-y-2 items-baseline gap-2">
-                            {contact && (
-                                <div className="md:w-1/2 border border-info rounded-md p-4">
-                                    <h3 className="text-lg font-bold">Contact</h3>
-                                    <p>{contact.email}</p>
-                                    <p>{contact.phone}</p>
-                                    <p>{contact.addressLine1}</p>
-                                    <p>{contact.addressLine2}</p>
-                                    <p>{contact.city} {contact.state} {contact.postalCode}</p>
-                                </div>
-                            )}
-                           {employer && (
-                                <div className="md:w-1/2 border border-info rounded-md p-4">
+                            <div className="md:w-1/2 space-y-2">
+                                {contact && (
+                                    <div className="border border-info rounded-md p-2">
+                                        <h3 className="text-lg font-bold">Contact</h3>
+                                        <p>{contact.email}</p>
+                                        <p>{contact.phone}</p>
+                                        <p>{contact.addressLine1}</p>
+                                        <p>{contact.addressLine2}</p>
+                                        <p>{contact.city} {contact.state} {contact.postalCode}</p>
+                                    </div>
+                                )}
+                                {student && (
+                                    <div className="border border-info rounded-md p-2">
+                                        <h3 className="text-lg font-bold">Student</h3>
+                                        <div className="flex gap-2">
+                                            <p>Accumulated Credits:</p>
+                                            <p>{student.accumulatedCredits}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <p>Appraiser Certified:</p>
+                                            <p>{student.appraiserCertified ? "Yes" : "No"}</p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <p>Mapping Certified:</p>
+                                            <p>{student.mappingCertified ? "Yes" : "No"}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            {employer && (
+                                <div className="md:w-1/2 border border-info rounded-md p-2">
                                     <h3 className="text-lg font-bold">Employer</h3>
                                     <p>{employer.employerName}</p>
                                     <p>{employer.jobTitle}</p>
@@ -109,30 +137,58 @@ const DashboardPage:React.FC = async () => {
                             )}
                         </div>
 
-                        <div className="w-full border border-info rounded-md p-4">
+                        <div className="w-full border border-info rounded-md p-2">
                             <div className="flex justify-end gap-2">
                                 {isAdmin && (
                                     <Link
                                         href="/admin"
-                                        className="btn btn-info dark:text-white">
-                                            Admin
+                                        className="btn btn-info btn-sm">
+                                            Admin Dashboard
                                     </Link>
                                 )}
                                 <Link 
                                     href={`/user/edit/${serverUser.userId}`}
-                                    className="btn btn-warning">
-                                        Edit
+                                    className="btn btn-warning btn-sm">
+                                        Edit Personal Information
                                 </Link>
                             </div>
                         </div>
                     </div>
+                    
                 )}
-                {/* {clerkUser &&
-                    <div className="h-96 p-4 border border-info rounded-md overflow-auto">
-                        <h2 className="text-xl font-bold">Clerk User</h2>
-                        <pre>{JSON.stringify(clerkUser, null, 2)}</pre>
+
+            <div className="w-full border border-info space-y-2 rounded-md p-4">
+                <div className="join join-vertical items-baseline sm:join-horizontal">
+                    <Link
+                        href={`/dashboard?enrolledCourses=true`}
+                        className={`btn join-item ${showEnrolledCourses ? 'btn-info' : ''}`}>
+                            Enrolled Courses
+                    </Link>
+
+                    <Link
+                        href={`/dashboard?waitlistedCourses=true`}
+                        className={`btn join-item ${showWaitlistedCourses ? 'btn-info' : ''}`}>
+                            Waitlisted Courses
+                    </Link>
+                </div>
+
+                {showEnrolledCourses && (
+                    <div className="w-full border border-info rounded-md p-4">
+                        <h2 className="text-xl font-bold">Enrolled Courses</h2>
+                        <p>Enrolled Courses will go here</p>
                     </div>
-                } */}
+                )}
+
+                {showWaitlistedCourses && (
+                    <div className="w-full border border-info rounded-md p-4">
+                        <h2 className="text-xl font-bold">Waitlisted Courses</h2>
+                        <p>Waitlisted Courses will go here</p>
+                    </div>
+                )}
+
+
+            </div>
+          
 
             </div>
         </div>
