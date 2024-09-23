@@ -50,7 +50,7 @@ namespace istc_education_api.Controllers
 				var isEnrolled = await _context.Courses
 					.Where(c => c.CourseId == courseId)
 					.SelectMany(c => c.Classes)
-					.SelectMany(c => c.Attendances ?? new List<Attendance>())
+					.SelectMany(c => c.Attendances!)
 					.AnyAsync(a => a.StudentId == studentId);
 
 				return Ok(isEnrolled);
@@ -141,9 +141,9 @@ namespace istc_education_api.Controllers
 			}
 		}
 
-		[HttpPost("Unenroll/{courseId}/{studentId}")]
+		[HttpDelete("Drop/{courseId}/{studentId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Unenroll(int courseId, int studentId)
+		public async Task<IActionResult> Drop(int courseId, int studentId)
 		{
 			try
 			{
@@ -187,9 +187,9 @@ namespace istc_education_api.Controllers
 		}
 
 
-		[HttpPost("AddWaitQueue/{courseId}/{studentId}")]
+		[HttpPost("AddWaitlist/{courseId}/{studentId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> AddWaitQueue(int courseId, int studentId)
+		public async Task<IActionResult> AddWaitlist(int courseId, int studentId)
 		{
 
 			try
@@ -240,9 +240,9 @@ namespace istc_education_api.Controllers
 			}
 		}
 
-		[HttpDelete("RemoveWaitQueue/{courseId}/{studentId}")]
+		[HttpDelete("RemoveWaitlist/{courseId}/{studentId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> RemoveWaitQueue(int courseId, int studentId)
+		public async Task<IActionResult> RemoveWaitlist(int courseId, int studentId)
 		{
 			try
 			{

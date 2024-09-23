@@ -3,9 +3,11 @@ import { getCourseEnrollments, getCourseWaitlist } from "@/utils/api/courses";
 import { getAllUsers } from "@/utils/api/users";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaAngleDown, FaAngleUp, FaPlus, FaSearch, FaTimes } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp, FaSearch } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
 import UserList from "./user-list";
+import { enrollStudent } from "@/utils/api/student";
+import ModalBase from "../modal/modal-base";
 
 interface ManageCourseEnrollmentProps {
     course: Course;
@@ -41,6 +43,9 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
 
         getCourseWaitlist(course.courseId).then((users) => {
             setWaitlistUsers(users);
+            if (users.length === 0) {
+                setIsWaitlistExpanded(false);
+            }
         }).catch((error) => {
             setError(error.message);
         }).finally(() => {
@@ -64,112 +69,125 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
     }
 
     const handleEnrollUser = (user: User) => {
-        setEnrolledUsers([...enrolledUsers, user]);
-    }
-
-    const handleDisabledEnrollButton = (user: User): boolean => {
-        return enrolledUsers.some(u => u.userId === user.userId);
+        enrollStudent(course.courseId, user.student?.studentId!).then((response) => {
+            if (response.success) {
+                setEnrolledUsers([...enrolledUsers, user]);
+                setWaitlistUsers(waitlistUsers.filter(u => u.userId !== user.userId));
+            } else {
+                setError(response.error as string);
+            }
+        }).catch((error) => {
+            setError(error.message);
+        });
     }
     
     return (
-        <div className="w-full max-w-2xl space-y-2">
-            <h2 className="text-2xl font-bold">Enrolled Students</h2>
-            <div className="space-y-2">
-                <UserList
-                    users={enrolledUsers}
-                    loading={loadingEnrolledUsers}
-                    onClick={(u) => handleRemoveUserFromEnrolled(u.userId)}
-                    add={false}
-                    nullText="No students enrolled"
-                />
-            </div>
-       
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Students</h2>
-                <button 
-                    className="btn btn-ghost btn-circle text-3xl"
-                    onClick={() => setIsStudentsExpanded(!isStudentsExpanded)}>
-                        {isStudentsExpanded ? <FaAngleDown/> : <FaAngleUp/>}
-                </button>
-            </div>
-            {isStudentsExpanded && (
-                <>
-                    <label className="input input-bordered input-info flex items-center gap-2">
-                        <input 
-                            type="text" 
-                            className="grow" 
-                            placeholder="Search students . . . " 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
-                        <FaSearch/>
-                    </label>
-                    <div className="space-y-2 mt-2">
-                        <UserList
-                            users={users}
-                            loading={loadingUsers}
-                            onClick={handleEnrollUser}
-                            add={true}
-                            nullText="No students found"
-                        />
-                    </div>
-                    {users.length > 0 && (
-                        <div className="flex justify-between mt-2">
-                            <button 
-                                className="btn btn-info dark:text-white"
-                                disabled={page === 1}
-                                onClick={() => setPage(page - 1)}
-                            >
-                                Previous
-                            </button>
-                            <button 
-                                className="btn btn-info dark:text-white"
-                                disabled={users.length < limit}
-                                onClick={() => setPage(page + 1)}
-                                >
-                                    Next
-                            </button>
-                        </div>
-                    )}
-                </>
-            )}
-
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold">Waitlist</h2>
-                <button 
-                    className="btn btn-ghost btn-circle text-3xl"
-                    onClick={() => setIsWaitlistExpanded(!isWaitlistExpanded)}>
-                        {isWaitlistExpanded ? <FaAngleDown/> : <FaAngleUp/>}
-                </button>
-            </div>
-            {isWaitlistExpanded && (
+        <>
+            <div className="w-full max-w-2xl space-y-2">
+                <h2 className="text-2xl font-bold">Enrolled Students</h2>
                 <div className="space-y-2">
                     <UserList
-                        users={waitlistUsers}
-                        loading={loadingWaitlistUsers}
-                        onClick={handleEnrollUser}
-                        add={true}
-                        nullText="No students in waitlist"
+                        users={enrolledUsers}
+                        loading={loadingEnrolledUsers}
+                        onClick={(u) => handleRemoveUserFromEnrolled(u.userId)}
+                        add={false}
+                        nullText="No students enrolled"
                     />
                 </div>
-            )}
-        
-            <div className="border-b "/>
 
-            <div className="w-full flex justify-end gap-2"> 
-                <button 
-                    className="btn btn-error dark:text-white"
-                    onClick={() => router.back()}>
-                        Back
-                </button>
-                <button 
-                    className="btn btn-success dark:text-white"
-                    >
-                        Save Changes
-                </button>
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold">Waitlist</h2>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setIsWaitlistExpanded(!isWaitlistExpanded)}>
+                            {isWaitlistExpanded ? <FaAngleDown/> : <FaAngleUp/>}
+                    </button>
+                </div>
+                {isWaitlistExpanded && (
+                    <div className="space-y-2">
+                        <UserList
+                            users={waitlistUsers}
+                            loading={loadingWaitlistUsers}
+                            onClick={handleEnrollUser}
+                            add={true}
+                            nullText="No students in waitlist"
+                        />
+                    </div>
+                )}
+        
+                <div className="flex justify-between items-center">
+                    <h2 className="text-2xl font-bold">Students</h2>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setIsStudentsExpanded(!isStudentsExpanded)}>
+                            {isStudentsExpanded ? <FaAngleDown/> : <FaAngleUp/>}
+                    </button>
+                </div>
+                {isStudentsExpanded && (
+                    <>
+                        <label className="input input-bordered input-info flex items-center gap-2">
+                            <input 
+                                type="text" 
+                                className="grow" 
+                                placeholder="Search students . . . " 
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                            <FaSearch/>
+                        </label>
+                        <div className="space-y-2 mt-2">
+                            <UserList
+                                users={users}
+                                loading={loadingUsers}
+                                onClick={handleEnrollUser}
+                                add={true}
+                                nullText="No students found"
+                            />
+                        </div>
+                        {users.length > 0 && (
+                            <div className="flex justify-between mt-2">
+                                <button 
+                                    className="btn btn-info dark:text-white"
+                                    disabled={page === 1}
+                                    onClick={() => setPage(page - 1)}
+                                >
+                                    Previous
+                                </button>
+                                <button 
+                                    className="btn btn-info dark:text-white"
+                                    disabled={users.length < limit}
+                                    onClick={() => setPage(page + 1)}
+                                    >
+                                        Next
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+                <div className="border-b "/>
+
+                <div className="w-full flex justify-end gap-2"> 
+                    <button 
+                        className="btn btn-error dark:text-white"
+                        onClick={() => router.back()}>
+                            Back
+                    </button>
+                </div>
             </div>
-        </div>
+            <ModalBase
+                title="Error"
+                width="w-1/2"
+                isOpen={error !== null}
+                onClose={() => setError(null)}
+                >
+                <p>{error}</p>
+            </ModalBase>
+        </>
     );
+
+
+
+
 
 
 }

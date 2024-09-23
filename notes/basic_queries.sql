@@ -2,26 +2,26 @@
 SELECT *
 FROM Users;
 
-SELECT *
-FROM Contacts;
+--SELECT *
+--FROM Contacts;
 
-SELECT *
-FROM Employers;
+--SELECT *
+--FROM Employers;
 
 SELECT *
 FROM Students;
 
---SELECT *
---FROM Attendances;
+SELECT *
+FROM Attendances;
 
 --SELECT *
 --FROM Certifications;
 
---SELECT *
---FROM Courses;
+SELECT *
+FROM Courses;
 
---SELECT *
---FROM Classes;
+SELECT *
+FROM Classes;
 
 --SELECT *
 --FROM Locations;

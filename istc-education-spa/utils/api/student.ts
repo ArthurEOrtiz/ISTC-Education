@@ -17,8 +17,8 @@ export const getAttendanceRecords = async (email: string) => {
 
 export const isStudenEnrolled = async (courseId: number, studentId: number): Promise<boolean> => {
     try {
-        const response = await axiosInstance.get(`/Student/IsStudentEnrolled/${courseId}${studentId}`);
-        return response.status === 200;
+        const response = await axiosInstance.get(`/Student/IsStudentEnrolled/${courseId}/${studentId}`);
+        return response.data as boolean;
     } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
             return false;
@@ -28,9 +28,9 @@ export const isStudenEnrolled = async (courseId: number, studentId: number): Pro
     }
 }
 
-export const addWaitQueue = async (courseId: number, studentId: number): Promise<ApiResponse> => {
+export const addWaitlist = async (courseId: number, studentId: number): Promise<ApiResponse> => {
     try {
-        const response = await axiosInstance.post(`/Student/AddWaitQueue/${courseId}/${studentId}`);
+        const response = await axiosInstance.post(`/Student/AddWaitlist/${courseId}/${studentId}`);
         if (response.status === 204) {
             return { success: true };
         } else {
@@ -40,7 +40,6 @@ export const addWaitQueue = async (courseId: number, studentId: number): Promise
         if (axios.isAxiosError(error)) {
             if(error.response?.status === 400) {
                 const errors: ErrorResponse | string = error.response.data.errors ?? error.response.data;
-                console.log(errors);
                 if (errors) {
                     return { success: false, error: errors};
                 } else {
@@ -53,10 +52,9 @@ export const addWaitQueue = async (courseId: number, studentId: number): Promise
     }
 }
 
-export const removeWaitQueue = async (courseId: number, studentId: number): Promise<ApiResponse> => {
-    console.log("removeWaitQueue", courseId, studentId);
+export const removeWaitlist = async (courseId: number, studentId: number): Promise<ApiResponse> => {
     try {
-        const response = await axiosInstance.delete(`/Student/RemoveWaitQueue/${courseId}/${studentId}`);
+        const response = await axiosInstance.delete(`/Student/RemoveWaitlist/${courseId}/${studentId}`);
         if (response.status === 204) {
             return { success: true };
         } else {
@@ -71,3 +69,36 @@ export const removeWaitQueue = async (courseId: number, studentId: number): Prom
     }
 }
 
+export const enrollStudent = async (courseId: number, studentId: number): Promise<ApiResponse> => {
+    try {
+        const response = await axiosInstance.post(`/Student/Enroll/${courseId}/${studentId}`);
+        if (response.status === 204) {
+            return { success: true };
+        } else {
+            return { success: false, error: `Unexpected status code: ${response.status}` };
+        }
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const errors: ErrorResponse | string = error.response?.data.errors ?? error.response?.data === "" ? error.message : error.response?.data;
+            return { success: false, error: errors};
+        }
+        return { success: false, error: 'An unexpected error ocurred' };
+    }
+}
+
+export const dropStudent = async (courseId: number, studentId: number): Promise<ApiResponse> => {
+    try {
+        const response = await axiosInstance.delete(`/Student/Drop/${courseId}/${studentId}`);
+        if (response.status === 204) {
+            return { success: true };
+        } else {
+            return { success: false, error: `Unexpected status code: ${response.status}` };
+        }
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            const errors: ErrorResponse | string = error.response?.data.errors ?? error.response?.data === "" ? error.message : error.response?.data;
+            return { success: false, error: errors};
+        }
+        return { success: false, error: 'An unexpected error ocurred' };
+    }
+}
