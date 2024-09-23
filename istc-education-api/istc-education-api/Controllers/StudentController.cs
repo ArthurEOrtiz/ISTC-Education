@@ -13,6 +13,76 @@ namespace istc_education_api.Controllers
 		{
 		}
 
+		[HttpGet]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> Index(
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] int? studentId = null,
+			[FromQuery] string? email = null
+			)
+		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
+			if (studentId != null && email != null)
+			{
+				return BadRequest("Cannot provide both studentId and email");
+			}
+			
+			try
+			{
+				if (email != null)
+				{
+					var student = await _context.Users
+						.Include(u => u.Contact)
+						.Where(u => u.Contact!.Email == email)
+						.SelectMany(u => _context.Students
+							.Include(s => s.Attendances)
+							.Include(s => s.WaitLists)
+							.Include(s => s.Exams)
+							.Where(s => s.UserId == u.UserId))
+						.FirstOrDefaultAsync();
+
+					if (student == null)
+					{
+						return NotFound("Student not found.");
+					}
+
+					return Ok(student);
+				}
+				else
+				{
+					var query = _context.Students
+						.Include(s => s.Attendances)
+						.Include(s => s.WaitLists)
+						.Include(s => s.Exams)
+						.AsQueryable();
+
+					if (studentId != null)
+					{
+						query = query.Where(s => s.StudentId == studentId);
+					}
+
+					var students = await query
+						.Skip((page - 1) * limit)
+						.Take(limit)
+						.ToListAsync();
+
+					return Ok(students);
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting students");
+				return BadRequest("Error getting students.");
+			}
+
+		}
+
 		[HttpGet("Attendance/{email}")]
 		[ProducesResponseType((int)HttpStatusCode.OK)]
 		[ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -22,10 +92,11 @@ namespace istc_education_api.Controllers
 			{
 				var student = await _context.Users
 					.Include(u => u.Contact)
-					.Where(u => u.Contact.Email == email)
+					.Where(u => u.Contact!.Email == email)
 					.SelectMany( u => _context.Students
 						.Include(s => s.Attendances)
 						.Include(s => s.WaitLists)
+						.Include(s => s.Exams)
 						.Where(s => s.UserId == u.UserId))
 					.FirstOrDefaultAsync();
 
