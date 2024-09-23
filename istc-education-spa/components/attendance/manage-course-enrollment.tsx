@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { FaAngleDown, FaAngleUp, FaSearch } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
 import UserList from "./user-list";
-import { enrollStudent } from "@/utils/api/student";
+import { dropStudent, enrollStudent } from "@/utils/api/student";
 import ModalBase from "../modal/modal-base";
 
 interface ManageCourseEnrollmentProps {
@@ -65,10 +65,25 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
     }, [page, query]);
     
     const handleRemoveUserFromEnrolled = (userId: number) => {
-        setEnrolledUsers(enrolledUsers.filter(user => user.userId !== userId));
+        const user = enrolledUsers.find(u => u.userId === userId);
+        if (!user) return;
+
+        setLoadingEnrolledUsers(true);
+        dropStudent(course.courseId, user.student?.studentId!).then((response) => {
+            if (response.success) {
+                setEnrolledUsers(enrolledUsers.filter(u => u.userId !== userId));
+            } else {
+                setError(response.error as string);
+            }
+        }).catch((error) => {
+            setError(error.message);
+        }).finally(() => {
+            setLoadingEnrolledUsers(false);
+        });
     }
 
     const handleEnrollUser = (user: User) => {
+        setLoadingWaitlistUsers(true);
         enrollStudent(course.courseId, user.student?.studentId!).then((response) => {
             if (response.success) {
                 setEnrolledUsers([...enrolledUsers, user]);
@@ -78,21 +93,31 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
             }
         }).catch((error) => {
             setError(error.message);
+        }).finally(() => {
+            setLoadingWaitlistUsers(false);
         });
     }
     
     return (
         <>
             <div className="w-full max-w-2xl space-y-2">
+              
+
                 <h2 className="text-2xl font-bold">Enrolled Students</h2>
                 <div className="space-y-2">
                     <UserList
                         users={enrolledUsers}
+                        enrollments={enrolledUsers}
                         loading={loadingEnrolledUsers}
                         onClick={(u) => handleRemoveUserFromEnrolled(u.userId)}
                         add={false}
                         nullText="No students enrolled"
                     />
+
+                    <div className="border-b"/>
+                    <h3 className={`font-bold ${enrolledUsers.length >= course.maxAttendance ? 'text-error' : ''}`}>
+                        {`${enrolledUsers.length} of ${course.maxAttendance} enrolled`}
+                    </h3>
                 </div>
 
                 <div className="flex justify-between items-center">
@@ -107,6 +132,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                     <div className="space-y-2">
                         <UserList
                             users={waitlistUsers}
+                            enrollments={enrolledUsers}
                             loading={loadingWaitlistUsers}
                             onClick={handleEnrollUser}
                             add={true}
@@ -138,6 +164,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                         <div className="space-y-2 mt-2">
                             <UserList
                                 users={users}
+                                enrollments={enrolledUsers}
                                 loading={loadingUsers}
                                 onClick={handleEnrollUser}
                                 add={true}

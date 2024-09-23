@@ -2,13 +2,25 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 
 interface UserListProps {
     users: User[];
+    enrollments: User[];
     loading: boolean;
     onClick: (user: User) => void;
     add: boolean;
     nullText?: string;
 }
 
-const UserList: React.FC<UserListProps> = ({users, loading, onClick, add, nullText = "No Stundets"}) => {
+const UserList: React.FC<UserListProps> = ({users, enrollments, loading, onClick, add, nullText = "No Stundets"}) => {
+    const isUserEnrolled = (user: User): boolean => {
+        return enrollments.some(e  => e.userId === user.userId);
+    }
+
+    const isButtonDisabled = (user: User): boolean => {
+        if (!add) {
+            return false;
+        }
+        return isUserEnrolled(user);
+    }
+    
     return (
         <>
             {!loading && users.length > 0 ? (
@@ -20,8 +32,9 @@ const UserList: React.FC<UserListProps> = ({users, loading, onClick, add, nullTe
                         </div>
                         <div>
                             <button 
-                                className="btn btn-error btn-circle btn-sm dark:text-white"
-                                onClick={() => onClick(user)}>
+                                className={`btn btn-circle btn-sm dark:text-white ${add ? "btn-success" : "btn-error"}`}
+                                onClick={() => onClick(user)}
+                                disabled={isButtonDisabled(user)}>
                                     {add ? <FaPlus /> : <FaTimes />}
                         </button>
                         </div>
@@ -33,7 +46,7 @@ const UserList: React.FC<UserListProps> = ({users, loading, onClick, add, nullTe
                     <p className="text-error">{nullText}</p>
                 </div>
             ) : (
-                <div className="flex justify-center">   
+                <div className="border border-info rounded-md flex justify-center p-4">   
                     <span className="loading loading-spinner loading-lg"></span>
                 </div>
             )}

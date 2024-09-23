@@ -125,7 +125,7 @@ const CourseEnrollmentActions: React.FC<CourseEnrollmentActionsProps> = ({ cours
     return (
         <>
             <div className="flex justify-end w-full gap-2">
-                <p className="text-xl font-bold">Status:</p>
+                <p className="text-xl font-bold">Enrollment Status:</p>
                 <p className={`text-xl font-bold ${statusTextColor}`}>{enrollmentStatus}</p>
             </div>
             <div className="flex justify-end w-full">
