@@ -167,14 +167,20 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
             {attendanceModal && selectedClass && (
                 <ModalBase
                     title="Attendance"
-                    width="w-1/2"
+                    width="sm:w-1/4"
                     isOpen={attendanceModal}
                     onClose={() =>{
                         setAttendanceModal(false);
                         setSelectedClass(null)
                     }}
                 >
-                    <ClassAttendanceModalBody cls={selectedClass} />
+                    <ClassAttendanceModalBody 
+                        cls={selectedClass} 
+                        onClose={() => {
+                            setAttendanceModal(false);
+                            setSelectedClass(null);
+                        }}
+                    />
                 </ModalBase>  
             )}
             

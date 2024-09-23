@@ -87,7 +87,15 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var course = await GetCourseQuery().FirstOrDefaultAsync(c => c.CourseId == id);
+				var course = await _context.Courses
+				.Include(c => c.Location)
+				.Include(c => c.PDF)
+				.Include(c => c.Topics)
+				.Include(c => c.Exams)
+				.Include(c => c.Classes)
+					.ThenInclude(c => c.Attendances)
+				.Include(c => c.WaitList)
+				.FirstOrDefaultAsync(c => c.CourseId == id);
 
 				if (course == null)
 				{
