@@ -5,9 +5,23 @@ import axios from "axios";
 export const getStudents = async (options: GetStudentsOptions = {}): Promise<Student | Student [] | null> => {
     const { page = 1, limit = 10, studentId, email } = options;
     const url = `Student?page=${page}&limit=${limit}${studentId ? `&studentId=${studentId}` : ''}${email ? `&email=${email}` : ''}`;
+
     try {
         const response = await axiosInstance.get(url);
-        return response.data; 
+        const data = response.data;
+        if (Array.isArray(data)) {
+            if (data.length === 0) {
+                return null;
+            }
+
+            if (data.length === 1) {
+                return data[0] as Student;
+            }
+
+            return data as Student[];
+        } else {
+            return data as Student;
+        }
     } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
             return [];

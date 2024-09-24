@@ -21,7 +21,8 @@ namespace istc_education_api.Controllers
 			[FromQuery] string? search = null,
 			[FromQuery] DateOnly? startDate = null,
 			[FromQuery] DateOnly? endDate = null,
-			[FromQuery] List<string>? status = null
+			[FromQuery] List<string>? status = null,
+			[FromQuery] List<int>? courseId = null	
 			)
 		{
 			if (page < 1 || limit < 1)
@@ -31,7 +32,9 @@ namespace istc_education_api.Controllers
 
 			try
 			{
-				var query = GetCourseQuery().AsQueryable();
+				var query = _context.Courses
+					.Include(c => c.Classes)
+					.AsQueryable();
 
 				if (!string.IsNullOrEmpty(search))
 				{
@@ -61,6 +64,11 @@ namespace istc_education_api.Controllers
 				{
 					var statusEnums = status.Select(s => Enum.Parse<CourseStatus>(s)).ToList();
 					query = query.Where(c => statusEnums.Contains(c.Status));
+				}
+
+				if (courseId != null && courseId.Count > 0)
+				{
+					query = query.Where(c => courseId.Contains(c.CourseId));
 				}
 
 				// Order by the first class start date
@@ -110,6 +118,52 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error getting course.");
 			}
 		}
+
+		[HttpGet("Records")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> GetRecords(
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] int? studentId = null
+			)
+		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
+			if (studentId == null) {
+				return BadRequest("Invalid student id");
+			}
+
+			try
+			{
+				var query = _context.Courses
+					.Include(c => c.Classes)
+					.AsQueryable();
+
+				if (studentId.HasValue)
+				{
+					query = query.Where(c => c.Classes.Any(c => c.Attendances!.Any(a => a.StudentId == studentId)));
+				}
+
+				query = query.OrderBy(c => c.Classes.Min(c => c.Date));
+
+				var courses = await query
+					.Skip((page - 1) * limit)
+					.Take(limit)
+					.ToListAsync();
+
+				return Ok(courses);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting course records");
+				return BadRequest("Error getting course records.");
+			}
+		}
+
 
 		[HttpPost]
 		[ProducesResponseType((int)HttpStatusCode.Created)]

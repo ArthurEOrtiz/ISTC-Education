@@ -14,7 +14,7 @@ const CourseIndexPage: React.FC<CourseIndexPageProps> = async ({searchParams}) =
     const limit = searchParams.limit ? parseInt(searchParams.limit as string) : 10;
     const startDate = new Date();
     
-    const courses = await getAllCourses(page, limit, startDate);
+    const courses = await getAllCourses({page, limit, startDate});
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">

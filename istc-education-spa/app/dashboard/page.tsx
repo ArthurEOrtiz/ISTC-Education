@@ -1,4 +1,5 @@
 import NewUserRegistration from "@/components/users/new-user-registration";
+import UserStudentHistory from "@/components/users/user-student-history";
 import { getUserByEmail, isUserAdmin, putUser } from "@/utils/api/users";
 import { currentUser, User as ClerkUser } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -148,7 +149,7 @@ const DashboardPage:React.FC = async () => {
                 )}
 
             <div className="w-full border border-info space-y-2 rounded-md p-4">
-               
+               <UserStudentHistory studentId={serverUser.student?.studentId}/>
 
 
             </div>

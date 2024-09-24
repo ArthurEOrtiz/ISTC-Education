@@ -30,7 +30,6 @@ const CourseEditPage:React.FC<CourseEditPageProps> = async ({searchParams}) => {
     const limit = searchParams.limit ? parseInt(searchParams.limit as string) : 10;
     const search = searchParams.search ? searchParams.search as string : undefined;
     const status: CourseStatus[] | undefined = searchParams.status ? JSON.parse(searchParams.status as string) : undefined;
-    // const courses = await getAllCourses(page, limit, status, undefined, undefined, search); 
     const courses = await getAllCourses({page, limit, statuses: status, search});
     
 

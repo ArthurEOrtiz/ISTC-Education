@@ -5,16 +5,25 @@ import axios from "axios";
 import { GetAllCoursesOptions } from "@/types/api/get-all-courses-options";
 
 export const getAllCourses = async (options: GetAllCoursesOptions = {}) => {
-    const { page = 1, limit = 10, statuses, startDate, endDate, search } = options
+    const { page = 1, limit = 10, statuses, startDate, endDate, search, courseIds} = options
     const startDateOnlystring =  startDate?.toISOString().split('T')[0];
     const endDateOnlystring = endDate?.toISOString().split('T')[0];
     
     let url = `/Course?page=${page}&limit=${limit}${startDate ? `&startDate=${startDateOnlystring}` : ''}${endDate ? `&endDate=${endDateOnlystring}` : ''}${search ? `&search=${search}` : ''}`;
 
-    const effectiveStatuses = Array.isArray(statuses) ? statuses : ["UpComing", "InProgress"];
+    const effectiveStatuses = Array.isArray(statuses) ? statuses : ["Upcoming", "InProgress"];
+
     for (const status of effectiveStatuses) {
         url += `&status=${status}`;
     }
+
+    if (courseIds) {
+        for (const courseId of courseIds) {
+            url += `&courseId=${courseId}`;
+        }
+    }
+
+    console.log("URL: ", url);
     
     try {
         const response = await axiosInstance.get(url);
