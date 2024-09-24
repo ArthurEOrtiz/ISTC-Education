@@ -1,7 +1,7 @@
 import CourseEnrollmentActions from "@/components/attendance/course-enrollment-actions";
 import CourseInfo from "@/components/course/course-info";
 import { getCourse } from "@/utils/api/courses";
-import { getAttendanceRecords } from "@/utils/api/student";
+import { getStudents } from "@/utils/api/student";
 import { convertDateToMMDDYYYY, convertTo12HourFormat } from "@/utils/global-functions";
 import { SignedIn } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
@@ -23,10 +23,13 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
 
     const { primaryEmailAddress } = await currentUser() ?? { primaryEmailAddress: null };   
 
-    const student: Student | null = primaryEmailAddress ? await getAttendanceRecords(primaryEmailAddress.emailAddress) : null;
+   
+    const student: Student | null = primaryEmailAddress ? await getStudents({email: primaryEmailAddress.emailAddress}) as Student | null : null;
 
     const statusColor = course.status === 'UpComing' ? 'text-info' : course.status === 'InProgress' ? 'text-success' : 'text-error';
     const readableStatus = course.status === 'UpComing' ? 'Upcoming' : course.status === 'InProgress' ? 'In Progress' : 'Completed';
+
+    console.log("student",student);
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">

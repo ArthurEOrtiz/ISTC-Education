@@ -83,36 +83,6 @@ namespace istc_education_api.Controllers
 
 		}
 
-		[HttpGet("Attendance/{email}")]
-		[ProducesResponseType((int)HttpStatusCode.OK)]
-		[ProducesResponseType((int)HttpStatusCode.NotFound)]
-		public async Task<IActionResult> GetStudentAttendanceRecords(string email)
-		{
-			try
-			{
-				var student = await _context.Users
-					.Include(u => u.Contact)
-					.Where(u => u.Contact!.Email == email)
-					.SelectMany( u => _context.Students
-						.Include(s => s.Attendances)
-						.Include(s => s.WaitLists)
-						.Include(s => s.Exams)
-						.Where(s => s.UserId == u.UserId))
-					.FirstOrDefaultAsync();
-
-				if (student == null) {
-					return NotFound("Student not found.");
-				}
-
-				return Ok(student);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogError(ex, "Error getting students");
-				return BadRequest("Error getting students.");
-			}
-		}
-
 		[HttpGet("IsStudentEnrolled/{courseId}/{studentId}")]
 		public async Task<IActionResult> IsStudentEnrolled(int courseId, int studentId)
 		{
