@@ -3,6 +3,8 @@ import { getUserByEmail, isUserAdmin, putUser } from "@/utils/api/users";
 import { currentUser, User as ClerkUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+
 
 interface DashboardPageProps {
     searchParams: {
@@ -158,22 +160,17 @@ const DashboardPage:React.FC<DashboardPageProps> = async ({ searchParams }) => {
                 )}
 
             <div className="w-full border border-info space-y-2 rounded-md p-4">
-                <div className="join join-vertical items-baseline sm:join-horizontal">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold">Enrolled Courses</h2>
                     <Link
-                        href={`/dashboard?enrolledCourses=true`}
-                        className={`btn join-item ${showEnrolledCourses ? 'btn-info' : ''}`}>
-                            Enrolled Courses
-                    </Link>
-
-                    <Link
-                        href={`/dashboard?waitlistedCourses=true`}
-                        className={`btn join-item ${showWaitlistedCourses ? 'btn-info' : ''}`}>
-                            Waitlisted Courses
+                        href={`${showEnrolledCourses ? '/dashboard' : '/dashboard?enrolledCourses=true'}`}
+                        className="btn btn-ghost btn-circle text-3xl">
+                            {showEnrolledCourses ? <FaAngleUp />: <FaAngleDown />}
                     </Link>
                 </div>
 
                 {showEnrolledCourses && (
-                    <div className="w-full border border-info rounded-md p-4">
+                    <div className="w-full">
                         <h2 className="text-xl font-bold">Enrolled Courses</h2>
                         <p>Enrolled Courses will go here</p>
                     </div>
@@ -185,6 +182,20 @@ const DashboardPage:React.FC<DashboardPageProps> = async ({ searchParams }) => {
                         <p>Waitlisted Courses will go here</p>
                     </div>
                 )}
+
+                {/* <div className="join join-vertical items-baseline sm:join-horizontal">
+                    <Link
+                        href={`/dashboard?enrolledCourses=true`}
+                        className={`btn join-item ${showEnrolledCourses ? 'btn-info' : ''}`}>
+                            Enrolled Courses
+                    </Link>
+
+                    <Link
+                        href={`/dashboard?waitlistedCourses=true`}
+                        className={`btn join-item ${showWaitlistedCourses ? 'btn-info' : ''}`}>
+                            Waitlisted Courses
+                    </Link>
+                </div> */}
 
 
             </div>

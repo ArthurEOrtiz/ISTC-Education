@@ -2,13 +2,6 @@
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 
-interface GetStudentsOptions {
-    page?: number;
-    limit?: number;
-    studentId?: number;
-    email?: string;
-}
-
 export const getStudents = async (options: GetStudentsOptions = {}): Promise<Student | Student [] | null> => {
     const { page = 1, limit = 10, studentId, email } = options;
     const url = `Student?page=${page}&limit=${limit}${studentId ? `&studentId=${studentId}` : ''}${email ? `&email=${email}` : ''}`;
