@@ -1,8 +1,11 @@
 'use server';
+import { Course } from "@/types/models/course";
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
+import { GetAllCoursesOptions } from "@/types/api/get-all-courses-options";
 
-export const getAllCourses = async (page: number, limit:number, statuses?:string[], startDate?:Date,  endDate?:Date, search?:string ) => {
+export const getAllCourses = async (options: GetAllCoursesOptions = {}) => {
+    const { page = 1, limit = 10, statuses, startDate, endDate, search } = options
     const startDateOnlystring =  startDate?.toISOString().split('T')[0];
     const endDateOnlystring = endDate?.toISOString().split('T')[0];
     

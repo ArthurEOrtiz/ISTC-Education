@@ -1,4 +1,5 @@
 'use client';   
+import { Course } from "@/types/models/course";
 import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import { useState } from "react";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";

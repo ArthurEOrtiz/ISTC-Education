@@ -10,6 +10,7 @@ import EmailInput from "../form/email-input";
 import SelectInput from "../form/select-input";
 import { states } from "@/utils/forms/constants";
 import { handleIntInput } from "@/utils/forms/handlers";
+import { Course } from "@/types/models/course";
 
 interface CourseFormProps {
     course: Course;

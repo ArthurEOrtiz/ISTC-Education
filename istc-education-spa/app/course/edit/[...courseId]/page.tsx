@@ -1,4 +1,5 @@
 import EditCourse from "@/components/course/edit-course";
+import { Course } from "@/types/models/course";
 import { getCourse } from "@/utils/api/courses";
 import { isUserAdmin } from "@/utils/api/users";
 import { auth } from "@clerk/nextjs/server";

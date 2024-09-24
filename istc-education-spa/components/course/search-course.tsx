@@ -14,7 +14,7 @@ interface SearchCourseProps {
 const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, children }) => {
     const [search, setSearch] = useState<string>("");
     const [filters, setFilters] = useState({
-        UpComing: true,
+        Upcoming: true,
         InProgress: true,
         Completed: false,
         Cancelled: false,

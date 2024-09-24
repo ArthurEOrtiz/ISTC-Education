@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';    
 
 const TestPage:React.FC = () => { 
   return (

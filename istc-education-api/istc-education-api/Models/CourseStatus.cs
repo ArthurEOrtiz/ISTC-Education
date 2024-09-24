@@ -2,7 +2,7 @@
 {
 	public enum CourseStatus
 	{
-		UpComing,
+		Upcoming,
 		InProgress,
 		Completed,
 		Cancelled,

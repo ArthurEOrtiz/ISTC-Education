@@ -34,7 +34,7 @@ namespace istc_education_api.Services
 				{
 					var courses = await context.Courses
 						.Include(c => c.Classes)
-						.Where(c => c.Status == CourseStatus.UpComing || c.Status == CourseStatus.InProgress)
+						.Where(c => c.Status == CourseStatus.Upcoming || c.Status == CourseStatus.InProgress)
 						.ToListAsync();
 
 					foreach (var course in courses)

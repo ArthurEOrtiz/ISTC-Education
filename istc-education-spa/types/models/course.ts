@@ -1,6 +1,9 @@
-interface Course {
+export type CourseStatus = 'Upcoming' | 'InProgress' | 'Completed' | 'Cancelled' | 'Archived';
+
+
+export interface Course {
     courseId: number;
-    status: 'UpComing' | 'InProgress' | 'Completed' | 'Archived' | 'Cancelled'; // Required
+    status: CourseStatus // Required
     title: string; // Required
     description: string | null;
     attendanceCredit: number; // Required

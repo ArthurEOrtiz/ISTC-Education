@@ -1,3 +1,4 @@
+import { Course } from "@/types/models/course";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 

@@ -11,7 +11,7 @@ namespace istc_education_api.Models
 
 		[Required(ErrorMessage = "Status is required.")]
 		[EnumDataType(typeof(CourseStatus), ErrorMessage ="Status must be 'UpComing', 'InProgress', 'Completed', 'Cancelled', or 'Archived'.")]
-		public CourseStatus Status { get; set; } = CourseStatus.UpComing;
+		public CourseStatus Status { get; set; } = CourseStatus.Upcoming;
 
 		[Required(ErrorMessage = "Title is required.")]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters.")]

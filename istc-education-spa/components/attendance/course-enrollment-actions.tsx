@@ -48,7 +48,7 @@ const CourseEnrollmentActions: React.FC<CourseEnrollmentActionsProps> = ({ cours
 
 
 
-        if (status !== 'UpComing' && status !== 'InProgress') {
+        if (status !== 'Upcoming' && status !== 'InProgress') {
             setButtonDisabled(true);
         }
     }, []);

@@ -1,8 +1,9 @@
 import { getAllTopics } from "@/utils/api/topic";
-import { Dispatch, SetStateAction, use, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import ModalBase from "../modal/modal-base";
 import { FaMagnifyingGlass } from "react-icons/fa6";
+import { Course } from "@/types/models/course";
 
 interface CourseAddRemoveTopicProps {
     course: Course;

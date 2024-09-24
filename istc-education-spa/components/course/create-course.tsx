@@ -8,6 +8,7 @@ import CourseForm from "./course-form";
 import CourseInfo from "./course-info";
 import AddRemoveClass from "./course-add-remove-class";
 import AddRemoveTopics from "./course-add-remove-topic";
+import { Course } from "@/types/models/course";
 
 const CreateCourse: React.FC = () => {
     const getTomorrowDate = (): string => {
@@ -18,7 +19,7 @@ const CreateCourse: React.FC = () => {
 
     const [ course, setCourse ] = useState<Course>({
         courseId: 0,
-        status: 'UpComing',
+        status: 'Upcoming',
         title: '',
         description: null,
         attendanceCredit: 0,
@@ -73,9 +74,7 @@ const CreateCourse: React.FC = () => {
     }
 
     const updateCourseStatus = () => {
-        if (course.classes.length > 0 && 
-            course.status !==  'Cancelled' && 
-            course.status !== 'Archived') {
+        if (course.classes.length > 0 ) {
             const today = new Date();
             const firstClass = new Date(course.classes[0].date);
             const lastClass = new Date(course.classes[course.classes.length - 1].date);
@@ -94,7 +93,7 @@ const CreateCourse: React.FC = () => {
             } else {
                 setCourse(prev => ({
                     ...prev,
-                    status: 'UpComing',
+                    status: 'Upcoming',
                 }));
             }
         }

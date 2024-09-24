@@ -129,14 +129,14 @@ namespace istc_education_api.Controllers
 					return NotFound("Course not found.");
 				}
 
-				if (course.Status != CourseStatus.UpComing && course.Status != CourseStatus.InProgress)
+				if (course.Status != CourseStatus.Upcoming && course.Status != CourseStatus.InProgress)
 				{
 					return BadRequest("Course is not available for enrollment.");
 				}
 
 				// Check if student is already enrolled
 				var existingEnrollment = course.Classes
-					.SelectMany(c => c.Attendances)
+					.SelectMany(c => c.Attendances!)
 					.Any(a => a.StudentId == studentId);
 
 				if (existingEnrollment)
@@ -249,7 +249,7 @@ namespace istc_education_api.Controllers
 					return NotFound("Course not found.");
 				}
 
-				if (course.Status != CourseStatus.UpComing && course.Status != CourseStatus.InProgress)
+				if (course.Status != CourseStatus.Upcoming && course.Status != CourseStatus.InProgress)
 				{
 					return BadRequest("Course is not available for enrollment.");
 				}

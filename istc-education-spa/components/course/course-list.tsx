@@ -1,3 +1,4 @@
+import { Course } from "@/types/models/course";
 import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import Link from "next/link";
 

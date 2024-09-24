@@ -26,8 +26,8 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
    
     const student: Student | null = primaryEmailAddress ? await getStudents({email: primaryEmailAddress.emailAddress}) as Student | null : null;
 
-    const statusColor = course.status === 'UpComing' ? 'text-info' : course.status === 'InProgress' ? 'text-success' : 'text-error';
-    const readableStatus = course.status === 'UpComing' ? 'Upcoming' : course.status === 'InProgress' ? 'In Progress' : 'Completed';
+    const statusColor = course.status === 'Upcoming' ? 'text-info' : course.status === 'InProgress' ? 'text-success' : 'text-error';
+    const readableStatus = course.status === 'Upcoming' ? 'Upcoming' : course.status === 'InProgress' ? 'In Progress' : 'Completed';
 
     console.log("student",student);
 

@@ -10,6 +10,7 @@ import ErrorBody from "../modal/error-body";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import ClassAttendanceModalBody from "../attendance/class-attendance-modal-body";
+import { Course } from "@/types/models/course";
 
 interface EditCourseProps {
     course: Course;
