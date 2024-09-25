@@ -80,7 +80,74 @@ namespace istc_education_api.Controllers
 				_logger.LogError(ex, "Error getting students");
 				return BadRequest("Error getting students.");
 			}
+		}
 
+		[HttpGet("Enrollment/{studentId}")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> Enrollment(
+			int studentId,
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] string? search = null,
+			[FromQuery] List<CourseStatus>? status = null
+		)
+		{
+			try
+			{
+				var student = await _context.Students.AnyAsync(s => s.StudentId == studentId);
+
+				if (!student)
+				{
+					BadRequest("Student not found.");
+				}
+
+				var query = _context.Courses
+					.Include(c => c.Location)
+					.Include(c => c.Classes)
+						.ThenInclude(c => c.Attendances)
+					.Where(c => c.Classes.Any(c => c.Attendances!.Any(a => a.StudentId == studentId)))
+					.AsQueryable();
+
+				if (!string.IsNullOrEmpty(search))
+				{
+					query = query.Where(c =>
+						c.Title.Contains(search) ||
+						c.Description!.Contains(search) ||
+						c.Location!.Description!.Contains(search) ||
+						c.Location!.AddressLine1!.Contains(search) ||
+						c.Location!.AddressLine2!.Contains(search) ||
+						c.Location!.City!.Contains(search) ||
+						c.Location!.State!.Contains(search) ||
+						c.Location!.PostalCode!.Contains(search));
+				}
+
+				if (status != null)
+				{
+					query = query.Where(c => status.Contains(c.Status));
+				}
+
+				var courses = await query
+					.Skip((page - 1) * limit)
+					.Take(limit)
+					.ToListAsync();
+
+				foreach (var course in courses)
+				{
+					foreach (var @class in course.Classes)
+					{
+						@class.Attendances = null;
+					}
+				}
+
+				return Ok(courses);
+
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting student enrollment");
+				return BadRequest("Error getting student enrollment.");
+			}
 		}
 
 		[HttpGet("IsStudentEnrolled/{courseId}/{studentId}")]

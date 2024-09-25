@@ -21,7 +21,7 @@ namespace istc_education_api.Controllers
 			[FromQuery] string? search = null,
 			[FromQuery] DateOnly? startDate = null,
 			[FromQuery] DateOnly? endDate = null,
-			[FromQuery] List<string>? status = null,
+			[FromQuery] List<CourseStatus>? status = null,
 			[FromQuery] List<int>? courseId = null	
 			)
 		{
@@ -62,8 +62,7 @@ namespace istc_education_api.Controllers
 
 				if (status != null && status.Count > 0)
 				{
-					var statusEnums = status.Select(s => Enum.Parse<CourseStatus>(s)).ToList();
-					query = query.Where(c => statusEnums.Contains(c.Status));
+					query = query.Where(c => status.Contains(c.Status));
 				}
 
 				if (courseId != null && courseId.Count > 0)

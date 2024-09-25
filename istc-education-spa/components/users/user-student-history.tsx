@@ -2,11 +2,12 @@
 
 import { Course } from "@/types/models/course";
 import { getAllCourses } from "@/utils/api/courses";
-import { getStudents } from "@/utils/api/student";
+import { getStudentEnrollment, getStudents } from "@/utils/api/student";
 import { convertDateToMMDDYYYY } from "@/utils/global-functions";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { FaAngleDown, FaAngleUp, FaSearch } from "react-icons/fa";
+import { useDebounce } from "use-debounce";
 
 interface UserStudentHistoryProps {
     studentId: number | undefined;
@@ -18,9 +19,21 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ error, setError ] = useState<string | null>(null);
     
-    const [ inProgressCourses, setInProgressCourses ] = useState<Course[]>([]); 
-    const [ completedCourses, setCompletedCourses ] = useState<Course[]>([]);
-    const [ upcomingCourses, setUpcomingCourses ] = useState<Course[]>([]);
+    const [ enrolledCourses, setEnrolledCourses ] = useState<Course[]>([]);
+    const [ isEnrolledExpanded, setIsEnrolledExpanded ] = useState<boolean>(false);
+    const [ isEnrolledLoading, setIsEnrolledLoading ] = useState<boolean>(false);
+
+    const [ search, setSearch ] = useState<string>("");
+    const [ page, setPage ] = useState<number>(1);
+    const limit = 5;
+    const [ query ] = useDebounce(search, 500);
+
+    const [ filters, setFilters ] = useState({
+        Upcoming: true,
+        InProgress: true,
+        Completed: false,
+    });
+
     const [ waitListedCourses, setWaitListedCourses ] = useState<Course[]>([]);
     const [ isWaitlistExpanded, setIsWaitlistExpanded ] = useState<boolean>(false);
     const [ isWaitListLoading, setIsWaitListLoading ] = useState<boolean>(false);   
@@ -38,6 +51,28 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
             setLoading(false);
         });
     }, []);
+
+
+    useEffect(() => {
+        setIsEnrolledLoading(true);
+        const statuses = (Object.keys(filters) as (keyof typeof filters)[]).filter((key) => filters[key]);
+        if (statuses.length === 0) {
+            setEnrolledCourses([]);
+            setIsEnrolledLoading(false);
+            return;
+        }
+        getStudentEnrollment({ studentId, search: query, page, limit, statuses}).then((courses) => {
+            setEnrolledCourses(courses);
+        }).catch((error) => {
+            setError(error.message);
+        }).finally(() => {
+            setIsEnrolledLoading(false);
+        });
+    }, [query, page, limit, filters]);
+
+    const toggleFilter = (filter: keyof typeof filters) => {
+        setFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
+    };
    
    
     const getWaitListedCourses = () => {
@@ -47,7 +82,6 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
             return;
         }
 
-        console.log("CourseIds: ", courseIds);
         setIsWaitListLoading(true);
         getAllCourses({ courseIds }).then((courses) => {
             setWaitListedCourses(courses);
@@ -58,8 +92,28 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
         });
     }
 
+    const getEnrolledCourses = () => {
+        if(!student) {
+            return;
+        }
+        setIsEnrolledLoading(true);
+        getStudentEnrollment({studentId}).then((courses) => {
+            setEnrolledCourses(courses);
+        }).catch((error) => {
+            setError(error.message);
+        }).finally(() => {
+            setIsEnrolledLoading(false);
+        });
+    }
+
+    const handleExpandEnrolled = () => {
+        setIsEnrolledExpanded(!isEnrolledExpanded);
+        if(enrolledCourses.length === 0) {
+            getEnrolledCourses();
+        }
+    }
+
     const handleExpandWaitlist =  () => {
-       
         setIsWaitlistExpanded(!isWaitlistExpanded);
         if(waitListedCourses.length === 0) {
             getWaitListedCourses();
@@ -71,6 +125,97 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
          
             {!loading && student ? (
                 <>
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-2xl font-bold">Enrolled Courses</h2>
+                        <button 
+                            className="btn btn-ghost btn-circle text-3xl"
+                            onClick={handleExpandEnrolled}
+                        >
+                            {isEnrolledLoading ? <span className="loading loading-spinner"></span> : isEnrolledExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        </button>
+                    </div>
+
+                    {isEnrolledExpanded && (
+                        <>
+                            <label className="input input-bordered input-info flex items-center gap-2">
+                                <input 
+                                    type="text" 
+                                    className="grow" 
+                                    placeholder="Search courses . . . " 
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                />
+                                <FaSearch/>
+                            </label>
+                            <div className="join">
+                                <button
+                                    className={`btn btn-sm join-item ${filters.Upcoming ? "btn-info" : ""}`}
+                                    onClick={() => toggleFilter("Upcoming")}
+                                >
+                                    Upcoming
+                                </button>
+                                <button
+                                    className={`btn btn-sm join-item ${filters.InProgress ? "btn-info" : ""}`}
+                                    onClick={() => toggleFilter("InProgress")}
+                                >
+                                    In Progress
+                                </button>
+                                <button
+                                    className={`btn btn-sm join-item ${filters.Completed ? "btn-info" : ""}`}
+                                    onClick={() => toggleFilter("Completed")}
+                                >
+                                    Completed
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-2">
+                                {enrolledCourses.map((course) => {
+                                    const { enrollmentDeadline, classes} = course;
+                                    const deadline = convertDateToMMDDYYYY(enrollmentDeadline);
+                                    const firstDayofClass = classes.length > 0 ? convertDateToMMDDYYYY(classes[0].date) : "";
+
+                                    return (
+                                        <div key={course.courseId} className="border border-info rounded-md p-2">
+                                            <Link href={`/course/${course.courseId}`}>
+                                                <h3 className="text-lg font-bold">{course.title}</h3>
+                                                <div className="flex gap-2">
+                                                    <p className="font-bold">Enrollment Deadline:</p>
+                                                    <p>{deadline}</p>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    <p className="font-bold">Start Date:</p>
+                                                    <p>{firstDayofClass}</p>
+                                                </div>
+                                                
+                                            </Link>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                           
+                            <div className="flex justify-between">
+                                <button 
+                                    className="btn btn-info btn-sm"
+                                    disabled={page === 1}
+                                    onClick={() => setPage(page - 1)}
+                                >
+                                    Previous
+                                </button>
+                                <button 
+                                    className="btn btn-info btn-sm"
+                                    disabled={enrolledCourses.length < limit}
+                                    onClick={() => setPage(page + 1)}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                            <div className="border-b border-info"></div>
+                        </>
+                    )}
+
+
+
                     <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">Waitlisted Courses</h2>
                         <button 
@@ -115,8 +260,6 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
                     <span className="loading loading-spinner loading-lg"></span>
                 </div>
             )}
-
-            <pre>{JSON.stringify(student, null, 2)}</pre>
         </>
     )
 }

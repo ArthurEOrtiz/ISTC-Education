@@ -1,6 +1,8 @@
 'use server';
+import { Course } from "@/types/models/course";
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
+import { GetStudentEnrollmentOptions } from "@/types/api/get-stundent-enrollment-options";
 
 export const getStudents = async (options: GetStudentsOptions = {}): Promise<Student | Student [] | null> => {
     const { page = 1, limit = 10, studentId, email } = options;
@@ -41,6 +43,29 @@ export const isStudenEnrolled = async (courseId: number, studentId: number): Pro
         } else {
             throw new Error('Error fetching enrollment status');
         }
+    }
+}
+
+export const getStudentEnrollment = async (options:GetStudentEnrollmentOptions = {}): Promise<Course[]> => {
+    const { page = 1, limit = 10, search, statuses, studentId } = options;
+
+    if (!studentId) {
+        throw new Error('Student ID is required');
+    }
+
+    let url = `Student/Enrollment/${studentId}?page=${page}&limit=${limit}${search ? `&search=${search}` : ''}`;
+
+    const effectiveStatuses = Array.isArray(statuses) ? statuses : ["Upcoming", "InProgress"];
+
+    for (const status of effectiveStatuses) {
+        url += `&status=${status}`;
+    }
+
+    try {
+        const response = await axiosInstance.get(url);
+        return response.data as Course[];
+    } catch (error) {
+        throw new Error('Error fetching student enrollment');
     }
 }
 
