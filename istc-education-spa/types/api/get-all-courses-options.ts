@@ -7,4 +7,6 @@ export interface GetAllCoursesOptions {
     startDate?: Date;
     endDate?: Date;
     search?: string;
+    courseIds?: number[];
+    topicIds?: number[];
 }

@@ -23,7 +23,7 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
     const [url, setUrl] = useState<string>(`edit?page=${page}&limit=${limit}&status=["UpComing","InProgress"]`);
     const [query] = useDebounce(search, 500);
     const router = useRouter();
-
+   
     useEffect(() => {
         const status = (Object.keys(filters) as (keyof typeof filters)[]) 
             .filter(key => filters[key])
@@ -60,7 +60,7 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                             className={`btn join-item ${filters[filter] ? 'btn-info' : ''}`}
                             onClick={() => toggleFilter(filter as keyof typeof filters)}
                         >
-                            {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                            {filter}
                         </button>
                     ))}
                 </div>
@@ -70,15 +70,15 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
             </>
             <div className="flex justify-between">
                 <button 
-                    className="btn btn-info"
+                    className="btn btn-sm btn-info"
                     disabled={page === 1}
                     onClick={() => handlePageChange(page - 1)}
                 >
                     Previous
                 </button>
                 <button 
-                    className="btn btn-info"
-                    disabled={courseCount <= limit}
+                    className="btn btn-sm btn-info"
+                    disabled={courseCount < limit}
                     onClick={() => handlePageChange(page + 1)}
                 >
                     Next

@@ -1,48 +1,38 @@
+import SearchTopic from "@/components/topic/search-topics";
+import TopicList from "@/components/topic/topic-list";
 import { getAllTopics } from "@/utils/api/topic";
-import { isUserAdmin } from "@/utils/api/users";
-import { auth } from "@clerk/nextjs/server";
-import Link from "next/link";
-import { FaPlus } from "react-icons/fa";
 
-const TopicIndexPage: React.FC = async() => {
-    const {userId: IPId} = auth();
-    
-    if (!IPId) {
-        throw new Error("Authorization Error");
-    }
+interface TopicIndexPageProps {
+    searchParams: {
+        [key: string]: string | string[] | undefined;
+    };
+}
 
-    const isAdmin = await isUserAdmin(IPId);
 
-    if (!isAdmin) {
-        throw new Error("You are not authorized to view topics");
-    }
+const TopicIndexPage: React.FC<TopicIndexPageProps> = async({searchParams}) => {
+    const page = searchParams.page ? parseInt(searchParams.page as string) : 1;
+    const limit = searchParams.limit ? parseInt(searchParams.limit as string) : 10;
+    const search = searchParams.search ? searchParams.search as string : null;
 
-    const topics = await getAllTopics();
+    const topics = await getAllTopics(page, limit, search ? search : undefined);
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <h1 className="text-3xl font-bold">Topics</h1>
-            <div className="w-full lg:w-2/3 p-4">
-                <div className="flex flex-col space-y-2">
-                    {topics.map((topic, index) => (
-                        <Link 
-                            key={index} 
-                            className="border border-info rounded-md flex justify-center p-4"
-                            href={`/topic/${topic.topicId}`}
-                            >
-                            <p className="text-2xl font-bold">{topic.title}</p>
-                        </Link>
-                    ))}
-                </div>
-                <div className="flex justify-end mt-2">
-                   <Link
-                        href="/topic/create"
-                        className="btn btn-success dark:text-white"
+            <div className="w-full max-w-4xl space-y-2 p-4">
+                    <SearchTopic
+                        page={page}
+                        limit={limit}
+                        topicCount={topics.length}
                     >
-                        <FaPlus/> Topic
-                    </Link>
-                </div>
+                        <TopicList
+                            topics={topics}
+                            hrefSuffix="/topic"
+                        />
+                    </SearchTopic>
+
             </div>
+            
         </div>
     );
 

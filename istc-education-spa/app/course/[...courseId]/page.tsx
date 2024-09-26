@@ -1,5 +1,6 @@
 import CourseEnrollmentActions from "@/components/attendance/course-enrollment-actions";
 import CourseInfo from "@/components/course/course-info";
+import { Course } from "@/types/models/course";
 import { getCourse } from "@/utils/api/courses";
 import { getStudents } from "@/utils/api/student";
 import { convertDateToMMDDYYYY, convertTo12HourFormat } from "@/utils/global-functions";
@@ -40,6 +41,10 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
                 <div className="flex gap-2 items-center">
                     <h2 className="text-xl font-bold">Status:</h2>
                     <p className={`${statusColor}`}>{readableStatus}</p>
+                </div>
+                <div className="flex gap-2 items-center">
+                    <h2 className="text-xl font-bold">Topics</h2>
+                    <p>{course.topics?.length}</p>
                 </div>
                 {course.topics && course.topics.length > 0 && (
                     <>

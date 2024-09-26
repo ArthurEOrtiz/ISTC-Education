@@ -1,4 +1,5 @@
 ﻿using istc_education_api.DataAccess;
+using istc_education_api.DTOs;
 using istc_education_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +23,8 @@ namespace istc_education_api.Controllers
 			[FromQuery] DateOnly? startDate = null,
 			[FromQuery] DateOnly? endDate = null,
 			[FromQuery] List<CourseStatus>? status = null,
-			[FromQuery] List<int>? courseId = null	
+			[FromQuery] List<int>? courseId = null,
+			[FromQuery] List<int>? topicId = null
 			)
 		{
 			if (page < 1 || limit < 1)
@@ -70,6 +72,11 @@ namespace istc_education_api.Controllers
 					query = query.Where(c => courseId.Contains(c.CourseId));
 				}
 
+				if (topicId != null && topicId.Count > 0)
+				{
+					query = query.Where(c => c.Topics!.Any(t => topicId.Contains(t.TopicId)));
+				}
+
 				// Order by the first class start date
 				query = query.OrderBy(c => c.Classes.Min(c => c.Date));
 
@@ -109,7 +116,33 @@ namespace istc_education_api.Controllers
 					return NotFound("Course not found.");
 				}
 
-				return Ok(course);
+				var courseDto = new CourseDto()
+				{
+					CourseId = course.CourseId,
+					Status = course.Status.ToString(),
+					Title = course.Title,
+					Description = course.Description,
+					AttendanceCredit = course.AttendanceCredit,
+					MaxAttendance = course.MaxAttendance,
+					EnrollmentDeadline = course.EnrollmentDeadline.ToString(),
+					InstructorName = course.InstructorName,
+					InstructorEmail = course.InstructorEmail,
+					HasExam = course.HasExam,
+					ExamCredit = course.ExamCredit,
+					HasPDF = course.HasPDF,
+					Location = course.Location,
+					PDF = course.PDF,
+					Topics = course.Topics?.Select(t => new TopicDto()
+					{
+						TopicId = t.TopicId,
+						Title = t.Title,
+						Description = t.Description
+					}).ToList(),
+					Exams = course.Exams,
+					Classes = course.Classes,
+					WaitList = course.WaitList
+				};
+				return Ok(courseDto);
 			}
 			catch (Exception ex)
 			{

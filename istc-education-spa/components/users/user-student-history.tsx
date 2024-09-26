@@ -186,7 +186,6 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
                                                     <p className="font-bold">Start Date:</p>
                                                     <p>{firstDayofClass}</p>
                                                 </div>
-                                                
                                             </Link>
                                         </div>
                                     );

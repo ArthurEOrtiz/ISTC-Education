@@ -5,7 +5,7 @@ import axios from "axios";
 import { GetAllCoursesOptions } from "@/types/api/get-all-courses-options";
 
 export const getAllCourses = async (options: GetAllCoursesOptions = {}) => {
-    const { page = 1, limit = 10, statuses, startDate, endDate, search, courseIds} = options
+    const { page = 1, limit = 10, statuses, startDate, endDate, search, courseIds, topicIds} = options
     const startDateOnlystring =  startDate?.toISOString().split('T')[0];
     const endDateOnlystring = endDate?.toISOString().split('T')[0];
     
@@ -23,7 +23,11 @@ export const getAllCourses = async (options: GetAllCoursesOptions = {}) => {
         }
     }
 
-    console.log("URL: ", url);
+    if (topicIds) {
+        for (const topicId of topicIds) {
+            url += `&topicId=${topicId}`;
+        }
+    }
     
     try {
         const response = await axiosInstance.get(url);

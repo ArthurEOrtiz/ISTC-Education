@@ -1,5 +1,6 @@
-export type CourseStatus = 'Upcoming' | 'InProgress' | 'Completed' | 'Cancelled' | 'Archived';
+import { Topic } from "./topic";
 
+export type CourseStatus = 'Upcoming' | 'InProgress' | 'Completed' | 'Cancelled' | 'Archived';
 
 export interface Course {
     courseId: number;

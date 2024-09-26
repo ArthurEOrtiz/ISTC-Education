@@ -1,4 +1,5 @@
 ﻿using istc_education_api.DataAccess;
+using istc_education_api.DTOs;
 using istc_education_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,67 @@ namespace istc_education_api.Controllers
 
 		[HttpGet]
 		[ProducesResponseType((int)HttpStatusCode.OK)]
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(
+			[FromQuery] int page = 1,
+			[FromQuery] int limit = 10,
+			[FromQuery] string? search = null
+			)
 		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
 			try
 			{
-				var topics = await _context.Topics.ToListAsync();
-				return Ok(topics);
+				var query = _context.Topics
+				.Include(t => t.Courses)
+				.AsQueryable();
+
+				
+				if (!string.IsNullOrWhiteSpace(search))
+				{
+					query = query.Where(t =>
+						t.Title.Contains(search) ||
+						t.Description!.Contains(search));
+				}
+
+				var topics = await query
+					.Skip((page - 1) * limit)
+					.Take(limit)
+					.ToListAsync();
+
+				var topicDtoList = new List<TopicDto>();
+
+				foreach (var topic in topics) {
+					var topicDto = new TopicDto()
+					{
+						TopicId = topic.TopicId,
+						Title = topic.Title,
+						Created = topic.Created.ToString("yyyy-MM-dd"),
+						Description = topic.Description,
+						Courses = topic.Courses?.Select(c => new CourseDto()
+						{
+							CourseId = c.CourseId,
+							Title = c.Title,
+							Status = c.Status.ToString(),
+							Description = c.Description,
+							AttendanceCredit = c.AttendanceCredit,
+							MaxAttendance = c.MaxAttendance,
+							EnrollmentDeadline = c.EnrollmentDeadline.ToString("yyyy-MM-dd"),
+							InstructorName = c.InstructorName,
+							InstructorEmail = c.InstructorEmail,
+							HasExam = c.HasExam,
+							ExamCredit = c.ExamCredit,
+							HasPDF = c.HasPDF,
+							PDF = c.PDF
+						}).ToList()
+					};
+					topicDtoList.Add(topicDto);
+				}
+
+				return Ok(topicDtoList);
+
 			}
 			catch (Exception ex)
 			{
@@ -36,6 +92,7 @@ namespace istc_education_api.Controllers
 			{
 				var topic = await _context.Topics
 					.Include(t => t.Courses)
+						.ThenInclude(c => c.Classes)
 					.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
@@ -43,7 +100,38 @@ namespace istc_education_api.Controllers
 					return NotFound("Topic not found.");
 				}
 
-				return Ok(topic);
+				var topicDto = new TopicDto()
+				{
+					TopicId = topic.TopicId,
+					Title = topic.Title,
+					Created = topic.Created.ToString("yyyy-MM-dd"),
+					Description = topic.Description,
+					Courses = topic.Courses?.Select(c => new CourseDto()
+					{
+						CourseId = c.CourseId,
+						Title = c.Title,
+						Status = c.Status.ToString(),
+						Description = c.Description,
+						AttendanceCredit = c.AttendanceCredit,
+						MaxAttendance = c.MaxAttendance,
+						EnrollmentDeadline = c.EnrollmentDeadline.ToString("yyyy-MM-dd"),
+						InstructorName = c.InstructorName,
+						InstructorEmail = c.InstructorEmail,
+						HasExam = c.HasExam,
+						ExamCredit = c.ExamCredit,
+						HasPDF = c.HasPDF,
+						PDF = c.PDF,
+						Topics = c.Topics?.Select(t => new TopicDto()
+						{
+							TopicId = t.TopicId,
+							Title = t.Title,
+							Created = t.Created.ToString("yyyy-MM-dd"),
+							Description = t.Description
+						}).ToList(),
+						Classes = c.Classes
+					}).ToList()
+			};
+				return Ok(topicDto);
 			}
 			catch (Exception ex)
 			{

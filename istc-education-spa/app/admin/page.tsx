@@ -13,8 +13,8 @@ const AdminPage: React.FC = async () => {
                     <Link href="/user" className="btn btn-primary">
                         Edit Users
                     </Link>
-                    <Link href="/topic/create" className="btn btn-primary">
-                        Create Topic
+                    <Link href="/topic" className="btn btn-primary">
+                        Edit Topics
                     </Link>
                 </div>
             </div>

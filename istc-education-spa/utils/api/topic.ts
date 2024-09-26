@@ -1,10 +1,13 @@
 'use server';
+import { Topic } from "@/types/models/topic";
 import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 
-export const getAllTopics = async () => {
+export const getAllTopics = async (page:number = 1, limit:number = 10, search?:string | null) => {
+    const url = `/Topic?page=${page}&limit=${limit}${search ? `&search=${search}` : ''}`;
+    console.log("getAllTopics URL:", url);
     try {
-        const response = await axiosInstance.get('/Topic');
+        const response = await axiosInstance.get(url);
         return response.data as Topic[];
     } catch (error) {
         console.error(error);

@@ -6,5 +6,5 @@ export interface GetStudentEnrollmentOptions {
     limit?: number;
     search?: string;
     statuses?: CourseStatus[];
-    studentId: number;
+    studentId?: number;
 }
