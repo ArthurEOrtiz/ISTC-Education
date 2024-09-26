@@ -197,15 +197,15 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                         <div className="flex flex-row justify-end space-x-2">
                             <button
                                 className="btn btn-success dark:text-white"
-                                onClick={() => router.push('/course')}
+                                onClick={() => router.push('/course/edit')}
                             >
-                                Go to Courses
+                                Back to Courses
                             </button>
                             <button
-                                className="btn btn-info dark:text-white"
+                                className="btn btn-inf"
                                 onClick={() => router.push('/admin')}
                             >
-                                Go to Admin Dashboard
+                                Admin Dashboard
                             </button>
                         </div>
                     </div>
