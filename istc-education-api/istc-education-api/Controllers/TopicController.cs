@@ -29,7 +29,6 @@ namespace istc_education_api.Controllers
 			try
 			{
 				var query = _context.Topics
-				.Include(t => t.Courses)
 				.AsQueryable();
 
 				
@@ -40,41 +39,14 @@ namespace istc_education_api.Controllers
 						t.Description!.Contains(search));
 				}
 
+				query = query.OrderBy(t => t.Created);
+
 				var topics = await query
 					.Skip((page - 1) * limit)
 					.Take(limit)
 					.ToListAsync();
 
-				var topicDtoList = new List<TopicDto>();
-
-				foreach (var topic in topics) {
-					var topicDto = new TopicDto()
-					{
-						TopicId = topic.TopicId,
-						Title = topic.Title,
-						Created = topic.Created.ToString("yyyy-MM-dd"),
-						Description = topic.Description,
-						Courses = topic.Courses?.Select(c => new CourseDto()
-						{
-							CourseId = c.CourseId,
-							Title = c.Title,
-							Status = c.Status.ToString(),
-							Description = c.Description,
-							AttendanceCredit = c.AttendanceCredit,
-							MaxAttendance = c.MaxAttendance,
-							EnrollmentDeadline = c.EnrollmentDeadline.ToString("yyyy-MM-dd"),
-							InstructorName = c.InstructorName,
-							InstructorEmail = c.InstructorEmail,
-							HasExam = c.HasExam,
-							ExamCredit = c.ExamCredit,
-							HasPDF = c.HasPDF,
-							PDF = c.PDF
-						}).ToList()
-					};
-					topicDtoList.Add(topicDto);
-				}
-
-				return Ok(topicDtoList);
+				return Ok(topics);
 
 			}
 			catch (Exception ex)

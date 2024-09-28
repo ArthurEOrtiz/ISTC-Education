@@ -17,8 +17,8 @@
 --SELECT *
 --FROM Certifications;
 
---SELECT *
---FROM Courses;
+SELECT *
+FROM Courses;
 
 --SELECT *
 --FROM Classes;
@@ -29,8 +29,8 @@
 --SELECT *
 --FROM PDFs;
 
---SELECT *
---FROM Exams;
+SELECT *
+FROM Exams;
 
 --SELECT *
 --FROM WaitLists;

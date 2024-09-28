@@ -1,7 +1,6 @@
 import SearchTopic from "@/components/topic/search-topics";
 import TopicList from "@/components/topic/topic-list";
 import { getAllTopics } from "@/utils/api/topic";
-import { FaPlus } from "react-icons/fa";
 
 interface TopicIndexPageProps {
     searchParams: {
@@ -26,9 +25,6 @@ const TopicIndexPage: React.FC<TopicIndexPageProps> = async({searchParams}) => {
                         limit={limit}
                         topicCount={topics.length}
                     >
-                        <button className="btn btn-success">
-                            <FaPlus /> Topic
-                        </button>
                         <TopicList
                             topics={topics}
                             hrefSuffix="/topic"

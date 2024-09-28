@@ -111,17 +111,17 @@ const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
                     <div className="space-y-2">
                         <h2 className="text-xl font-bold">Topic updated successfully</h2>
                         <div className="flex flex-row justify-end space-x-2">
-                            <button 
-                                className="btn btn-success dark:text-white"
-                                onClick={() => router.push('/topic/edit')}
-                            >
-                                Back to Topics
-                            </button>
                             <button
                                 className="btn btn-info"
                                 onClick={() => router.push('/admin')}
                             >
                                 Admin Dashboard
+                            </button>
+                            <button 
+                                className="btn btn-success dark:text-white"
+                                onClick={() => router.push('/topic/edit')}
+                            >
+                                Back to Topics
                             </button>
                         </div>
                     </div>

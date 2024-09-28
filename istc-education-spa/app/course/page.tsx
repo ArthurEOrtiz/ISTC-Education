@@ -1,6 +1,7 @@
 import CourseList from "@/components/course/course-list";
 import { getAllCourses } from "@/utils/api/courses";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface CourseIndexPageProps {
     searchParams: {
@@ -20,18 +21,21 @@ const CourseIndexPage: React.FC<CourseIndexPageProps> = async ({searchParams}) =
         <div className="w-full flex flex-col items-center space-y-2">
             <h1 className="text-3xl font-bold">Courses</h1>
             <div className="w-full max-w-4xl space-y-2 p-4">
-                <CourseList 
-                    courses={courses}
-                    hrefSuffix="/course"/>
+                <Suspense fallback={<div>Loading...</div>} >
+                    <CourseList 
+                        courses={courses}
+                        hrefSuffix="/course"/>
+                </Suspense>
+                
                 <div className="flex justify-between">
                     <Link 
                         href={`/course?page=${page - 1}&limit=${limit}`}
-                        className={`btn ${page === 1 ? 'btn-disabled' : 'btn-info'}`}>
+                        className={`btn btn-sm ${page === 1 ? 'btn-disabled' : 'btn-info'}`}>
                             Previous
                     </Link>
                     <Link 
                         href={`/course?page=${page + 1}&limit=${limit}`}
-                        className={`btn ${courses.length < limit ? 'btn-disabled' : 'btn-info'}`}>
+                        className={`btn btn-sm ${courses.length < limit ? 'btn-disabled' : 'btn-info'}`}>
                             Next
                     </Link>
                 </div>

@@ -3,6 +3,7 @@ import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "reac
 import TextInput from "../form/text-input";
 import TextAreaInput from "../form/textarea-input";
 import { useRouter } from "next/navigation";
+import { Topic } from "@/types/models/topic";
 
 interface TopicFormProps {
     topic: Topic;

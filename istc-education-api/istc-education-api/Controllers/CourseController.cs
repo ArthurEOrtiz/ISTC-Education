@@ -221,7 +221,7 @@ namespace istc_education_api.Controllers
 
 				_context.Courses.Add(course);
 				await _context.SaveChangesAsync();
-				return CreatedAtAction(nameof(Details), new { id = course.CourseId }, course);
+				return CreatedAtAction(nameof(Details), new { id = course.CourseId }, null);
 			}
 			catch (Exception ex)
 			{

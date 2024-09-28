@@ -168,6 +168,8 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
                 formErrors[id] = value === '' ? '' : validateEmail(value)
                 break;
             case 'check-email':
+                console.log('Checking email');
+                console.log(value, course.instructorEmail);
                 formErrors["instructorEmail"] = value === course.instructorEmail ? '' : 'Emails do not match';
                 break;
             case 'location.description':

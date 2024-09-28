@@ -12,14 +12,11 @@ const TopicList: React.FC<TopicListProps> = ({topics, hrefSuffix}) => (
             topics.map((topic, index) => (
             <Link 
                 key={index} 
-                className="border border-info rounded-md flex justify-between items-center p-4"
+                className="border border-info rounded-md flex p-4"
                 href={`${hrefSuffix}/${topic.topicId}`}
                 >
+                
                 <p className="text-2xl font-bold">{topic.title}</p>
-                <div className="flex gap-2">
-                    <p>Course Count:</p>
-                    <p className="text-info">{topic.courses?.length}</p>
-                </div>
             </Link>
         ))
         ) : (

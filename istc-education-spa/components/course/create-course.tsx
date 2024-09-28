@@ -153,7 +153,10 @@ const CreateCourse: React.FC = () => {
                     title="Success"
                     width="w-1/3"
                     isOpen={success}
-                    onClose={() => {router.push('/course/edit')}}
+                    onClose={() => {
+                        router.push('/course/edit');
+                        router.refresh();
+                    }}
                 >
                     <div className="space-y-2">
                         <h2 className="text-xl font-bold">Course Created Successfully!</h2>
@@ -166,7 +169,10 @@ const CreateCourse: React.FC = () => {
                             </button>
                             <button
                                 className="btn btn-info"
-                                onClick={() => router.push('/course/edit')}
+                                onClick={() => {
+                                    router.push('/course/edit');
+                                    router.refresh();
+                                }}
                             >
                                 Back to Edit Courses
                             </button>

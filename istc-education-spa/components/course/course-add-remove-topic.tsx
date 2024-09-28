@@ -1,9 +1,11 @@
 import { getAllTopics } from "@/utils/api/topic";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import ModalBase from "../modal/modal-base";
 import { FaMagnifyingGlass } from "react-icons/fa6";
 import { Course } from "@/types/models/course";
+import { Topic } from "@/types/models/topic";
+import { useDebounce } from "use-debounce";
 
 interface CourseAddRemoveTopicProps {
     course: Course;
@@ -12,18 +14,44 @@ interface CourseAddRemoveTopicProps {
 
 const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCourse }) => {
     const [ topics, setTopics ] = useState<Topic[] | null>(null);
-    const [ filteredTopics, setFilteredTopics ] = useState<Topic[] | null>(null);
+    const [ search , setSearch ] = useState<string>("");
+    const [ query ] = useDebounce(search, 500);
+    const [ page, setPage ] = useState<number>(1);
+    const limit = 10;
     const [ error, setError ] = useState<string | null>(null);
     const [ loadingTopics, setLoadingTopics ] = useState<boolean>(false);
+    const [ searching, setSearching ] = useState<boolean>(false);
+    const [ navToNext, setNavToNext ] = useState<boolean>(false);
+    const [ navToPrev, setNavToPrev ] = useState<boolean>(false);
     const [ selectTopicModal, setSelectTopicModal ] = useState<boolean>(false);
 
+    useEffect(() => {
+        setSearching(true);
+        getAllTopics(page, limit, query).then( topics => {
+            setTopics(topics);
+        }).catch( error => {
+            setError("Error fetching topics");
+        }).finally(() => {
+            setSearching(false);
+        });
+    }, [query]);
+
+    useEffect(() => {
+        getAllTopics(page, limit, query).then( topics => {
+            setTopics(topics);
+        }).catch( error => {
+            setError("Error fetching topics");
+        }).finally(() => {
+            setNavToNext(false);
+            setNavToPrev(false);
+        })
+    }, [page]);
 
     const handleOpenModal = async () => {
         setLoadingTopics(true);
-        const topics = await getAllTopics();
+        const topics = await getAllTopics(page, limit);
         if (topics) {
             setTopics(topics);
-            setFilteredTopics(topics);
         } else {
             setError("Error fetching topics");
         }
@@ -53,17 +81,19 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
         });
     }
 
-    const handleSearchTopics = (search: string) => {
-        if (search === "") {
-            setFilteredTopics(topics);
-        } else {
-            const searchResults = topics ? topics.filter( topic => topic.title.toLowerCase().includes(search.toLowerCase())) : null;
-            setFilteredTopics(searchResults);
-        }
-    }
-
     const handleDisableAddButton = (topic: Topic): boolean => {
         return course.topics?.find( t => t.topicId === topic.topicId) ? true : false
+    }
+
+    const handleNavToNext = async () => {
+        setNavToNext(true);
+        setPage(page + 1);
+
+    }
+
+    const handleNavToPrev = async () => {
+        setNavToPrev(true);
+        setPage(page - 1);
     }
 
     return (
@@ -91,16 +121,16 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
             )}
             <div className="flex justify-end mt-2">
                 <button 
-                    className="btn btn-success dark:text-white"
+                    className="btn btn-sm btn-success dark:text-white"
                     onClick={handleOpenModal}
                     >
                     {loadingTopics ? <span className="loading loading-spinner"></span> : <><FaPlus/> Topic</>}  
                 </button>
             </div>
-            {selectTopicModal && filteredTopics &&
+            {selectTopicModal && 
                 <ModalBase 
                     title="Select Topics" 
-                    width="w-2/5"
+                    width="w-full max-w-lg"
                     isOpen={selectTopicModal} 
                     onClose={() => setSelectTopicModal(false)}
                 >
@@ -131,22 +161,23 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
                         <div className='border-b'/>
                         <div>
                             <label className="input input-bordered flex items-center gap-2">
-                                <FaMagnifyingGlass />
+                                {searching ? <span className="loading loading-dots"></span> : <FaMagnifyingGlass/>}
                                 <input 
                                     type="text" 
                                     className="grow" 
                                     placeholder="Search for topics"
-                                    onChange={(e) => handleSearchTopics(e.target.value)}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                 />
                             </label>
                         </div>
                         <h3 className="text-lg font-bold">Topics</h3>
                         <div className='border-b'/>
                         <div className="mt-1 space-y-2">
-                            {filteredTopics && filteredTopics.length > 0 ? (
+                            {topics && topics.length > 0 ? (
                                 <div className="space-y-2 overflow-y-auto max-h-96">
                                     
-                                    {filteredTopics.map( (topic) => (
+                                    {topics.map( topic => (
                                         <div key={topic.topicId} className="flex gap-2 items-center">
                                             <p>{topic.title}</p>
                                             <button 
@@ -159,16 +190,44 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
                                         </div>
                                     ))}
                                 </div>
-                            ) :(
+                            ) : (
                                 <div className="bg-error-content rounded-md p-4">
                                     <h2 className="text-error font-bold">No topics found</h2>
                                 </div>
                             )}
-                            {error && <p className="text-error">{error}</p>}
+                            <div className="flex justify-between">
+                                <button 
+                                    className={`btn btn-sm ${page === 1 ? 'btn-disabled' : 'btn-info'}`}
+                                    onClick={handleNavToPrev}
+                                    disabled={page === 1}
+                                >
+                                    {navToPrev ? <span className="loading loading-spinner"></span> : "Previous"}
+                                </button>
+                                <button 
+                                    className={`btn btn-sm ${topics && topics.length < limit ? 'btn-disabled' : 'btn-info'}`}
+                                    onClick={handleNavToNext}
+                                    disabled={topics != null && topics.length < limit}
+                                >
+                                    {navToNext ? <span className="loading loading-spinner"></span> : "Next"}
+                                </button>
+                            </div>
+                        
                         </div>
                     </div>
                 </ModalBase>          
-            }  
+            }
+
+            {error &&
+                <ModalBase
+                    title="Error"
+                    isOpen={error ? true : false}
+                    onClose={() => setError(null)}
+                >
+                    <div className="bg-error-content p-4 rounded-md">
+                        <h2 className="text-error font-bold">{error}</h2>
+                    </div>
+                </ModalBase>
+            }
 
         </>
     )

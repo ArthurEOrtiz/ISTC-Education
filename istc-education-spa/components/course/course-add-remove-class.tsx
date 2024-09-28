@@ -176,7 +176,7 @@ const AddRemoveClass: React.FC<AddRemoveClassProps> = ({ course, setCourse }) =>
 
             <div className="flex justify-end mt-2">
                 <button 
-                    className="btn btn-success dark:text-white"
+                    className="btn btn-sm btn-success dark:text-white"
                     onClick={handleAddClass}
                 >
                     <FaPlus /> Class

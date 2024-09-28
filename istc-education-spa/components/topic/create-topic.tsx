@@ -5,6 +5,8 @@ import ModalBase from "../modal/modal-base";
 import { useRouter } from "next/navigation";
 import TopicForm from "./topic-form";
 import TopicInfo from "./topic-info";
+import { Topic } from "@/types/models/topic";
+import ErrorBody from "../modal/error-body";
 
 
 const CreateTopic: React.FC = () => {
@@ -40,7 +42,7 @@ const CreateTopic: React.FC = () => {
     return (
         <>
             {step === 1 && (   
-                <div className="w-full sm:w-5/6 md:w-2/3 lg:w-1/3 border border-info rounded-md p-4">
+                <div className="w-full max-w-xl border border-info rounded-md p-4">
                     <TopicForm
                         submitText="Next"
                         goBack
@@ -51,7 +53,7 @@ const CreateTopic: React.FC = () => {
                 </div>
             )}
             {step === 2 && (
-                <div className="border border-info sm:w-1/3 rounded-md p-4">
+                <div className="border border-info max-w-2xl rounded-md p-4">
                     <div className="p-4">
                         <TopicInfo topic={topic} />
                     </div>
@@ -70,6 +72,16 @@ const CreateTopic: React.FC = () => {
                             {saving ? <span className="loading loading-spinner"></span> : "Create Topic"}
                         </button>
                     </div>
+                    {errors && (
+                        <ModalBase
+                            title="Error"
+                            width="w-1/2"
+                            isOpen={errors !== null}
+                            onClose={() => setError(null)}
+                        >
+                            <ErrorBody errors={errors} />
+                        </ModalBase>
+                    )}
                     {success && (
                         <ModalBase
                             title="Topic Created"
@@ -84,13 +96,16 @@ const CreateTopic: React.FC = () => {
                                         className="btn btn-success dark:text-white"
                                         onClick={() => router.push('/admin')}
                                     >
-                                        Go to Admin Dashboard
+                                        Admin Dashboard
                                     </button>
                                     <button
                                         className="btn btn-success dark:text-white"
-                                        onClick={() => router.push('/topic')}
+                                        onClick={() => {
+                                            router.push('/topic/edit')
+                                            router.refresh()    
+                                        }}
                                     >
-                                        Go to Topics
+                                        Back to Topics
                                     </button>
                                 </div>
                             </div>

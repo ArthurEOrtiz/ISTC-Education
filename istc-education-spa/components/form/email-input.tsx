@@ -50,7 +50,7 @@ const EmailInput: React.FC<EmailInputProps> = ({ label, id, placeholder, default
                     defaultValue={checkEmail}
                     id="check-email"
                     onBlur={onBlur}
-                    onChange={onChange}
+                    onChange={(e) => setCheckEmail(e.target.value)}
                 />
             </label>
             {isEmailChecking && (
