@@ -14,7 +14,7 @@ namespace istc_education_api.Models
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 50 characters")]
 		public string Title { get; set; } = string.Empty;
 
-		public DateTime Created { get; set; } = DateTime.Now;
+		public DateTime Created { get; set; } = DateTime.UtcNow;
 
 		[StringLength(500, MinimumLength = 5, ErrorMessage ="Description must be between 3 and 500 characters.")]
 		public string? Description { get; set; }

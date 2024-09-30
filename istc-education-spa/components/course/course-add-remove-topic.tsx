@@ -211,6 +211,15 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
                                     {navToNext ? <span className="loading loading-spinner"></span> : "Next"}
                                 </button>
                             </div>
+                            <div className='border-b'/>
+                            <div className="flex justify-end mt-2">
+                                <button 
+                                    className="btn btn-sm btn-success dark:text-white"
+                                    onClick={() => setSelectTopicModal(false)}
+                                >
+                                    Done
+                                </button>
+                            </div>
                         
                         </div>
                     </div>

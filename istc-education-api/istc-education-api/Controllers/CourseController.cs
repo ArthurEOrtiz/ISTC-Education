@@ -124,7 +124,7 @@ namespace istc_education_api.Controllers
 					Description = course.Description,
 					AttendanceCredit = course.AttendanceCredit,
 					MaxAttendance = course.MaxAttendance,
-					EnrollmentDeadline = course.EnrollmentDeadline.ToString(),
+					EnrollmentDeadline = course.EnrollmentDeadline.ToString("yyyy-MM-dd"),
 					InstructorName = course.InstructorName,
 					InstructorEmail = course.InstructorEmail,
 					HasExam = course.HasExam,
@@ -135,6 +135,7 @@ namespace istc_education_api.Controllers
 					Topics = course.Topics?.Select(t => new TopicDto()
 					{
 						TopicId = t.TopicId,
+						Created = t.Created.ToString("yyyy-MM-dd"),
 						Title = t.Title,
 						Description = t.Description
 					}).ToList(),

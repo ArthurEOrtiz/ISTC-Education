@@ -8,6 +8,7 @@ import { useDebounce } from "use-debounce";
 import UserList from "./user-list";
 import { dropStudent, enrollStudent } from "@/utils/api/student";
 import ModalBase from "../modal/modal-base";
+import { Course } from "@/types/models/course";
 
 interface ManageCourseEnrollmentProps {
     course: Course;
@@ -167,7 +168,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                                 enrollments={enrolledUsers}
                                 loading={loadingUsers}
                                 onClick={handleEnrollUser}
-                                add={true}
+                                add
                                 nullText="No students found"
                             />
                         </div>

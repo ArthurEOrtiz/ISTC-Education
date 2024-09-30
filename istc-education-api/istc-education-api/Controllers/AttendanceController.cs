@@ -69,49 +69,20 @@ namespace istc_education_api.Controllers
 					PropertyNamingPolicy = JsonNamingPolicy.CamelCase
 				};
 
-
 				if (input.ValueKind == JsonValueKind.Object)
 				{
 					var singleAttendance = JsonSerializer.Deserialize<Attendance>(input.GetRawText(), options);
-					if (singleAttendance != null)
-					{
-						if (!await _context.Students.AnyAsync(s => s.StudentId == singleAttendance.StudentId))
-						{
-							return BadRequest($"StudentId {singleAttendance.StudentId} does not exist.");
-						}
-						_context.Attendances.Update(singleAttendance);
-					}
-					else
-					{
-						return BadRequest("Invalid input type");
-					}
+					return await HandleSingleAttendance(singleAttendance);
 				}
 				else if (input.ValueKind == JsonValueKind.Array)
 				{
 					var attendancesArray = JsonSerializer.Deserialize<Attendance[]>(input.GetRawText(), options);
-					if (attendancesArray != null)
-					{
-						foreach (var attendance in attendancesArray)
-						{
-							if (!await _context.Students.AnyAsync(s => s.StudentId == attendance.StudentId))
-							{
-								return BadRequest($"StudentId {attendance.StudentId} does not exist.");
-							}
-						}
-						_context.Attendances.UpdateRange(attendancesArray);
-					}
-					else
-					{
-						return BadRequest("Invalid input type");
-					}
+					return await HandleMultipleAttendances(attendancesArray);
 				}
 				else
 				{
 					return BadRequest("Invalid input type");
 				}
-
-				await _context.SaveChangesAsync();
-				return NoContent();
 			}
 			catch (Exception ex)
 			{
@@ -120,6 +91,53 @@ namespace istc_education_api.Controllers
 			}
 		}
 
+		private async Task<IActionResult> HandleSingleAttendance(Attendance? attendance)
+		{
+			if (attendance == null)
+			{
+				return BadRequest("Invalid input type");
+			}
 
+			if (!await _context.Students.AnyAsync(s => s.StudentId == attendance.StudentId))
+			{
+				return BadRequest($"StudentId {attendance.StudentId} does not exist.");
+			}
+
+			_context.Attendances.Update(attendance);
+			await UpdateUserLastUpdated(attendance.StudentId);
+			await _context.SaveChangesAsync();
+
+			return NoContent();
+		}
+
+		private async Task<IActionResult> HandleMultipleAttendances(Attendance[]? attendances)
+		{
+			if (attendances == null)
+			{
+				return BadRequest("Invalid input type");
+			}
+
+			var studentIds = attendances.Select(a => a.StudentId).Distinct();
+			var existingStudentIds = await _context.Students
+					.Where(s => studentIds.Contains(s.StudentId))
+					.Select(s => s.StudentId)
+					.ToListAsync();
+
+			var invalidStudentIds = studentIds.Except(existingStudentIds).ToList();
+			if (invalidStudentIds.Count != 0)
+			{
+				return BadRequest($"StudentIds {string.Join(", ", invalidStudentIds)} do not exist.");
+			}
+
+			foreach (var attendance in attendances)
+			{
+				await UpdateUserLastUpdated(attendance.StudentId);
+			}
+
+			_context.Attendances.UpdateRange(attendances);
+			await _context.SaveChangesAsync();
+
+			return NoContent();
+		}
 	}
 }

@@ -34,6 +34,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
         setSaving(true);
         try {
             const response = await putCourse(course);
+            
             if (response.success) {
                 setSuccess(true);
             } else {
@@ -196,13 +197,13 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                         <h2 className="text-xl font-bold">Course Updated Successfully</h2>
                         <div className="flex flex-row justify-end space-x-2">
                             <button
-                                className="btn btn-success dark:text-white"
-                                onClick={() => router.push('/course/edit')}
+                                className="btn btn-info"
+                                onClick={() => router.back()}
                             >
                                 Back to Courses
                             </button>
                             <button
-                                className="btn btn-inf"
+                                className="btn btn-info"
                                 onClick={() => router.push('/admin')}
                             >
                                 Admin Dashboard

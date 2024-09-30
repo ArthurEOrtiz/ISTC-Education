@@ -62,10 +62,7 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var topic = await _context.Topics
-					.Include(t => t.Courses)
-						.ThenInclude(c => c.Classes)
-					.FirstOrDefaultAsync(t => t.TopicId == id);
+				var topic = await _context.Topics.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
 				{
@@ -78,31 +75,7 @@ namespace istc_education_api.Controllers
 					Title = topic.Title,
 					Created = topic.Created.ToString("yyyy-MM-dd"),
 					Description = topic.Description,
-					Courses = topic.Courses?.Select(c => new CourseDto()
-					{
-						CourseId = c.CourseId,
-						Title = c.Title,
-						Status = c.Status.ToString(),
-						Description = c.Description,
-						AttendanceCredit = c.AttendanceCredit,
-						MaxAttendance = c.MaxAttendance,
-						EnrollmentDeadline = c.EnrollmentDeadline.ToString("yyyy-MM-dd"),
-						InstructorName = c.InstructorName,
-						InstructorEmail = c.InstructorEmail,
-						HasExam = c.HasExam,
-						ExamCredit = c.ExamCredit,
-						HasPDF = c.HasPDF,
-						PDF = c.PDF,
-						Topics = c.Topics?.Select(t => new TopicDto()
-						{
-							TopicId = t.TopicId,
-							Title = t.Title,
-							Created = t.Created.ToString("yyyy-MM-dd"),
-							Description = t.Description
-						}).ToList(),
-						Classes = c.Classes
-					}).ToList()
-			};
+				};
 				return Ok(topicDto);
 			}
 			catch (Exception ex)
@@ -125,7 +98,7 @@ namespace istc_education_api.Controllers
 			{
 				_context.Topics.Add(topic);
 				await _context.SaveChangesAsync();
-				return CreatedAtAction(nameof(Details), new { id = topic.TopicId }, topic);
+				return CreatedAtAction(nameof(Details), new { id = topic.TopicId }, null);
 			}
 			catch (Exception ex)
 			{

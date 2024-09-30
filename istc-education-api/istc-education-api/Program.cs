@@ -27,6 +27,7 @@ builder.Services.AddSwaggerGen();
 //});
 
 builder.Services.AddHostedService<CourseStatusUpdater>();
+builder.Services.AddHostedService<CalculateAccumulatedCredits>();
 builder.Services.AddDbContext<DataContext>(options => 
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
 ));

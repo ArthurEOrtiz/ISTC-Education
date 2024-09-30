@@ -6,6 +6,7 @@ import { getStudents } from "@/utils/api/student";
 import { convertDateToMMDDYYYY, convertTo12HourFormat } from "@/utils/global-functions";
 import { SignedIn } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface CourseDetailsPageProps {
@@ -42,18 +43,14 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
                     <h2 className="text-xl font-bold">Status:</h2>
                     <p className={`${statusColor}`}>{readableStatus}</p>
                 </div>
-                <div className="flex gap-2 items-center">
-                    <h2 className="text-xl font-bold">Topics</h2>
-                    <p>{course.topics?.length}</p>
-                </div>
                 {course.topics && course.topics.length > 0 && (
                     <>
                         <h2 className="text-xl font-bold">Topics</h2>
                         <div className="flex flex-wrap gap-2">
                             {course.topics?.map((topic, index) => (
-                                <div key={index} className="border border-info rounded-md p-4">
+                                <Link href={`/topic/${topic.topicId}`} key={index} className="border border-info rounded-md p-4">
                                     <p className="font-bold">{topic.title}</p>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </>

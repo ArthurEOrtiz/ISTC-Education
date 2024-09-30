@@ -157,7 +157,9 @@ namespace istc_education_api.Controllers
 				{
 					_context.Entry(user.Student).State = EntityState.Modified;
 				}
-			
+
+				user.LastUpdated = DateTime.UtcNow;
+
 				await _context.SaveChangesAsync();
 				return NoContent();
 			}

@@ -238,6 +238,7 @@ namespace istc_education_api.Controllers
 
 				student.Attendances ??= []; // Ensure Attendances is not null
 				student.Attendances.AddRange(attendances);
+				await UpdateUserLastUpdated(studentId);
 				await _context.SaveChangesAsync();
 
 				return NoContent();
@@ -276,7 +277,7 @@ namespace istc_education_api.Controllers
 
 				var attendances = student.Attendances?
 					.Where(a => course.Classes.Any(c => c.ClassId == a.ClassId))
-					.ToList() ?? new List<Attendance>();
+					.ToList() ?? [];
 
 				if (student.Attendances != null)
 				{
@@ -284,6 +285,7 @@ namespace istc_education_api.Controllers
 				}
 
 				await _context.SaveChangesAsync();
+				await UpdateUserLastUpdated(studentId);
 
 				return NoContent();
 			}
@@ -337,6 +339,7 @@ namespace istc_education_api.Controllers
 				};
 
 				_context.WaitLists.Add(waitList);
+				await UpdateUserLastUpdated(studentId);
 				await _context.SaveChangesAsync();
 
 				return Created();
@@ -364,6 +367,8 @@ namespace istc_education_api.Controllers
 				}
 
 				_context.WaitLists.Remove(waitList);
+				await UpdateUserLastUpdated(studentId);
+
 				await _context.SaveChangesAsync();
 
 				return NoContent();
@@ -374,5 +379,7 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error removing student from waitlist.");
 			}
 		}
+
+		
 	}
 }

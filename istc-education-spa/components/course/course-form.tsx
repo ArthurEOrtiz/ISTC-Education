@@ -82,6 +82,13 @@ const CourseForm: React.FC<CourseFormProps> = ({ course, setCourse, submitText="
                     [id]: newValue,
                 }));
                 break;
+            case id === "enrollmentDeadline":
+                const date = new Date(value).toISOString().split('T')[0];
+                setCourse(prev => ({
+                    ...prev,
+                    enrollmentDeadline: date,
+                }));
+                break;
             default:
                 setCourse(prev => ({
                     ...prev,

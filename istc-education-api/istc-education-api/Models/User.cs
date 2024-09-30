@@ -15,6 +15,8 @@ namespace istc_education_api.Models
 		[EnumDataType(typeof(UserStatus), ErrorMessage = "Status must be 'Active', 'AdminRegistered','Archived'.")]
 		public UserStatus Status { get; set; } 
 
+		public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
+
 		[Required(ErrorMessage = "First Name is required.")]
 		[StringLength(50, MinimumLength = 3, ErrorMessage = "First name must be between 3 and 50 characters.")]
 		public string FirstName { get; set; } = string.Empty;

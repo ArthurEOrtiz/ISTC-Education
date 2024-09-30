@@ -8,10 +8,10 @@ import { Topic } from "@/types/models/topic";
 interface TopicFormProps {
     topic: Topic;
     setTopic: Dispatch<SetStateAction<Topic>>;
-    submitText: string;
+    submitText?: string;
     submitting?: boolean;
     goBack?: boolean;
-    onSubmit: (topic: Topic) => void;
+    onSubmit?: (topic: Topic) => void;
 }
 
 const TopicForm: React.FC<TopicFormProps> = ({ topic, setTopic, submitText, submitting = false, goBack, onSubmit }) => {
@@ -21,7 +21,7 @@ const TopicForm: React.FC<TopicFormProps> = ({ topic, setTopic, submitText, subm
 
     const handleOnSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        onSubmit(topic);
+        onSubmit && onSubmit(topic);
     }
 
     useEffect(() => {
@@ -96,13 +96,15 @@ const TopicForm: React.FC<TopicFormProps> = ({ topic, setTopic, submitText, subm
                         Back
                     </button>
                 )}
-                <button
-                    type="submit"
-                    className="btn btn-success dark:text-white"
-                    disabled={!isFormValid || submitting}
-                >
-                    {submitting ? <span className="loading loading-spinner"></span> : submitText}
-                </button>
+                {submitText && (
+                    <button
+                        type="submit"
+                        className="btn btn-success dark:text-white"
+                        disabled={!isFormValid || submitting}
+                    >
+                        {submitting ? <span className="loading loading-spinner"></span> : submitText}
+                    </button>
+                )}
             </div>
         </form>
     );

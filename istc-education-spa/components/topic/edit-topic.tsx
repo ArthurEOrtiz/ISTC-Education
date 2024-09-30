@@ -6,6 +6,10 @@ import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
 import { deleteTopic, putTopic } from "@/utils/api/topic";
 import { useRouter } from "next/navigation";
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import { Course } from "@/types/models/course";
+import AddRemoveCourse from "./topic-add-remove-course";
+import LoadingCourse from "@/app/course/loading";
 
 interface EditTopicProps {
     topic: Topic;
@@ -13,12 +17,22 @@ interface EditTopicProps {
 
 const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
     const [ topic, setTopic ] = useState<Topic>(incomingTopic);
+    
+
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
     const [ submitting, setSubmitting ] = useState<boolean>(false);
     const [ deleting, setDeleting ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
     const [ deleted, setDeleted ] = useState<boolean>(false);
+
+    const [ infoExpanded, setInfoExpanded ] = useState<boolean>(true);
+    const [ courseExpanded, setCourseExpanded ] = useState<boolean>(false);
+    const [ courseLoading, setCourseLoading ] = useState<boolean>(false);
+   
+    
     const router = useRouter();
+
+ 
 
     const handleSubmit = async () => {
         setSubmitting(true);
@@ -55,23 +69,40 @@ const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
 
     return (
         <>  
-            <div className="space-y-2">
-                <div className="w-full flex justify-end">
+            <div className="w-full max-w-xl space-y-2">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold">Edit Topic</h1>
                     <button
-                        className="btn btn-error btn-sm dark:text-white"
-                        onClick={() => setDeleted(true)}
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setInfoExpanded(!infoExpanded)}
                     >
-                        Delete
+                        {infoExpanded ? <FaAngleUp/> : <FaAngleDown/>}
                     </button>
                 </div>
-                <TopicForm
-                    topic={topic}
-                    setTopic={setTopic}
-                    submitText="Save"
-                    submitting={submitting}
-                    onSubmit={handleSubmit}
-                    goBack
-                />
+                <div className={`${infoExpanded ? 'block' : 'hidden'}`}>
+                    <TopicForm
+                        topic={topic}
+                        setTopic={setTopic}
+                    />
+                </div>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl font-bold">Courses</h1>
+                    <button
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setCourseExpanded(!courseExpanded)}
+                    >
+                        {courseExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                    </button>
+                </div>
+                <div className={`${courseExpanded && !courseLoading ? 'block' : 'hidden'}`}>
+                    <AddRemoveCourse
+                        topic={topic}
+                        setTopic={setTopic}
+                        loading={courseLoading}
+                        setLoading={setCourseLoading}
+                        expanded={courseExpanded}
+                    />
+                </div>
             </div>
 
             {deleted && (
