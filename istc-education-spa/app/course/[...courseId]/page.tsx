@@ -31,8 +31,6 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
     const statusColor = course.status === 'Upcoming' ? 'text-info' : course.status === 'InProgress' ? 'text-success' : 'text-error';
     const readableStatus = course.status === 'Upcoming' ? 'Upcoming' : course.status === 'InProgress' ? 'In Progress' : 'Completed';
 
-    console.log("student",student);
-
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <div className="sm:w-2/3 sm:flex sm:justify-center">

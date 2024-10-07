@@ -1,6 +1,6 @@
 'use client';
 import { Topic } from "@/types/models/topic";
-import { useState } from "react";
+import React, { useState } from "react";
 import TopicForm from "./topic-form";
 import ModalBase from "../modal/modal-base";
 import ErrorBody from "../modal/error-body";
@@ -27,12 +27,8 @@ const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
 
     const [ infoExpanded, setInfoExpanded ] = useState<boolean>(true);
     const [ courseExpanded, setCourseExpanded ] = useState<boolean>(false);
-    const [ courseLoading, setCourseLoading ] = useState<boolean>(false);
-   
     
     const router = useRouter();
-
- 
 
     const handleSubmit = async () => {
         setSubmitting(true);
@@ -91,18 +87,40 @@ const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
                         className="btn btn-ghost btn-circle text-3xl"
                         onClick={() => setCourseExpanded(!courseExpanded)}
                     >
-                        {courseExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                        {courseExpanded ? <FaAngleUp/> :  <FaAngleDown/>}
                     </button>
                 </div>
-                <div className={`${courseExpanded && !courseLoading ? 'block' : 'hidden'}`}>
+                <div className={`${courseExpanded ? 'block' : 'hidden'}`}>
                     <AddRemoveCourse
                         topic={topic}
                         setTopic={setTopic}
-                        loading={courseLoading}
-                        setLoading={setCourseLoading}
-                        expanded={courseExpanded}
                     />
                 </div>
+                <div className="border-b"/>
+                <div className="flex justify-between">
+                    <button
+                        className="btn btn-info"
+                        onClick={() => router.push('/topic/edit')}
+                    >
+                        Back
+                    </button>
+                    <div className="flex space-x-2">
+                        <button
+                            className="btn btn-error dark:text-white"
+                            onClick={() => setDeleted(true)}
+                        >
+                            Delete
+                        </button>
+                        <button
+                            className="btn btn-success dark:text-white"
+                            onClick={handleSubmit}
+                        >
+                            {submitting ? <span className="loading loading-spinner"></span> : 'Save'}
+                        </button>
+                    </div>
+                </div>
+                
+
             </div>
 
             {deleted && (

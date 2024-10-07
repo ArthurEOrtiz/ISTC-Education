@@ -1,5 +1,5 @@
 import { getAllTopics } from "@/utils/api/topic";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import ModalBase from "../modal/modal-base";
 import { FaMagnifyingGlass } from "react-icons/fa6";

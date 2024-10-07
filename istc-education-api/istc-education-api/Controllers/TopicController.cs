@@ -4,6 +4,7 @@ using istc_education_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Reflection;
 
 namespace istc_education_api.Controllers
 {
@@ -62,7 +63,9 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var topic = await _context.Topics.FirstOrDefaultAsync(t => t.TopicId == id);
+				var topic = await _context.Topics
+				.Include(t => t.Courses)
+				.FirstOrDefaultAsync(t => t.TopicId == id);
 
 				if (topic == null)
 				{
@@ -75,7 +78,22 @@ namespace istc_education_api.Controllers
 					Title = topic.Title,
 					Created = topic.Created.ToString("yyyy-MM-dd"),
 					Description = topic.Description,
+					Courses = topic.Courses?.Select(c => new CourseDto()
+					{
+						CourseId = c.CourseId,
+						Title = c.Title,
+						Status = c.Status.ToString(),
+						Description = c.Description,
+						AttendanceCredit = c.AttendanceCredit,
+						MaxAttendance = c.MaxAttendance,
+						EnrollmentDeadline = c.EnrollmentDeadline.ToString("yyyy-MM-dd"),
+						InstructorName = c.InstructorName,
+						InstructorEmail = c.InstructorEmail,
+						HasExam = c.HasExam,
+						HasPDF = c.HasPDF,
+					}).ToList()
 				};
+	
 				return Ok(topicDto);
 			}
 			catch (Exception ex)
