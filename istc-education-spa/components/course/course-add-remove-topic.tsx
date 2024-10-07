@@ -176,7 +176,6 @@ const AddRemoveTopics: React.FC<CourseAddRemoveTopicProps> = ({ course, setCours
                         <div className="mt-1 space-y-2">
                             {topics && topics.length > 0 ? (
                                 <div className="space-y-2 overflow-y-auto max-h-96">
-                                    
                                     {topics.map( topic => (
                                         <div key={topic.topicId} className="flex gap-2 items-center">
                                             <p>{topic.title}</p>
