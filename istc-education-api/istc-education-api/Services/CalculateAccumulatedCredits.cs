@@ -36,9 +36,9 @@ namespace istc_education_api.Services
 					var oneWeekAgo = DateTime.Now.AddDays(-7);
 				
 					var users = await context.Users
-						.Include(u => u.Student)
+						.Include(u => u.Student!)
 							.ThenInclude(s => s.Attendances)
-						.Include(u => u.Student)
+						.Include(u => u.Student!)
 							.ThenInclude(s => s.Exams)
 						.Where(u => u.Student != null && u.Status != UserStatus.Archived && u.LastUpdated > oneWeekAgo)
 						.ToListAsync(stoppingToken);

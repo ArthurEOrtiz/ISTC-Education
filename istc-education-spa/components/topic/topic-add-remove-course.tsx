@@ -247,6 +247,18 @@ const AddRemoveCourse: React.FC<AddRemoveCourseProps> = ({ topic, setTopic }) =>
                     </div>
                 </div>
             </ModalBase>
+            
+            <ModalBase
+                title="Error"
+                width="w-1/2"
+                isOpen={!!error}
+                onClose={() => setError(null)}
+            >
+                <div className="bg-error-content p-4 rounded-md">
+                    <h2 className="text-error font-bold">{error}</h2>
+                </div>
+            </ModalBase>
+            
         </>
     );
 }

@@ -130,7 +130,7 @@ namespace istc_education_api.Controllers
 					HasExam = course.HasExam,
 					ExamCredit = course.ExamCredit,
 					HasPDF = course.HasPDF,
-					Location = course.Location,
+					Location = course.Location!,
 					PDF = course.PDF,
 					Topics = course.Topics?.Select(t => new TopicDto()
 					{
@@ -255,7 +255,7 @@ namespace istc_education_api.Controllers
 				}
 
 				_context.Entry(existingCourse).CurrentValues.SetValues(course);
-				_context.Entry(existingCourse.Location).CurrentValues.SetValues(course.Location);
+				_context.Entry(existingCourse.Location!).CurrentValues.SetValues(course.Location!);
 
 				UpdatePDF(existingCourse, course.PDF);
 

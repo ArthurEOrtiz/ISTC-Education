@@ -4,7 +4,6 @@ using istc_education_api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
-using System.Reflection;
 
 namespace istc_education_api.Controllers
 {
@@ -32,7 +31,7 @@ namespace istc_education_api.Controllers
 				var query = _context.Topics
 				.AsQueryable();
 
-				
+
 				if (!string.IsNullOrWhiteSpace(search))
 				{
 					query = query.Where(t =>
@@ -93,7 +92,7 @@ namespace istc_education_api.Controllers
 						HasPDF = c.HasPDF,
 					}).ToList()
 				};
-	
+
 				return Ok(topicDto);
 			}
 			catch (Exception ex)
@@ -136,7 +135,19 @@ namespace istc_education_api.Controllers
 
 			try
 			{
-			  _context.Entry(topic).State = EntityState.Modified;
+				var existingTopic = await _context.Topics
+					.Include(t => t.Courses)
+					.FirstOrDefaultAsync(t => t.TopicId == id);
+
+				if (existingTopic == null)
+				{
+					return NotFound("Topic not found.");
+				}
+
+				_context.Entry(existingTopic).CurrentValues.SetValues(topic);
+
+				UpdateCourses(existingTopic, topic.Courses);
+
 				await _context.SaveChangesAsync();
 				return NoContent();
 			}
@@ -168,6 +179,41 @@ namespace istc_education_api.Controllers
 			{
 				_logger.LogError(ex, "Error deleting topic");
 				return BadRequest("Error deleting topic.");
+			}
+		}
+
+		private void UpdateCourses(Topic existingTopic, ICollection<Course>? updatedCourses)
+		{
+			if (updatedCourses == null)
+			{
+				existingTopic.Courses = null;
+				return;
+			}
+
+			if (existingTopic.Courses != null)
+			{
+				// Remove courses that are no longer in the updated list
+				foreach (var existingCourse in existingTopic.Courses.ToList())
+				{
+					if (!updatedCourses.Any(c => c.CourseId == existingCourse.CourseId))
+					{
+						existingTopic.Courses.Remove(existingCourse);
+					}
+				}
+
+				// Add new courses to the topic
+				foreach (var updatedCourse in updatedCourses)
+				{
+					if (!existingTopic.Courses.Any(c => c.CourseId == updatedCourse.CourseId))
+					{
+						existingTopic.Courses.Add(updatedCourse);
+					}
+				}
+			}
+			else
+			{
+				// If the existing topic has no courses, just add the new courses to the topic
+				existingTopic.Courses = updatedCourses;
 			}
 		}
 	}

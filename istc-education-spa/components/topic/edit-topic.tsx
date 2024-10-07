@@ -7,9 +7,7 @@ import ErrorBody from "../modal/error-body";
 import { deleteTopic, putTopic } from "@/utils/api/topic";
 import { useRouter } from "next/navigation";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
-import { Course } from "@/types/models/course";
 import AddRemoveCourse from "./topic-add-remove-course";
-import LoadingCourse from "@/app/course/loading";
 
 interface EditTopicProps {
     topic: Topic;
@@ -26,7 +24,7 @@ const EditTopic: React.FC<EditTopicProps> = ({ topic: incomingTopic }) => {
     const [ deleted, setDeleted ] = useState<boolean>(false);
 
     const [ infoExpanded, setInfoExpanded ] = useState<boolean>(true);
-    const [ courseExpanded, setCourseExpanded ] = useState<boolean>(false);
+    const [ courseExpanded, setCourseExpanded ] = useState<boolean>(true);
     
     const router = useRouter();
 

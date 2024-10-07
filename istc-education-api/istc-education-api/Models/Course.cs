@@ -40,17 +40,12 @@ namespace istc_education_api.Models
 
 		public bool HasPDF { get; set; }
 
-		// So every course needs a location, even if its online. 
-		// I'm telling the computer to make one even if its blank.
-		public virtual Location Location { get; set; } = new Location();
+		public virtual Location? Location { get; set; } 
 
 		// Storing pdf's in a blob as a hack for now.
 		// I'm gonna bring this up to supervision we need something better.
 		public virtual PDF? PDF { get; set; }
 
-		// This is the one many-to-many relationship in the database.
-		// I'm using a HashSet because it's a collection of unique items.
-		// I'm using a nullable type because it's possible for a course to have no topics.
 		public virtual ICollection<Topic>? Topics { get; set; }
 
 
