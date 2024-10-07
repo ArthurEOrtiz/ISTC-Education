@@ -33,7 +33,7 @@ const TopicEditPage: React.FC<TopicEditPageProps> = async({params}) => {
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
-            <h1 className="text-3xl font-bold">Edit {topic.title}</h1>
+            <h1 className="text-3xl font-bold">{topic.title}</h1>
             <EditTopic topic={topic} />
         </div>
     );
