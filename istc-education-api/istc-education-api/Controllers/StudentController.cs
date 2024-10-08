@@ -32,7 +32,7 @@ namespace istc_education_api.Controllers
 			{
 				return BadRequest("Cannot provide both studentId and email");
 			}
-			
+
 			try
 			{
 				if (email != null)
@@ -171,25 +171,16 @@ namespace istc_education_api.Controllers
 			}
 		}
 
-		[HttpPost("Enroll/{courseId}/{studentId}")]
+		[HttpPost("Enroll/{courseId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Enroll(int courseId, int studentId)
+		public async Task<IActionResult> Enroll(int courseId, [FromQuery] List<int> studentIds)
 		{
 			try
 			{
-				var student = await _context.Students
-					.Include(s => s.Attendances)
-					.FirstOrDefaultAsync(s => s.StudentId == studentId);
-
-				if (student == null)
-				{
-					return NotFound("Student not found.");
-				}
-
 				var course = await _context.Courses
-					.Include(c => c.Classes)
-						.ThenInclude(c => c.Attendances)
-					.FirstOrDefaultAsync(c => c.CourseId == courseId);
+						.Include(c => c.Classes)
+								.ThenInclude(c => c.Attendances)
+						.FirstOrDefaultAsync(c => c.CourseId == courseId);
 
 				if (course == null)
 				{
@@ -201,54 +192,85 @@ namespace istc_education_api.Controllers
 					return BadRequest("Course is not available for enrollment.");
 				}
 
-				// Check if student is already enrolled
-				var existingEnrollment = course.Classes
-					.SelectMany(c => c.Attendances!)
-					.Any(a => a.StudentId == studentId);
+				var currentEnrollments = course.Classes
+						.SelectMany(c => c.Attendances!)
+						.Where(a => studentIds.Contains(a.StudentId))
+						.Select(a => a.StudentId)
+						.Distinct()
+						.ToList();
 
-				if (existingEnrollment)
+				var studentsToDrop = course.Classes
+						.SelectMany(c => c.Attendances!)
+						.Where(a => !studentIds.Contains(a.StudentId))
+						.ToList();
+
+				// Drop students not in the provided list
+				foreach (var student in studentsToDrop)
 				{
-					return BadRequest("Student is already enrolled in this course.");
+					await UpdateUserLastUpdated(student.StudentId);
+					_context.Attendances.Remove(student);
 				}
 
-				// Check if student is waitlisted
-				var waitList = await _context.WaitLists
-					.Where(w => w.StudentId == studentId && w.CourseId == courseId)
-					.FirstOrDefaultAsync();
-
-				if (waitList != null)
+				foreach (var studentId in studentIds)
 				{
-					_context.WaitLists.Remove(waitList);
-				}
+					var student = await _context.Students
+							.Include(s => s.Attendances)
+							.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
-				var attendances = new List<Attendance>();
-
-				foreach (var @class in course.Classes)
-				{
-					var attendance = new Attendance
+					if (student == null)
 					{
-						StudentId = studentId,
-						ClassId = @class.ClassId,
-						HasAttended = false
-					};
+						_logger.LogWarning("Student with ID {StudentId} not found.", studentId);
+						continue;
+					}
 
-					attendances.Add(attendance);
+					await UpdateUserLastUpdated(studentId);
+
+					// Check if student is already enrolled
+					if (currentEnrollments.Contains(studentId))
+					{
+						_logger.LogInformation("Student with ID {StudentId} is already enrolled in course {CourseId}.", studentId, courseId);
+						continue;
+					}
+
+					// Check if student is waitlisted
+					var waitList = await _context.WaitLists
+							.Where(w => w.StudentId == studentId && w.CourseId == courseId)
+							.FirstOrDefaultAsync();
+
+					if (waitList != null)
+					{
+						_context.WaitLists.Remove(waitList);
+					}
+
+					var attendances = new List<Attendance>();
+
+					foreach (var @class in course.Classes)
+					{
+						var attendance = new Attendance
+						{
+							StudentId = studentId,
+							ClassId = @class.ClassId,
+							HasAttended = false
+						};
+
+						attendances.Add(attendance);
+					}
+
+					student.Attendances ??= new List<Attendance>(); // Ensure Attendances is not null
+					student.Attendances.AddRange(attendances);
 				}
-				
 
-				student.Attendances ??= []; // Ensure Attendances is not null
-				student.Attendances.AddRange(attendances);
-				await UpdateUserLastUpdated(studentId);
 				await _context.SaveChangesAsync();
-
 				return NoContent();
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Error enrolling student");
-				return BadRequest("Error enrolling student.");
+				_logger.LogError(ex, "Error enrolling students");
+				return BadRequest("Error enrolling students.");
 			}
 		}
+
+
 
 		[HttpDelete("Drop/{courseId}/{studentId}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -380,6 +402,6 @@ namespace istc_education_api.Controllers
 			}
 		}
 
-		
+
 	}
 }

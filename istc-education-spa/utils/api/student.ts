@@ -110,9 +110,11 @@ export const removeWaitlist = async (courseId: number, studentId: number): Promi
     }
 }
 
-export const enrollStudent = async (courseId: number, studentId: number): Promise<ApiResponse> => {
+export const enrollStudents = async (courseId: number, studentIds: number[]): Promise<ApiResponse> => {
+    const url = `/Student/Enroll/${courseId}?${studentIds.map(id => `studentIds=${id}`).join('&')}`;
+
     try {
-        const response = await axiosInstance.post(`/Student/Enroll/${courseId}/${studentId}`);
+        const response = await axiosInstance.post(url);
         if (response.status === 204) {
             return { success: true };
         } else {

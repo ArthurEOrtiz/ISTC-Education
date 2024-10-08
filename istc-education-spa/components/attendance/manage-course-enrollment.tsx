@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { FaAngleDown, FaAngleUp, FaSearch } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
 import UserList from "./user-list";
-import { dropStudent, enrollStudent } from "@/utils/api/student";
+import { dropStudent, enrollStudents } from "@/utils/api/student";
 import ModalBase from "../modal/modal-base";
 import { Course } from "@/types/models/course";
 
@@ -21,6 +21,8 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
     const [ users, setUsers ] = useState<User[]>([]);
     const [ loadingUsers, setLoadingUsers ] = useState<boolean>(true);
     const [ waitlistUsers, setWaitlistUsers ] = useState<User[]>([]);
+    const [ saving, setSaving ] = useState<boolean>(false); 
+    const [ success, setSuccess ] = useState<boolean>(false);
     const [ loadingWaitlistUsers, setLoadingWaitlistUsers ] = useState<boolean>(true);
     const [ isWaitlistExpanded, setIsWaitlistExpanded ] = useState<boolean>(true);
     const [ isStudentsExpanded, setIsStudentsExpanded ] = useState<boolean>(true);
@@ -64,53 +66,41 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
             setLoadingUsers(false);
         });
     }, [page, query]);
-    
-    const handleRemoveUserFromEnrolled = (userId: number) => {
-        const user = enrolledUsers.find(u => u.userId === userId);
-        if (!user) return;
 
-        setLoadingEnrolledUsers(true);
-        dropStudent(course.courseId, user.student?.studentId!).then((response) => {
+    const handleSaveEnrollment = () => {
+   
+        const studentIds = enrolledUsers.map(u => u.student?.studentId);
+       
+        if (!studentIds || studentIds.length === 0) {
+            setError("No students to enroll.");
+            return;
+        }
+        
+        setSaving(true);
+        enrollStudents(course.courseId, studentIds as number[]).then((response) => {
             if (response.success) {
-                setEnrolledUsers(enrolledUsers.filter(u => u.userId !== userId));
+                setWaitlistUsers(waitlistUsers.filter(u => !studentIds.includes(u.student?.studentId)));
+                setSuccess(true);
             } else {
                 setError(response.error as string);
             }
         }).catch((error) => {
             setError(error.message);
         }).finally(() => {
-            setLoadingEnrolledUsers(false);
-        });
-    }
-
-    const handleEnrollUser = (user: User) => {
-        setLoadingWaitlistUsers(true);
-        enrollStudent(course.courseId, user.student?.studentId!).then((response) => {
-            if (response.success) {
-                setEnrolledUsers([...enrolledUsers, user]);
-                setWaitlistUsers(waitlistUsers.filter(u => u.userId !== user.userId));
-            } else {
-                setError(response.error as string);
-            }
-        }).catch((error) => {
-            setError(error.message);
-        }).finally(() => {
-            setLoadingWaitlistUsers(false);
+            setSaving(false);
         });
     }
     
     return (
         <>
             <div className="w-full max-w-2xl space-y-2">
-              
-
                 <h2 className="text-2xl font-bold">Enrolled Students</h2>
                 <div className="space-y-2">
                     <UserList
                         users={enrolledUsers}
                         enrollments={enrolledUsers}
                         loading={loadingEnrolledUsers}
-                        onClick={(u) => handleRemoveUserFromEnrolled(u.userId)}
+                        onClick={(u) => setEnrolledUsers(enrolledUsers.filter(user => user.userId !== u.userId))}
                         add={false}
                         nullText="No students enrolled"
                     />
@@ -135,7 +125,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                             users={waitlistUsers}
                             enrollments={enrolledUsers}
                             loading={loadingWaitlistUsers}
-                            onClick={handleEnrollUser}
+                            onClick={(user) => setEnrolledUsers([...enrolledUsers, user])}
                             add={true}
                             nullText="No students in waitlist"
                         />
@@ -167,7 +157,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                                 users={users}
                                 enrollments={enrolledUsers}
                                 loading={loadingUsers}
-                                onClick={handleEnrollUser}
+                                onClick={(u) => setEnrolledUsers([...enrolledUsers, u])}
                                 add
                                 nullText="No students found"
                             />
@@ -175,18 +165,18 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                         {users.length > 0 && (
                             <div className="flex justify-between mt-2">
                                 <button 
-                                    className="btn btn-info dark:text-white"
+                                    className="btn btn-sm btn-info"
                                     disabled={page === 1}
                                     onClick={() => setPage(page - 1)}
                                 >
                                     Previous
                                 </button>
                                 <button 
-                                    className="btn btn-info dark:text-white"
+                                    className="btn btn-sm btn-info"
                                     disabled={users.length < limit}
                                     onClick={() => setPage(page + 1)}
                                     >
-                                        Next
+                                    Next
                                 </button>
                             </div>
                         )}
@@ -194,11 +184,18 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                 )}
                 <div className="border-b "/>
 
-                <div className="w-full flex justify-end gap-2"> 
+                <div className="w-full flex justify-between"> 
                     <button 
-                        className="btn btn-error dark:text-white"
+                        className="btn btn-info"
                         onClick={() => router.back()}>
                             Back
+                    </button>
+
+                    <button
+                        className="btn btn-success dark:text-white"
+                        onClick={handleSaveEnrollment}
+                        >
+                            {saving ? <span className="loading loading-spinner"></span> : "Save"}
                     </button>
                 </div>
             </div>
@@ -209,6 +206,14 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
                 onClose={() => setError(null)}
                 >
                 <p>{error}</p>
+            </ModalBase>
+            <ModalBase
+                title="Success"
+                width="w-1/2"
+                isOpen={success}
+                onClose={() => setSuccess(false)}
+                >
+                 <p>Students have been successfully enrolled in the course.</p>
             </ModalBase>
         </>
     );
