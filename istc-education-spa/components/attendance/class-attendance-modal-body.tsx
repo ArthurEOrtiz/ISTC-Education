@@ -3,7 +3,7 @@ import { getCourseEnrollments } from "@/utils/api/courses";
 import { useEffect, useState } from "react";
 
 interface ClassAttendanceModalBodyProps {
-    cls: Class;
+    cls: Class | null;
     onClose: () => void;    
 }
 
@@ -15,15 +15,17 @@ const ClassAttendanceModalBody: React.FC<ClassAttendanceModalBodyProps> = ({ cls
 
 
     useEffect(() => {
+        if (!cls) return;
         getStudents();
         getAttendance(cls.classId).then((response) => {
             setAttendances(response);
         }).catch((error) => {
             setErrors(error.message);
         });
-    }, []);
+    }, [cls]);
 
     const getStudents = async () => {
+        if (!cls) return
         setLoading(true);
         getCourseEnrollments(cls.courseId).then((response) => {
             setEnrolledUsers(response);
@@ -33,8 +35,6 @@ const ClassAttendanceModalBody: React.FC<ClassAttendanceModalBodyProps> = ({ cls
             setLoading(false);
         });
     }
-
-     
     
     const handleSelectStudent = (user: User) => {
         setAttendances((attendances) => {

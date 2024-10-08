@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CourseForm from "./course-form";
 import AddRemoveClass from "./course-add-remove-class";
 import AddRemoveTopics from "./course-add-remove-topic";
@@ -29,6 +29,11 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
     const [ selectedClass, setSelectedClass ] = useState<Class | null>(null);   
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
+
+    useEffect(() => {
+        setAttendanceModal(selectedClass !== null);
+    }
+    ,[selectedClass]);
 
     const handleUpdateCourse = async () => {
         setSaving(true);
@@ -129,7 +134,6 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                                         <button
                                             className="btn btn-info"
                                             onClick={() => {
-                                                setAttendanceModal(true);
                                                 setSelectedClass(cls);
                                             }}
                                         >
@@ -146,7 +150,6 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                         </div>
                     )}
                 </div>
-                
                
                 <div className="w-full border-b my-2" />
                 <div className="w-full flex justify-end gap-2">
@@ -165,26 +168,24 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                     
                 </div>
             </div>
-
-            {attendanceModal && selectedClass && (
-                <ModalBase
-                    title="Attendance"
-                    width="sm:w-1/4"
-                    isOpen={attendanceModal}
-                    onClose={() =>{
+          
+            <ModalBase
+                title="Attendance"
+                width="sm:w-1/4"
+                isOpen={attendanceModal}
+                onClose={() =>{
+                    setAttendanceModal(false);
+                    setSelectedClass(null)
+                }}
+            >
+                <ClassAttendanceModalBody 
+                    cls={selectedClass} 
+                    onClose={() => {
                         setAttendanceModal(false);
-                        setSelectedClass(null)
+                        setSelectedClass(null);
                     }}
-                >
-                    <ClassAttendanceModalBody 
-                        cls={selectedClass} 
-                        onClose={() => {
-                            setAttendanceModal(false);
-                            setSelectedClass(null);
-                        }}
-                    />
-                </ModalBase>  
-            )}
+                />
+            </ModalBase>  
             
             {success && (
                 <ModalBase

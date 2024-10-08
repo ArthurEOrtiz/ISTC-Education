@@ -129,6 +129,7 @@ export const enrollStudents = async (courseId: number, studentIds: number[]): Pr
     }
 }
 
+// Not implemented
 export const dropStudent = async (courseId: number, studentId: number): Promise<ApiResponse> => {
     try {
         const response = await axiosInstance.delete(`/Student/Drop/${courseId}/${studentId}`);
