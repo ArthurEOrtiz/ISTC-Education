@@ -1,3 +1,4 @@
+import CertificationButton from "@/components/certification/certification-button";
 import NewUserRegistration from "@/components/users/new-user-registration";
 import UserStudentHistory from "@/components/users/user-student-history";
 import { getUserByEmail, isUserAdmin, putUser } from "@/utils/api/users";
@@ -137,9 +138,10 @@ const DashboardPage:React.FC = async () => {
                                             Admin Dashboard
                                     </Link>
                                 )}
+                                <CertificationButton studentId={serverUser.student!.studentId} />
                                 <Link 
                                     href={`/user/edit/${serverUser.userId}`}
-                                    className="btn btn-warning btn-sm">
+                                    className="btn btn-info btn-sm">
                                         Edit Personal Information
                                 </Link>
                             </div>
@@ -148,9 +150,9 @@ const DashboardPage:React.FC = async () => {
                     
                 )}
 
-            <div className="w-full border border-info space-y-2 rounded-md p-4">
-               <UserStudentHistory studentId={serverUser.student?.studentId}/>
-            </div>
+                <div className="w-full border border-info space-y-2 rounded-md p-4">
+                    <UserStudentHistory studentId={serverUser.student?.studentId}/>
+                </div>
           
 
             </div>

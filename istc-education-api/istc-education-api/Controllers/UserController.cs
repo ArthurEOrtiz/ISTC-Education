@@ -88,7 +88,11 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var user = await GetUserQuery().FirstOrDefaultAsync(u => u.UserId == id);
+				var user = await GetUserQuery()
+					.Include(u => u.Student)
+						.ThenInclude(s => s!.Certifications)
+					.FirstOrDefaultAsync(u => u.UserId == id);
+
 				if (user == null)
 				{
 					return NotFound("User not found.");
@@ -124,41 +128,107 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error creating user");
 			}
 		}
+		[HttpGet("WithCertifications")]
+		[ProducesResponseType((int)HttpStatusCode.OK)]
+		[ProducesResponseType((int)HttpStatusCode.BadRequest)]
+		public async Task<IActionResult> GetUsersWithCertifications(
+		[FromQuery] int page = 1,
+		[FromQuery] int limit = 10,
+		[FromQuery] string? search = null
+		)
+		{
+			if (page < 1 || limit < 1)
+			{
+				return BadRequest("Invalid page or limit");
+			}
+
+			try
+			{
+				var query = _context.Users
+						.Include(u => u.Student)
+							.ThenInclude(s => s!.Certifications)
+						.Include(u => u.Contact)
+						.Include(u => u.Employer)
+						.Where(u => u.Student != null && u.Student.Certifications != null && u.Student.Certifications.Count != 0)
+						.AsQueryable();
+
+				if (!string.IsNullOrEmpty(search))
+				{
+					query = query.Where(u =>
+						u.FirstName.Contains(search) ||
+						u.MiddleName!.Contains(search) ||
+						u.LastName.Contains(search) ||
+						u.Contact!.Email.Contains(search) ||
+						u.Employer!.EmployerName.Contains(search) ||
+						u.Employer.JobTitle.Contains(search)	
+						);
+				}
+
+				var users = await query
+						.Skip((page - 1) * limit)
+						.Take(limit)
+						.ToListAsync();
+
+				return Ok(users);
+			}
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Error getting users with certifications");
+				return BadRequest("Error getting users with certifications");
+			}
+		}
+
 
 		[HttpPut("{id}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
-		public async Task<IActionResult> Update(int id, [FromBody] User user)
+		public async Task<IActionResult> Update(int id, [FromBody] User updatedUser)
 		{
+			if (id != updatedUser.UserId)
+			{
+				return BadRequest("User ID mismatch");
+			}
+
+			if (!ModelState.IsValid)
+			{
+				return BadRequest(ModelState);
+			}
 			try
 			{
-				if (id != user.UserId)
+				var currentUser = await _context.Users
+					.Include(u => u.Contact)
+					.Include(u => u.Employer)
+					.Include(u => u.Student)
+						.ThenInclude(s => s!.Certifications)
+					.FirstOrDefaultAsync(u => u.UserId == id);
+
+				if (currentUser == null)
 				{
-					return BadRequest("User ID mismatch");
+					return NotFound("User not found.");
 				}
 
-				if (!ModelState.IsValid)
+				_context.Entry(currentUser).CurrentValues.SetValues(updatedUser);
+
+				if (currentUser.Contact != null && updatedUser.Contact != null)
 				{
-					return BadRequest(ModelState);
+					_context.Entry(currentUser.Contact).CurrentValues.SetValues(updatedUser.Contact);
 				}
 
-				_context.Entry(user).State = EntityState.Modified;
-
-				if (user.Contact != null)
+				if (currentUser.Employer != null && updatedUser.Employer != null)
 				{
-					_context.Entry(user.Contact).State = EntityState.Modified;
+					_context.Entry(currentUser.Employer).CurrentValues.SetValues(updatedUser.Employer);
 				}
 
-				if (user.Employer != null)
+				if (currentUser.Student != null && updatedUser.Student != null)
 				{
-					_context.Entry(user.Employer).State = EntityState.Modified;
+					_context.Entry(currentUser.Student).CurrentValues.SetValues(updatedUser.Student);
+
+					if (updatedUser.Student.Certifications != null)
+					{
+						UpdateCertifications(currentUser.Student, updatedUser.Student.Certifications);
+					}
 				}
 
-				if (user.Student != null)
-				{
-					_context.Entry(user.Student).State = EntityState.Modified;
-				}
-
-				user.LastUpdated = DateTime.UtcNow;
+				currentUser.LastUpdated = DateTime.UtcNow;
 
 				await _context.SaveChangesAsync();
 				return NoContent();
@@ -167,7 +237,7 @@ namespace istc_education_api.Controllers
 			{
 				if (!UserExists(id))
 				{
-					return NotFound("User no longer exists.");
+					return NotFound("User does not exists.");
 				}
 				else
 				{
@@ -181,6 +251,38 @@ namespace istc_education_api.Controllers
 				return BadRequest("Error updating user");
 			}
 		}
+
+		private void UpdateCertifications(Student currentUserStudent, ICollection<Certification> updatedCertifications)
+		{
+			currentUserStudent.Certifications ??= new List<Certification>();
+
+			var certificationsToRemove = currentUserStudent.Certifications
+					.Where(c => !updatedCertifications.Any(uc => uc.CertificationId == c.CertificationId))
+					.ToList();
+
+			foreach (var certification in certificationsToRemove)
+			{
+				currentUserStudent.Certifications.Remove(certification);
+			}
+
+			foreach (var certification in updatedCertifications)
+			{
+				var existingCertification = currentUserStudent.Certifications
+						.FirstOrDefault(c => c.CertificationId == certification.CertificationId);
+
+				if (existingCertification == null)
+				{
+					currentUserStudent.Certifications.Add(certification);
+				}
+				else
+				{
+					_context.Entry(existingCertification).CurrentValues.SetValues(certification);
+				}
+			}
+		}
+
+
+
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -211,6 +313,7 @@ namespace istc_education_api.Controllers
 				.Include(u => u.Contact)
 				.Include(u => u.Employer)
 				.Include(u => u.Student);
+					
 		}
 
 		private bool UserExists(int id)

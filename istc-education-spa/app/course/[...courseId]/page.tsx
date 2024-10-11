@@ -71,7 +71,6 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = async ({params}) => 
                     <CourseEnrollmentActions course={course} student={student} />
                 </SignedIn>
             </div>
-            
         </div>
     );
 

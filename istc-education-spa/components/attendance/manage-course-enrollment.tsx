@@ -58,7 +58,7 @@ const ManageCourseEnrollment: React.FC<ManageCourseEnrollmentProps> = ({ course 
 
     useEffect(() => {
         setLoadingUsers(true);
-        getAllUsers(page, limit, query).then((users) => {
+        getAllUsers({page, limit, search:query}).then((users) => {
             setUsers(users);
         }).catch((error) => {
             setError(error.message);

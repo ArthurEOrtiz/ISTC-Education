@@ -1,7 +1,7 @@
 interface Certification {
     certificationId: number;
     studentId: number;
-    certificationType: 'Appraiser' | 'Mapping';
+    type: 'Appraiser' | 'Mapping';
     requestedDate: Date;
     reviewDate: Date | null;
     isApproved: boolean;

@@ -3,13 +3,27 @@ import { axiosInstance } from "./httpConfig";
 import axios from "axios";
 import { clerkClient } from "@clerk/nextjs/server";
 
-export const getAllUsers = async (page:number, limit:number, search?:string ) => {
+export const getAllUsers = async (options: GetAllUsersOptions = {} ) => {
+    const { page = 1, limit = 10, search, IPId, email, studentId } = options;
+
+    const url = `/User?page=${page}&limit=${limit}${search ? `&search=${search}` : ''}${IPId ? `&IPId=${IPId}` : ''}${email ? `&email=${email}` : ''}${studentId ? `&studentId=${studentId}` : ''}`;
     try {
-        const url = search ? `/User?page=${page}&limit=${limit}&search=${search}` : `/User?page=${page}&limit=${limit}`;
+        
         const response = await axiosInstance.get(url);
         return response.data as User[];
     } catch (error) {
         throw new Error('Error fetching all users');    
+    }
+}
+
+export const getAllUsersWithCertifications = async (page: number, limit: number, search?: string): Promise<User[]> => {
+    const url = `/User/WithCertifications?page=${page}&limit=${limit}${search ? `&search=${search}` : ''}`;
+    console.log("URL", url);    
+    try {
+        const response = await axiosInstance.get(url);
+        return response.data as User[];
+    } catch (error) {
+        throw new Error('Error fetching all users with certifications');
     }
 }
 

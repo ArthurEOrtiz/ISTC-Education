@@ -5,7 +5,7 @@ import Image from 'next/image'
 
 const Header:React.FC = () => {
     return (
-        <header className="w-full bg-secondary-content p-4">
+        <header className="w-full bg-cyan-700 text-white p-4">
             <div className="flex flex-col items-center">
                 <Link href="/" className="flex flex-col items-center space-y-2">
                     <Image

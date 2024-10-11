@@ -1,6 +1,6 @@
 /****** Script for SelectTopNRows command from SSMS  ******/
---SELECT *
---FROM Users;
+SELECT *
+FROM Users;
 
 --SELECT *
 --FROM Contacts;
@@ -8,17 +8,17 @@
 --SELECT *
 --FROM Employers;
 
---SELECT *
---FROM Students;
+SELECT *
+FROM Students;
 
 --SELECT *
 --FROM Attendances;
 
---SELECT *
---FROM Certifications;
-
 SELECT *
-FROM Courses;
+FROM Certifications;
+
+--SELECT *
+--FROM Courses;
 
 --SELECT *
 --FROM Classes;
@@ -29,14 +29,14 @@ FROM Courses;
 --SELECT *
 --FROM PDFs;
 
-SELECT *
-FROM Exams;
+--SELECT *
+--FROM Exams;
 
 --SELECT *
 --FROM WaitLists;
 
-SELECT *
-FROM Topics;
+--SELECT *
+--FROM Topics;
 
-SELECT *
-FROM CourseTopic;
+--SELECT *
+--FROM CourseTopic;

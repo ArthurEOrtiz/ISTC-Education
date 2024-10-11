@@ -12,8 +12,9 @@ namespace istc_education_api.Models
 		[ForeignKey("Student")]
 		public int StudentId { get; set; }
 
-		[RegularExpression("Appraiser|Mapping", ErrorMessage = "Certification type must be 'Appraiser' or 'Mapping'.")]
-		public string CertificationType { get; set; } = string.Empty;
+		[Required(ErrorMessage = "Certification Type is required.")]
+		[EnumDataType(typeof(CertificationType), ErrorMessage = "Certification Type must be 'Mapping' or 'Appraiser'.")]
+		public CertificationType Type { get; set; } 
 
 		public DateTime RequestedDate { get; set; } = DateTime.UtcNow;
 

@@ -33,7 +33,8 @@ const CourseEditPage: React.FC<CourseEditPageProps> = async({params}) => {
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
-            <h1 className="text-3xl font-bold">Edit Course</h1>
+            <h1 className="text-3xl font-bold">{course.title}</h1>
+            
             <EditCourse course={course} />
         </div>
     );

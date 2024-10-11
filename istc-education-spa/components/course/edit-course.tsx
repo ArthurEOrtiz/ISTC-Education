@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import CourseForm from "./course-form";
 import AddRemoveClass from "./course-add-remove-class";
 import AddRemoveTopics from "./course-add-remove-topic";
@@ -25,6 +25,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
     const [ classesExpanded, setClassesExpanded ] = useState<boolean>(false);
     const [ attendanceExpanded, setAttendanceExpanded ] = useState<boolean>(true);
     const [ archiveConfirmationModal, setArchiveConfirmationModal ] = useState<boolean>(false);
+    const [ cancelConfirmationModal, setCancelConfirmationModal ] = useState<boolean>(false);
     const [ attendanceModal, setAttendanceModal ] = useState<boolean>(false);
     const [ selectedClass, setSelectedClass ] = useState<Class | null>(null);   
     const [ success, setSuccess ] = useState<boolean>(false);
@@ -52,19 +53,24 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
         }
     }
 
+    const disabled: boolean = course.status === "Archived" || course.status === "Cancelled" || course.classes.length === 0;
+
     return(
         <>
+            <div className="flex gap-2">
+                <p className="text-lg">Status:</p>
+                <p className="text-lg font-semibold">{course.status}</p>
+            </div>
+            
             <div className="w-full max-w-2xl flex flex-col items-center">
                 <div className="w-full flex justify-between">
-                    <h2 className="text-2xl font-bold">{course.title}</h2>
-                    <div className="flex justify-between items-center gap-2">
-                        <button 
-                            className="btn btn-ghost btn-circle text-3xl"
-                            onClick={() => setInfoExpanded(!infoExpanded)}
-                        >
-                            {infoExpanded ? <FaAngleUp/> : <FaAngleDown/>}
-                        </button>
-                    </div>
+                    <h2 className="text-2xl font-bold">Information</h2>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setInfoExpanded(!infoExpanded)}
+                    >
+                        {infoExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                    </button>
                 </div>
                 <div className={`${infoExpanded ? "block" : "hidden"}`}>
                     <CourseForm
@@ -75,14 +81,12 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                 </div>
                 <div className="w-full flex justify-between">
                     <h2 className="text-2xl font-bold">Topics</h2>
-                    <div className="flex justify-between items-center gap-2">
-                        <button 
-                            className="btn btn-ghost btn-circle text-3xl"
-                            onClick={() => setTopicsExpanded(!topicsExpanded)}
-                        >
-                            {topicsExpanded ? <FaAngleUp/> : <FaAngleDown/>}
-                        </button>
-                    </div>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setTopicsExpanded(!topicsExpanded)}
+                    >
+                        {topicsExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                    </button>
                 </div>
 
                 <div className={`w-full ${topicsExpanded ? "block" : "hidden"}`}>
@@ -91,14 +95,12 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
 
                 <div className="w-full flex justify-between">
                     <h2 className="text-2xl font-bold">Classes</h2>
-                    <div className="flex justify-between items-center gap-2">
-                        <button 
-                            className="btn btn-ghost btn-circle text-3xl"
-                            onClick={() => setClassesExpanded(!classesExpanded)}
-                        >
-                            {classesExpanded ? <FaAngleUp/> : <FaAngleDown/>}
-                        </button>
-                    </div>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setClassesExpanded(!classesExpanded)}
+                    >
+                        {classesExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                    </button>
                 </div>
 
                 <div className={`w-full ${classesExpanded ? "block" : "hidden"}`}>
@@ -107,14 +109,12 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
 
                 <div className="w-full flex justify-between">
                     <h2 className="text-2xl font-bold">Attendance</h2>
-                    <div className="flex justify-between items-center gap-2">
-                        <button 
-                            className="btn btn-ghost btn-circle text-3xl"
-                            onClick={() => setAttendanceExpanded(!attendanceExpanded)}
-                        >
-                            {attendanceExpanded ? <FaAngleUp/> : <FaAngleDown/>}
-                        </button>
-                    </div>
+                    <button 
+                        className="btn btn-ghost btn-circle text-3xl"
+                        onClick={() => setAttendanceExpanded(!attendanceExpanded)}
+                    >
+                        {attendanceExpanded ? <FaAngleUp/> : <FaAngleDown/>}
+                    </button>
                 </div>
 
                 <div className={`w-full ${attendanceExpanded ? "block" : "hidden"}`}>
@@ -123,6 +123,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                             <button 
                                 className="btn btn-info"
                                 onClick={() => router.push(`/course/enrollment/${course.courseId}`)}
+                                
                             >
                                 Manage Enrollment
                             </button>
@@ -136,6 +137,7 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                                             onClick={() => {
                                                 setSelectedClass(cls);
                                             }}
+                                            disabled={disabled}
                                         >
                                             View Attendance
                                         </button>
@@ -152,19 +154,35 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                 </div>
                
                 <div className="w-full border-b my-2" />
-                <div className="w-full flex justify-end gap-2">
+                <div className="w-full flex justify-between">
                     <button 
-                        className="btn btn-error dark:text-white"
+                        className="btn btn-info"
                         onClick={() => router.back()}>
                             Back
                     </button>
-                    <button 
-                        className="btn btn-success dark:text-white"
-                        onClick={handleUpdateCourse}
-                        disabled={saving}
+                    <div className="flex gap-2">
+                        <button 
+                            className="btn btn-warning"
+                            onClick={() => setCancelConfirmationModal(true)}
+                            disabled={course.status === "Cancelled"}
                         >
-                            {saving ? <span className="loading loading-spinner"></span> : "Update Course"}
-                    </button>
+                            Cancel Course
+                        </button>
+                        <button 
+                            className="btn btn-error dark:text-white"
+                            onClick={() => setArchiveConfirmationModal(true)}
+                            disabled={course.status === "Archived"}
+                        >
+                            Archive
+                        </button>
+                        <button 
+                            className="btn btn-success dark:text-white"
+                            onClick={handleUpdateCourse}
+                            disabled={saving}
+                            >
+                                {saving ? <span className="loading loading-spinner"></span> : "Update Course"}
+                        </button>
+                    </div>
                     
                 </div>
             </div>
@@ -229,13 +247,49 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                         <div className="flex flex-row justify-end space-x-2">
                             <button
                                 className="btn btn-error dark:text-white"
-                                onClick={() => setCourse({...course, status: "Archived"})}
+                                onClick={() => {
+                                    setCourse({...course, status: "Archived"})
+                                    setArchiveConfirmationModal(false);
+                                }}
                             >
                                 Archive
                             </button>
                             <button
                                 className="btn btn-warning"
                                 onClick={() => setArchiveConfirmationModal(false)}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </ModalBase>
+            )}
+            {cancelConfirmationModal && (
+                <ModalBase
+                    title="Cancel Course"
+                    width="w-1/2"
+                    isOpen={cancelConfirmationModal}
+                    onClose={() => setCancelConfirmationModal(false)}
+                >
+                    <div className="space-y-2">
+                        <div>
+                            <h2 className="font-bold">Are you sure you want to cancel this course?</h2>
+                            <p></p>
+                            <p>This action cannot be undone!</p>
+                        </div>
+                        <div className="flex flex-row justify-end space-x-2">
+                            <button
+                                className="btn btn-error dark:text-white"
+                                onClick={() => {
+                                    setCourse({...course, status: "Cancelled"})
+                                    setCancelConfirmationModal(false);
+                                }}
+                            >
+                                Cancel Course
+                            </button>
+                            <button
+                                className="btn btn-warning"
+                                onClick={() => setCancelConfirmationModal(false)}
                             >
                                 Cancel
                             </button>

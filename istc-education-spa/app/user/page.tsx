@@ -27,15 +27,18 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
     const limit = searchParams.limit ? parseInt(searchParams.limit as string) : 10;
     const search = searchParams.search ? searchParams.search as string : undefined;
 
-    const users: User[] = await getAllUsers(page, limit, search);
+    const users: User[] = await getAllUsers({page, limit, search});
 
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <h1 className="text-3xl font-bold"> Users </h1>
             <div className="w-full max-w-2xl space-y-2 p-4">
-                <div>
-                    <SearchUser/>
-                </div>
+                <SearchUser
+                    page={page}
+                    limit={limit}
+                    userCount={users.length}
+                    urlPrefix="/user"
+                >
                 <div className="w-full flex justify-end">
                     <Link href="/user/create" className="btn btn-success dark:text-white">
                         <FaPlus/> User
@@ -52,19 +55,7 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
                         </Link>
                     ))}
                 </div>
-                <div className="flex justify-between">
-                    <Link 
-                        href={`/user?page=${page - 1}&limit=${limit}`}
-                        className={`btn ${page === 1 ? 'btn-disabled' : 'btn-info'}`}>
-                            Previous
-                    </Link>
-                    <Link 
-                        href={`/user?page=${page + 1}&limit=${limit}`}
-                        className={`btn ${users.length < limit ? 'btn-disabled' : 'btn-info'}`}>
-                            Next
-                    </Link>  
-
-                </div>
+                </SearchUser>
             </div>
         </div>
     );

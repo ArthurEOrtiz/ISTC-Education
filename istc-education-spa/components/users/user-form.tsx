@@ -419,15 +419,16 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
                 required
             />
             <div className="border-b p-2"/>
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-between">
                 {goBack && (
                     <button
-                        className="btn btn-error dark:text-white"
+                        className="btn btn-info"
                         onClick={() => router.back()}
                     >
-                        Go Back
+                        Back
                     </button>
                 )}
+                {onSubmit && (
                 <button 
                     type="submit"
                     className="btn btn-success dark:text-white"
@@ -435,6 +436,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
                 >
                     {submitting ? <span className="loading loading-spinner"></span> : submitText}
                 </button>
+                )}
             </div>
         </form>
     )
