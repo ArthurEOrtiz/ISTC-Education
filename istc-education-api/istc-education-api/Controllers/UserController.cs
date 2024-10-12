@@ -225,6 +225,7 @@ namespace istc_education_api.Controllers
 					if (updatedUser.Student.Certifications != null)
 					{
 						UpdateCertifications(currentUser.Student, updatedUser.Student.Certifications);
+						UpdateStudentCertificationBooleans(currentUser.Student);
 					}
 				}
 
@@ -280,9 +281,29 @@ namespace istc_education_api.Controllers
 				}
 			}
 		}
+		private void UpdateStudentCertificationBooleans(Student currentStudent)
+		{
+			bool appraiserCertified = false;
+			bool mappingCertified = false;
 
+			if (currentStudent.Certifications != null)
+			{
+				foreach (var certification in currentStudent.Certifications)
+				{
+					if (certification.Type == CertificationType.Appraiser)
+					{
+						appraiserCertified = certification.IsApproved;
+					}
+					else if (certification.Type == CertificationType.Mapping)
+					{
+						mappingCertified = certification.IsApproved;
+					}
+				}
+			}
 
-
+			_context.Entry(currentStudent).Property("AppraiserCertified").CurrentValue = appraiserCertified;
+			_context.Entry(currentStudent).Property("MappingCertified").CurrentValue = mappingCertified;
+		}
 
 		[HttpDelete("{id}")]
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]

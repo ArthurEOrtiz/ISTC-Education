@@ -78,7 +78,6 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, otherEmployerChange,
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
 
-        // first if the value is a string remove any leading or trailing whitespace
         if (typeof value === 'string') {
             value.trim();
         }

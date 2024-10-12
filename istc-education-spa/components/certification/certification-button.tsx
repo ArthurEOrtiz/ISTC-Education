@@ -24,6 +24,8 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
         });
     }, []);
 
+
+
     return (
         <>
             <button
@@ -46,8 +48,6 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
                                 <h2 className="text-xl font-bold">{cert.type}</h2>
                                 <p>Requested: {new Date(cert.requestedDate).toLocaleDateString('en-US')}</p>
                                 <p>Status: {cert.reviewDate == null ? "Pending" : cert.isApproved ? "Approved" : "Deneied"}</p>
-                               
-
                             </div>
                         ))}
                     </div>

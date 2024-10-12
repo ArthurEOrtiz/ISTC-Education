@@ -140,7 +140,7 @@ const DashboardPage:React.FC = async () => {
                                 )}
                                 <CertificationButton studentId={serverUser.student!.studentId} />
                                 <Link 
-                                    href={`/user/edit/${serverUser.userId}`}
+                                    href={`/user/edit/${serverUser.userId}?info=true`}
                                     className="btn btn-info btn-sm">
                                         Edit Personal Information
                                 </Link>
