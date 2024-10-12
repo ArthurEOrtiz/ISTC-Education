@@ -48,7 +48,7 @@ const UserIndexPage: React.FC<UserIndexPageProps> = async({searchParams}) => {
                     {users.map((user, index) => (
                         <Link 
                             key={index}
-                            href={`/user/edit/${user.userId}`} 
+                            href={`/user/edit/${user.userId}?info=true&certifications=true`} 
                             className="border border-info hover:bg-info rounded-md flex gap-2 items-center p-4">
                             <p className="sm:text-2xl font-bold border-r border-info pr-2">{user.lastName}, {user.firstName} {user.middleName} </p>
                             <p className="sm:text-xl">{user.contact.email}</p>

@@ -151,7 +151,7 @@ const DashboardPage:React.FC = async () => {
                 )}
 
                 <div className="w-full border border-info space-y-2 rounded-md p-4">
-                    <UserStudentHistory studentId={serverUser.student?.studentId}/>
+                    <UserStudentHistory studentId={student?.studentId}/>
                 </div>
           
 

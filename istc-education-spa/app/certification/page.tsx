@@ -32,7 +32,7 @@ const CertificationIndexPage: React.FC<CertificationIndexPageProps> = async({sea
     return (
         <div className="w-full flex flex-col items-center space-y-2">
             <h1 className="text-3xl font-bold">Certifications</h1>
-            <p>The following list conatins users with pending or approved certifications</p>
+            <p>The following list conatins users with pending approved or rejected certifications</p>
             <div className="w-full max-w-2xl space-y-2 p-4">
                 <SearchUser
                     page={page}
@@ -40,16 +40,11 @@ const CertificationIndexPage: React.FC<CertificationIndexPageProps> = async({sea
                     userCount={users.length}
                     urlPrefix="/certification"
                 >
-                    <div className="w-full flex justify-end">
-                        <Link href="/user/create" className="btn btn-success dark:text-white">
-                            <FaPlus/> User
-                        </Link>
-                    </div>
                     <div className="space-y-2">
                         {users.map((user, index) => (
                             <Link
                                 key={index}
-                                href={`/user/edit/${user.userId}`}
+                                href={`/user/edit/${user.userId}?info=false&certifications=true`}
                                 className="border border-info hover:bg-info rounded-md flex gap-2 items-center p-4"
                             >
                                 <p className="sm:text-2xl font-bold border-r border-info pr-2">

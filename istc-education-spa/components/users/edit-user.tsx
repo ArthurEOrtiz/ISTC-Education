@@ -1,9 +1,9 @@
 'use client';
 import UserForm from "./user-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalBase from "../modal/modal-base";
 import { putUser } from "@/utils/api/users";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ErrorBody from "../modal/error-body";
 import { FaAngleDown, FaAngleUp } from "react-icons/fa";
 import EditUserCertifications from "../certification/edit-user-certifications";
@@ -14,19 +14,32 @@ interface EditUserProps {
 }
 
 export const EditUser: React.FC<EditUserProps> = ({ user: incomingUser, isAdmin = false }) => {
+    const searchParams = useSearchParams();
     const [ user, setUser ] = useState<User>(incomingUser);
-    const [ infoExpanded, setInfoExpanded ] = useState<boolean>(true);
+    const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
+    const [ infoExpanded, setInfoExpanded ] = useState<boolean>(searchParams.get('info') === 'true');
     const [ errors, setErrors ] = useState<string | ErrorResponse | null>(null);
-    const [ certificationExpanded, setCertificationExpanded] = useState<boolean>(true);
+    const [ certificationExpanded, setCertificationExpanded] = useState<boolean>(searchParams.get('certifications') === 'true');
     const [ isSubmitting, setIsSubmitting ] = useState<boolean>(false);
     const [ archiveConfirmationModal, setArchiveConfirmationModal ] = useState<boolean>(false);
     const [ success, setSuccess ] = useState<boolean>(false);
     const router = useRouter();
 
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('info', infoExpanded.toString());
+        params.set('certifications', certificationExpanded.toString());
+        router.replace(`${window.location.pathname}?${params.toString()}`);
+    }, [infoExpanded, certificationExpanded]);
+    
+
     const handleSubmit = async (user: User) => {
         setIsSubmitting(true);
+
+        const submittingUser: User = { ...user, employer: { ...user.employer, employerName: otherEmployer || user.employer.employerName } };
+   
         try {
-            const response = await putUser(user);
+            const response = await putUser(submittingUser);
             if (response.success) {
                 setSuccess(true);
             } else {
@@ -43,6 +56,8 @@ export const EditUser: React.FC<EditUserProps> = ({ user: incomingUser, isAdmin 
         setArchiveConfirmationModal(false);
         setUser({ ...user, status: "Archived" });
     }
+    
+   
 
     return (
         <>
@@ -61,10 +76,11 @@ export const EditUser: React.FC<EditUserProps> = ({ user: incomingUser, isAdmin 
                     <UserForm
                         user={user}
                         setUser={setUser}
+                        otherEmployerChange={(e) => setOtherEmployer(e)}
                         submitText="Update User"
                         submitting={isSubmitting}
                         goBack={!isAdmin}
-                        onSubmit={isAdmin ? undefined : handleSubmit}
+                        onSubmit={!isAdmin ? handleSubmit : undefined}
                         onError={setErrors}
                     />
                 )}

@@ -13,6 +13,7 @@ import { handleIntInput } from "@/utils/forms/handlers";
 interface UserFormProps {
     user: User;
     setUser: Dispatch<SetStateAction<User>>;
+    otherEmployerChange?: (value: string | null) => void;
     submitText?: string;
     submitting?: boolean;
     goBack?: boolean;    
@@ -20,7 +21,7 @@ interface UserFormProps {
     onSubmit?: (user: User) => void;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit", submitting = false,  goBack = false, onSubmit, onError }) => {
+const UserForm: React.FC<UserFormProps> = ({ user, setUser, otherEmployerChange, submitText = "Submit", submitting = false,  goBack = false, onSubmit, onError }) => {
     const [ otherEmployer, setOtherEmployer ] = useState<string | null>(null);
     const [ errors, setErrors ] = useState<FormError>({});
     const [ isEmailChecking, setIsEmailChecking ] = useState<boolean>(false);
@@ -55,20 +56,32 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
         user.employer.jobTitle,
         otherEmployer,
         errors
-    ]);    
+    ]);
+    
+    useEffect(() => {
+        if (otherEmployerChange) {
+            otherEmployerChange(otherEmployer);
+        }
+    }, [otherEmployer]);
 
     const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const submittingUser = user;   
-        if (otherEmployer !== null && submittingUser.employer) {
+        if (otherEmployer !== null) {
             submittingUser.employer.employerName = otherEmployer;
         }
         
+      
         onSubmit && onSubmit(submittingUser);
     }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { id, value } = e.target;
+
+        // first if the value is a string remove any leading or trailing whitespace
+        if (typeof value === 'string') {
+            value.trim();
+        }
 
         switch(true) {
             case id === 'check-email':
@@ -375,7 +388,7 @@ const UserForm: React.FC<UserFormProps> = ({ user, setUser, submitText = "Submit
             </div>
             <SelectInput
                 id="employer.employerName"
-                value={user.employer?.employerName || 'Initial'}
+                value={user.employer?.employerName === "Other" ? (otherEmployer ?? '') : user.employer?.employerName ?? ''}
                 onBlur={handleValidation}
                 onChange={(e) => {
                     const { value } = e.target;
