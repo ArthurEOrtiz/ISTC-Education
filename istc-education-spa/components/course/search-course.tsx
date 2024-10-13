@@ -1,5 +1,5 @@
 'use client';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
@@ -11,6 +11,14 @@ interface SearchCourseProps {
     children: React.ReactNode;
 }
 
+const filterDisplayNames: { [key: string]: string } = {
+    Upcoming: "Upcoming",
+    InProgress: "In Progress",
+    Completed: "Completed",
+    Cancelled: "Cancelled",
+    Archived: "Archived",
+};
+
 const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, children }) => {
     const [search, setSearch] = useState<string>("");
     const [filters, setFilters] = useState({
@@ -21,7 +29,10 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
         Archived: false,
     });
     const [url, setUrl] = useState<string>(`edit?page=${page}&limit=${limit}&status=["UpComing","InProgress"]`);
+    const [loadingNext, setLoadingNext] = useState<boolean>(false);
+    const [loadingPrev, setLoadingPrev] = useState<boolean>(false);
     const [query] = useDebounce(search, 500);
+    const searchParams = useSearchParams();
     const router = useRouter();
    
     useEffect(() => {
@@ -32,9 +43,20 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
         router.push(query ? `${baseUrl}&search=${query}` : baseUrl);
     }, [filters, query, page, limit, router]);
 
-    const handlePageChange = (newPage: number) => {
-        router.push(url.replace(`page=${page}`, `page=${newPage}`));
-    };
+    useEffect(() => {
+        setLoadingNext(false);
+        setLoadingPrev(false);
+    }, [searchParams]);
+
+    const handleNavigateNext = () => {
+        setLoadingNext(true);
+        router.push(url.replace(`page=${page}`, `page=${page + 1}`));
+    }
+
+    const handleNavigatePrev = () => {
+        setLoadingPrev(true);
+        router.push(url.replace(`page=${page}`, `page=${page - 1}`));
+    }
 
     const toggleFilter = (filter: keyof typeof filters) => {
         setFilters(prev => ({ ...prev, [filter]: !prev[filter] }));
@@ -60,7 +82,7 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                             className={`btn join-item ${filters[filter] ? 'btn-info' : ''}`}
                             onClick={() => toggleFilter(filter as keyof typeof filters)}
                         >
-                            {filter}
+                            {filterDisplayNames[filter]}
                         </button>
                     ))}
                 </div>
@@ -72,16 +94,16 @@ const SearchCourse: React.FC<SearchCourseProps> = ({ page, limit, courseCount, c
                 <button 
                     className="btn btn-sm btn-info"
                     disabled={page === 1}
-                    onClick={() => handlePageChange(page - 1)}
+                    onClick={handleNavigatePrev}
                 >
-                    Previous
+                    {loadingPrev ? <span className="loading loading-spinner loading-sm"></span> : 'Previous'}
                 </button>
                 <button 
                     className="btn btn-sm btn-info"
                     disabled={courseCount < limit}
-                    onClick={() => handlePageChange(page + 1)}
+                    onClick={handleNavigateNext}
                 >
-                    Next
+                    {loadingNext ? <span className="loading loading-spinner loading-sm"></span> : 'Next'}
                 </button>
             </div>
         </>

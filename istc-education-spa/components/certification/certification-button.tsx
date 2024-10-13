@@ -66,8 +66,6 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
                         Apply for Appraiser Certification
                     </button>
                 </div>
-
-                
             </ModalBase>
         </>
 

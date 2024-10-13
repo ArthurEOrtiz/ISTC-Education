@@ -124,7 +124,14 @@ namespace istc_education_api.Controllers
 
 				if (status != null)
 				{
-					query = query.Where(c => status.Contains(c.Status));
+					// What will make this different than search course by status in other methods, is that
+					// in this context we return courses that the user has attended all the classes. 
+					query = query.Where(c =>
+						status.Contains(CourseStatus.Completed)
+								? c.Classes.Any(cls => cls.Attendances!.All(a => a.HasAttended))
+								: status.Contains(c.Status)
+					);
+
 				}
 
 				var courses = await query
