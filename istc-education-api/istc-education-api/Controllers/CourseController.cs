@@ -61,7 +61,7 @@ namespace istc_education_api.Controllers
 				if (endDate.HasValue)
 				{
 					query = query.Where(c => c.Classes.Any(c => c.Date <= endDate));
-					
+
 				}
 
 				if (status != null && status.Count > 0)
@@ -168,7 +168,8 @@ namespace istc_education_api.Controllers
 				return BadRequest("Invalid page or limit");
 			}
 
-			if (studentId == null) {
+			if (studentId == null)
+			{
 				return BadRequest("Invalid student id");
 			}
 
@@ -272,11 +273,7 @@ namespace istc_education_api.Controllers
 
 				if (course.Status == CourseStatus.Cancelled)
 				{
-					// Email all students enrolled in the course that the course has been cancelled
-					// But first lest test this with sending a single email to myself.
-					
-					
-					await _emailService.SendEmailAsync("ortiz.arthur.e@gmail.com", "Course Cancelled", "The course has been cancelled.");
+					await SendCancellationEmailsAsync(existingCourse);
 				}
 
 				return NoContent();
@@ -330,20 +327,7 @@ namespace istc_education_api.Controllers
 		{
 			try
 			{
-				var users = await _context.Courses
-					.Where(c => c.CourseId == courseId)
-					.SelectMany(c => c.Classes)
-					.SelectMany(c => c.Attendances!)
-					.Select(a => a.StudentId)
-					.Distinct()
-					.Join(_context.Users
-						.Include(u => u.Contact)
-						.Include(u => u.Student),
-								studentId => studentId,
-								user => user.Student!.StudentId,
-								(studentId, user) => user)
-					.ToListAsync();
-
+				var users = await GetEnrolledUsersAsync(courseId);
 
 				return Ok(users);
 			}
@@ -484,6 +468,66 @@ namespace istc_education_api.Controllers
 					// If the existing course has a pdf, update the pdf.
 					_context.Entry(existingCourse.PDF).CurrentValues.SetValues(updatedPDF);
 				}
+			}
+		}
+
+		private async Task<List<User>> GetEnrolledUsersAsync(int courseId)
+		{
+			return await _context.Courses
+					.Where(c => c.CourseId == courseId)
+					.SelectMany(c => c.Classes)
+					.SelectMany(c => c.Attendances!)
+					.Select(a => a.StudentId)
+					.Distinct()
+					.Join(_context.Users
+							.Include(u => u.Contact)
+							.Include(u => u.Student),
+									studentId => studentId,
+									user => user.Student!.StudentId,
+									(studentId, user) => user)
+					.ToListAsync();
+		}
+
+		private async Task SendCancellationEmailsAsync(Course course)
+		{
+			var enrolledUsers = await GetEnrolledUsersAsync(course.CourseId);
+
+			if (enrolledUsers.Count == 0)
+			{
+				return;
+			}
+
+			string emailHeader = "Course Cancellation Notice";
+			string emailBody = @"
+				<h1>Hello [First Name],</h1>
+				<p>
+					We regret to inform you that the course <strong>""[Course Title]""</strong> scheduled for 
+					<strong>[First Class Date]</strong> has been canceled due to unforeseen circumstances.
+				</p>
+				<p>
+					We apologize for any inconvenience this may cause and appreciate your understanding. 
+				</p>
+				<p>
+					Thank you for your patience.
+				</p>";
+
+			foreach (var user in enrolledUsers)
+			{
+				var userEmail = user.Contact!.Email; 
+				var firstName = user.FirstName;
+				var courseTitle = course.Title;
+				var firstClassDate = course.Classes.Min(c => c.Date).ToString();
+				var year = DateTime.Now.Year;
+
+				emailBody = emailBody.Replace("[First Name]", firstName)
+					.Replace("[Course Title]", courseTitle)
+					.Replace("[First Class Date]", firstClassDate)
+					.Replace("[Year]", year.ToString());
+
+				var email = _emailService.GenerateEmailBody(emailHeader, emailBody, year.ToString());
+
+				await _emailService.SendEmailAsync(userEmail, "Course Cancelled", email);
+
 			}
 		}
 	}
