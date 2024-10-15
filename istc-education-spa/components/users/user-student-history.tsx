@@ -3,11 +3,10 @@
 import { Course } from "@/types/models/course";
 import { getAllCourses } from "@/utils/api/courses";
 import { getStudentEnrollment, getStudents } from "@/utils/api/student";
-import { convertDateToMMDDYYYY } from "@/utils/global-functions";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaAngleDown, FaAngleUp, FaSearch } from "react-icons/fa";
 import { useDebounce } from "use-debounce";
+import CourseList from "../course/course-list";
 
 interface UserStudentHistoryProps {
     studentId: number | undefined;
@@ -137,60 +136,43 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
 
                     {isEnrolledExpanded && (
                         <>
-                            <label className="input input-bordered input-info flex items-center gap-2">
-                                <input 
-                                    type="text" 
-                                    className="grow" 
-                                    placeholder="Search courses . . . " 
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                />
-                                <FaSearch/>
-                            </label>
-                            <div className="join">
-                                <button
-                                    className={`btn btn-sm join-item ${filters.Upcoming ? "btn-info" : ""}`}
-                                    onClick={() => toggleFilter("Upcoming")}
-                                >
-                                    Upcoming
-                                </button>
-                                <button
-                                    className={`btn btn-sm join-item ${filters.InProgress ? "btn-info" : ""}`}
-                                    onClick={() => toggleFilter("InProgress")}
-                                >
-                                    In Progress
-                                </button>
-                                <button
-                                    className={`btn btn-sm join-item ${filters.Completed ? "btn-info" : ""}`}
-                                    onClick={() => toggleFilter("Completed")}
-                                >
-                                    Completed
-                                </button>
+                            <div className="flex justify-between space-x-36">
+                                <label className="grow input input-bordered input-info flex items-center gap-2">
+                                    <input 
+                                        type="text" 
+                                        className="grow" 
+                                        placeholder="Search courses . . . " 
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                    <FaSearch/>
+                                </label>
+                                <div className="join">
+                                    <button
+                                        className={`btn join-item ${filters.Upcoming ? "btn-info" : ""}`}
+                                        onClick={() => toggleFilter("Upcoming")}
+                                    >
+                                        Upcoming
+                                    </button>
+                                    <button
+                                        className={`btn join-item ${filters.InProgress ? "btn-info" : ""}`}
+                                        onClick={() => toggleFilter("InProgress")}
+                                    >
+                                        In Progress
+                                    </button>
+                                    <button
+                                        className={`btn join-item ${filters.Completed ? "btn-info" : ""}`}
+                                        onClick={() => toggleFilter("Completed")}
+                                    >
+                                        Completed
+                                    </button>
+                                </div>
                             </div>
                             
-                            <div className="space-y-2">
-                                {enrolledCourses.map((course) => {
-                                    const { enrollmentDeadline, classes} = course;
-                                    const deadline = convertDateToMMDDYYYY(enrollmentDeadline);
-                                    const firstDayofClass = classes.length > 0 ? convertDateToMMDDYYYY(classes[0].date) : "";
-
-                                    return (
-                                        <div key={course.courseId} className="border border-info rounded-md p-2">
-                                            <Link href={`/course/${course.courseId}`}>
-                                                <h3 className="text-lg font-bold">{course.title}</h3>
-                                                <div className="flex gap-2">
-                                                    <p className="font-bold">Enrollment Deadline:</p>
-                                                    <p>{deadline}</p>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <p className="font-bold">Start Date:</p>
-                                                    <p>{firstDayofClass}</p>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                            <CourseList
+                                courses={enrolledCourses}
+                                hrefSuffix="/course"
+                            />
 
                            
                             <div className="flex justify-between">
@@ -226,30 +208,12 @@ const UserStudentHistory: React.FC<UserStudentHistoryProps> = ({ studentId }) =>
                     </div>
                     
                     {isWaitlistExpanded && (
-                        <div className="space-y-2">
-                            {waitListedCourses.map((course) => {
-                                const { enrollmentDeadline, classes} = course;
-                                const deadline = convertDateToMMDDYYYY(enrollmentDeadline);
-                                const firstDayofClass = classes.length > 0 ? convertDateToMMDDYYYY(classes[0].date) : "";
-
-                                return (
-                                    <div key={course.courseId} className="border border-info rounded-md p-2">
-                                        <Link href={`/course/${course.courseId}`}>
-                                            <h3 className="text-lg font-bold">{course.title}</h3>
-                                            <div className="flex gap-2">
-                                                <p className="font-bold">Enrollment Deadline:</p>
-                                                <p>{deadline}</p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <p className="font-bold">Start Date:</p>
-                                                <p>{firstDayofClass}</p>
-                                            </div>
-                                            
-                                        </Link>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                 
+                        <CourseList
+                            courses={waitListedCourses}
+                            hrefSuffix="/course"
+                        />
+               
                     )}
                 </>
             ) : !student && !loading ? (

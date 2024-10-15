@@ -32,6 +32,8 @@ builder.Services.AddDbContext<DataContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
 ));
 
+builder.Services.AddSingleton<EmailService>();
+
 builder.Services.AddLogging();	
 
 var app = builder.Build();

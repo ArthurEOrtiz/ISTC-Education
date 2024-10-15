@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from "react";
 import ModalBase from "../modal/modal-base";
-import { getAllCertifications } from "@/utils/api/certification";
+import { getAllCertifications, postCertification } from "@/utils/api/certification";
 
 interface CertificationButtonProps {
     studentId: number;
@@ -24,6 +24,27 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
         });
     }, []);
 
+    const handleAddCertification = async (certType: "Appraiser" | "Mapping") => {
+        setLoadingCerts(true);
+        const newCert: Certification = {
+            certificationId: 0,
+            studentId: studentId,
+            type: certType,
+            requestedDate: new Date(),
+            reviewDate: null,
+            approvedBy: null,
+            isApproved: false
+        };
+
+        postCertification(newCert).then((cert) => {
+            setCertifications([...certifications, cert]);
+        }).catch((error) => {
+            setError(error.message);
+        }).finally(() => {
+            setLoadingCerts(false);
+        });
+    }
+
 
 
     return (
@@ -40,12 +61,19 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
                 width="w-full max-w-xl"
             >
                 {error && <p>{error}</p>}
-                {loadingCerts && <p>Loading Certifications...</p>}
+                {loadingCerts && (
+                    <div className="w-full flex justify-center p-40">
+                        <span className="loading loading-spinner loading-lg"></span>
+                    </div>
+                )}
                 {!loadingCerts && !error && (
                     <div className="space-y-2">
                         {certifications.map((cert, index) => (
                             <div key={index} className="border border-info rounded-md p-4">
-                                <h2 className="text-xl font-bold">{cert.type}</h2>
+                                <div className="flex justify-between">
+                                    <h2 className="text-xl font-bold">{cert.type}</h2>
+                                    <p>Id: {cert.certificationId}</p>
+                                </div>
                                 <p>Requested: {new Date(cert.requestedDate).toLocaleDateString('en-US')}</p>
                                 <p>Status: {cert.reviewDate == null ? "Pending" : cert.isApproved ? "Approved" : "Deneied"}</p>
                             </div>
@@ -56,12 +84,14 @@ const CertificationButton: React.FC<CertificationButtonProps> = ({studentId}) =>
                     <button
                         className="btn btn-info btn-sm"
                         disabled={certifications.some(cert => cert.type === 'Mapping')}
+                        onClick={() => handleAddCertification('Mapping')}
                     >
                         Apply for Mapping Certification
                     </button>
                     <button
                         className="btn btn-info btn-sm"
                         disabled={certifications.some(cert => cert.type === 'Appraiser')}
+                        onClick={() => handleAddCertification('Appraiser')}
                     >
                         Apply for Appraiser Certification
                     </button>

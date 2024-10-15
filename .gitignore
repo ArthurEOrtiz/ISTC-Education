@@ -4,3 +4,4 @@ istc-education-spa/.env
 /istc-education-api/istc-education-api/obj
 /istc-education-api/istc-education-api/bin
 /certs
+istc-education-api/istc-education-api/appsettings.json

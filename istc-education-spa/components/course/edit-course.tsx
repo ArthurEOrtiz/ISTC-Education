@@ -157,7 +157,10 @@ const EditCourse: React.FC<EditCourseProps> = ({ course:incomingCourse }) => {
                 <div className="w-full flex justify-between">
                     <button 
                         className="btn btn-info"
-                        onClick={() => router.back()}>
+                        onClick={() => {
+                            router.refresh()
+                            router.back()
+                        }}>
                             Back
                     </button>
                     <div className="flex gap-2">

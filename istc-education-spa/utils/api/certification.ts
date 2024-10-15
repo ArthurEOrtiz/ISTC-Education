@@ -15,3 +15,11 @@ export const getAllCertifications = async (options: GetAllCertificationsOptions 
     }
 }
 
+export const postCertification = async (certification: Certification) => {
+    try {
+        const response = await axiosInstance.post('/Certification', certification);
+        return response.data as Certification;
+    } catch (error) {
+        throw new Error('Error posting certification');
+    }
+}

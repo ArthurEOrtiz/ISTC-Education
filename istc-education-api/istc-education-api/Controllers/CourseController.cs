@@ -9,8 +9,10 @@ namespace istc_education_api.Controllers
 {
 	public class CourseController : BaseController<Course>
 	{
-		public CourseController(DataContext context, ILogger<Course> logger) : base(context, logger)
+		private readonly EmailService _emailService;
+		public CourseController(DataContext context, ILogger<Course> logger, EmailService emailService) : base(context, logger)
 		{
+			_emailService = emailService;
 		}
 
 		[HttpGet]
@@ -267,6 +269,15 @@ namespace istc_education_api.Controllers
 				}
 
 				await _context.SaveChangesAsync();
+
+				if (course.Status == CourseStatus.Cancelled)
+				{
+					// Email all students enrolled in the course that the course has been cancelled
+					// But first lest test this with sending a single email to myself.
+					
+					
+					await _emailService.SendEmailAsync("ortiz.arthur.e@gmail.com", "Course Cancelled", "The course has been cancelled.");
+				}
 
 				return NoContent();
 			}

@@ -5,8 +5,8 @@ FROM Users;
 --SELECT *
 --FROM Contacts;
 
---SELECT *
---FROM Employers;
+SELECT *
+FROM Employers;
 
 SELECT *
 FROM Students;
@@ -14,8 +14,8 @@ FROM Students;
 --SELECT *
 --FROM Attendances;
 
-SELECT *
-FROM Certifications;
+--SELECT *
+--FROM Certifications;
 
 --SELECT *
 --FROM Courses;
